@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Easy Comic',
+      title: '轻松看漫画',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -30,17 +30,35 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Easy Comic'),
+        title: const Text('轻松看漫画'),
         elevation: 4,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+              } else if (value == 'about') {
+                showAboutDialog(
+                  context: context,
+                  applicationName: '轻松看漫画',
+                  applicationVersion: '1.0.0',
+                  applicationLegalese: '© 2024 The Easy Comic Authors',
+                );
+              }
             },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'settings',
+                child: Text('设置'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'about',
+                child: Text('关于'),
+              ),
+            ],
           ),
         ],
       ),
@@ -52,7 +70,7 @@ class HomePage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const ComicReaderPage()),
             );
           },
-          child: const Text('Open Comic'),
+          child: const Text('打开漫画'),
         ),
       ),
     );

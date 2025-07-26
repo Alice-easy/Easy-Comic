@@ -35,14 +35,14 @@ class _SettingsPageState extends State<SettingsPage> {
       await prefs.setString('webdav_password', _passwordController.text);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Settings saved')));
+      ).showSnackBar(const SnackBar(content: Text('设置已保存')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text('设置')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -51,31 +51,31 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               TextFormField(
                 controller: _hostController,
-                decoration: const InputDecoration(labelText: 'Host'),
+                decoration: const InputDecoration(labelText: '主机'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a host';
+                    return '请输入主机地址';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _userController,
-                decoration: const InputDecoration(labelText: 'User'),
+                decoration: const InputDecoration(labelText: '用户名'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a user';
+                    return '请输入用户名';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: '密码'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
+                    return '请输入密码';
                   }
                   return null;
                 },
@@ -83,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveSettings,
-                child: const Text('Save'),
+                child: const Text('保存'),
               ),
             ],
           ),

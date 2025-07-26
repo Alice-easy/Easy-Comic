@@ -33,7 +33,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
 
     if (host == null || user == null || password == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please configure WebDAV settings first')),
+        const SnackBar(content: Text('请先配置 WebDAV 设置')),
       );
       return;
     }
@@ -47,13 +47,13 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload ${image.path}: $e')),
+          SnackBar(content: Text('上传失败 ${image.path}: $e')),
         );
       }
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Comic uploaded successfully')),
+      const SnackBar(content: Text('漫画上传成功')),
     );
   }
 
@@ -61,13 +61,31 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Comic Reader'),
+        title: const Text('漫画阅读'),
         actions: [
-          IconButton(icon: const Icon(Icons.backup), onPressed: _uploadComic),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'upload') {
+                _uploadComic();
+              } else if (value == 'close') {
+                Navigator.pop(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'upload',
+                child: Text('上传到 WebDAV'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'close',
+                child: Text('关闭'),
+              ),
+            ],
+          ),
         ],
       ),
       body: _images.isEmpty
-          ? const Center(child: Text('No images selected.'))
+          ? const Center(child: Text('未选择图片。'))
           : PageView.builder(
               itemCount: _images.length,
               itemBuilder: (context, index) {
@@ -76,7 +94,7 @@ class _ComicReaderPageState extends State<ComicReaderPage> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _pickImages,
-        tooltip: 'Pick Images',
+        tooltip: '选择图片',
         child: const Icon(Icons.add_a_photo),
       ),
     );
