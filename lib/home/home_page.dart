@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:file_picker/file_picker.dart';
@@ -49,7 +48,7 @@ class HomePage extends ConsumerWidget {
               );
         }
       }
-      ref.refresh(comicListProvider);
+      ref.invalidate(comicListProvider);
     }
   }
 
@@ -66,7 +65,7 @@ class HomePage extends ConsumerWidget {
   void _removeComic(WidgetRef ref, Comic comic) {
     final db = ref.read(dbProvider);
     (db.delete(db.comics)..where((tbl) => tbl.id.equals(comic.id))).go();
-    ref.refresh(comicListProvider);
+    ref.invalidate(comicListProvider);
   }
 
   @override
@@ -263,36 +262,35 @@ class HomePage extends ConsumerWidget {
     await ref.read(syncProvider.notifier).sync();
 
     if (context.mounted) {
-      final syncState = ref.read(syncProvider);
-      syncState.when(
-        data: (result) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(
-                  '同步完成: 上传${result.uploaded}个，下载${result.downloaded}个',
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-        },
-        error: (error, stackTrace) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text('同步失败: $error'),
-                backgroundColor: Colors.red,
-                action: SnackBarAction(
-                  label: 'Retry',
-                  onPressed: () => ref.read(syncProvider.notifier).sync(),
-                ),
-              ),
-            );
-        },
-        loading: () {},
-      );
+      ref.read(syncProvider).when(
+            data: (result) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '同步完成: 上传${result.uploaded}个，下载${result.downloaded}个',
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+            },
+            error: (error, stackTrace) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text('同步失败: $error'),
+                    backgroundColor: Colors.red,
+                    action: SnackBarAction(
+                      label: 'Retry',
+                      onPressed: () => ref.read(syncProvider.notifier).sync(),
+                    ),
+                  ),
+                );
+            },
+            loading: () {},
+          );
     }
   }
 }

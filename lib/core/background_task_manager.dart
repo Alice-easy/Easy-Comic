@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../data/drift_db.dart';
+import 'sync_engine.dart';
 import 'task_registrar.dart';
+import 'webdav_service.dart';
 
 /// 后台任务管理器
 class BackgroundTaskManager {
@@ -42,11 +44,6 @@ void callbackDispatcher() {
   });
 }
 
-import 'package:webdav_client/webdav_client.dart';
-import '../data/drift_db.dart';
-import 'sync_engine.dart';
-import 'webdav_service.dart';
-
 /// 处理同步任务
 Future<bool> _handleSyncTask(Map<String, dynamic>? inputData) async {
   try {
@@ -58,11 +55,9 @@ Future<bool> _handleSyncTask(Map<String, dynamic>? inputData) async {
     final db = DriftDb();
     // 在实际应用中，这些配置应该来自用户的设置
     final webdavService = WebDAVService(
-      client: Client(
-        'https://dav.jianguoyun.com/dav/',
-        'user',
-        'password',
-      ),
+      host: 'https://dav.jianguoyun.com/dav/',
+      user: 'user',
+      password: 'password',
     );
     final syncEngine = SyncEngine(db: db, webdavService: webdavService);
 

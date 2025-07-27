@@ -1,23 +1,17 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:webdav_client/webdav_client.dart';
 import '../core/sync_engine.dart';
 import '../core/webdav_service.dart';
-import '../data/drift_db.dart';
 import '../models/sync_models.dart';
 import 'home_page.dart';
 
-final webdavServiceProvider = Provider<WebDAVService>((ref) {
-  // 在实际应用中，这些配置应该来自用户的设置
-  return WebDAVService(
-    client: Client(
-      'https://dav.jianguoyun.com/dav/',
-      'user',
-      'password',
-    ),
-  );
-});
+final webdavServiceProvider = Provider<WebDAVService>(
+  (ref) => WebDAVService(
+    host: 'https://dav.jianguoyun.com/dav/',
+    user: 'user',
+    password: 'password',
+  ),
+);
 
 final syncEngineProvider = Provider<SyncEngine>((ref) {
   final db = ref.watch(dbProvider);

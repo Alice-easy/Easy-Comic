@@ -10,9 +10,10 @@ void main() {
     try {
       const testFileHash = 'test_hash_123';
       const expectedCurrentPage = 2;
+      const totalPages = 10;
 
       // Insert progress
-      await database.upsertProgress(testFileHash, expectedCurrentPage);
+      await database.upsertProgress(testFileHash, expectedCurrentPage, totalPages);
 
       // Retrieve progress
       final progress = await database.getProgress(testFileHash);

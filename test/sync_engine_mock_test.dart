@@ -23,11 +23,10 @@ void main() {
     mockWebDAVService = MockWebDAVService();
 
     // 初始化同步引擎
-    syncEngine = SyncEngine.instance
-      ..initialize(
-        db: database,
-        webdavService: mockWebDAVService,
-      );
+    syncEngine = SyncEngine(
+      db: database,
+      webdavService: mockWebDAVService,
+    );
   });
 
   tearDown(() async {
@@ -37,7 +36,7 @@ void main() {
   group('SyncEngine Tests', () {
     test('should upload local data when remote is empty', () async {
       // 准备测试数据
-      await database.upsertProgress('test_file_hash', 5);
+      await database.upsertProgress('test_file_hash', 5, 10);
 
       // Mock WebDAV 行为
       when(

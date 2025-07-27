@@ -8,42 +8,29 @@ environment:
   sdk: '>=3.8.1 <4.0.0'
 
 dependencies:
+  archive: ^4.0.7
+  async: ^2.13.0
+  crypto: ^3.0.3
+  drift: ^2.18.0
+  file_picker: ^10.2.0
   flutter:
     sdk: flutter
-
-  # 状态管理
   flutter_riverpod: ^2.5.1
-
-  # 网络与文件处理
-  archive: ^4.0.7
-  file_picker: ^10.2.0
   path: ^1.8.3
   path_provider: ^2.1.4
   photo_view: ^0.15.0
   shared_preferences: ^2.5.3
-  webdav_client: ^1.2.2
-
-  # 数据库
-  drift: ^2.18.0
   sqlite3_flutter_libs: ^0.5.0
-  crypto: ^3.0.3
-
-  # 后台任务
+  webdav_client: ^1.2.2
   workmanager: ^0.8.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  # 构建与代码生成
   build_runner: ^2.4.9
   drift_dev: ^2.18.0
-
-  # 图标生成
   flutter_launcher_icons: ^0.14.4
-
-  # 代码规范与测试
   flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
   mockito: ^5.4.4
 
 flutter:

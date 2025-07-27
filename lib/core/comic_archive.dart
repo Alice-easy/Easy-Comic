@@ -55,9 +55,7 @@ class ComicArchive {
 
     final imageDataList = <Uint8List>[];
     for (final file in imageFiles) {
-      if (file.content != null) {
-        imageDataList.add(Uint8List.fromList(file.content as List<int>));
-      }
+      imageDataList.add(Uint8List.fromList(file.content as List<int>));
     }
 
     return imageDataList;

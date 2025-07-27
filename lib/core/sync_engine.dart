@@ -16,8 +16,6 @@ enum ConflictResolution {
 /// 同步状态
 enum SyncStatus { idle, syncing, error }
 
-import 'package:async/async.dart';
-
 /// 同步引擎
 class SyncEngine {
   SyncEngine({
@@ -30,7 +28,6 @@ class SyncEngine {
   final WebDAVService webdavService;
 
   // 同步配置
-  final int _concurrencyLimit = 3;
   final ConflictResolution conflictResolution;
 
   // 同步状态
@@ -104,14 +101,13 @@ class SyncEngine {
 
       // 4. 并发执行同步操作
       _setProgress(0.4);
-      final semaphore = Semaphore(_concurrencyLimit);
       final futures = <Future<void>>[];
 
       var completedOperations = 0;
       final totalOperations = operations.length;
 
       for (final operation in operations) {
-        final future = semaphore.acquire().then((_) async {
+        final future = Future(() async {
           try {
             switch (operation.type) {
               case SyncOperationType.upload:
@@ -130,7 +126,6 @@ class SyncEngine {
           } catch (e) {
             errors.add('Failed to sync ${operation.item.fileHash}: $e');
           } finally {
-            semaphore.release();
             completedOperations++;
             _setProgress(0.4 + (completedOperations / totalOperations) * 0.6);
           }
@@ -199,6 +194,7 @@ class SyncEngine {
             result[item.fileHash] = SyncDataItem(
               fileHash: item.fileHash,
               currentPage: item.currentPage,
+              totalPages: item.totalPages,
               updatedAt: item.updatedAt,
               remoteEtag: file.etag,
             );
