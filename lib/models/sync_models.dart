@@ -47,3 +47,20 @@ class SyncDataItem {
     'updatedAt': updatedAt.toIso8601String(),
   };
 }
+
+/// 漫画类，对应数据库中的Comics表
+class Comic {
+  Comic({
+    required this.id,
+    required this.filePath,
+    required this.fileName,
+    required this.addedAt,
+    this.coverImage,
+  });
+
+  final int id;
+  final String filePath;
+  final String fileName;
+  final String? coverImage;
+  final DateTime addedAt;
+}

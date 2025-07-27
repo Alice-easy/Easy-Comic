@@ -12,6 +12,7 @@ import 'package:easy_comic/main.dart';
 
 import '../core/comic_archive.dart';
 import '../data/drift_db.dart';
+import '../models/sync_models.dart' hide Comic; // 隐藏导入的Comic类，避免与Drift生成的Comic类冲突
 import '../reader/reader_page.dart';
 import '../settings/settings_page.dart';
 import 'sync_provider.dart';

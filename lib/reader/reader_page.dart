@@ -1,15 +1,16 @@
+import 'dart:convert';
 import 'dart:typed_data';
-import 'package:easy_comic/data/drift_db.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:crypto/crypto.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
 
 import '../core/comic_archive.dart';
+import '../data/drift_db.dart';
 import '../home/home_page.dart';
 
 class ReaderPage extends ConsumerStatefulWidget {

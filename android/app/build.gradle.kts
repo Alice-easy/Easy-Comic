@@ -8,16 +8,6 @@ plugins {
 }
 
 android {
-    // TODO: 这是为了解决反复出现的构建失败问题而采取的临时措施。
-    // 强烈建议您将以下签名信息移回 'key.properties' 文件，并从版本控制中忽略该文件。
-    signingConfigs {
-        create("release") {
-            keyAlias = "release"
-            keyPassword = "a_new_mock_password_123"
-            storeFile = file("C:/ADMIN/Comic/Easy-Comic/android/app/release.keystore")
-            storePassword = "a_new_mock_password_123"
-        }
-    }
     namespace = "com.example.easy_comic"
     compileSdkPreview = "UpsideDownCake"
     compileSdk = 35
@@ -42,7 +32,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -28,7 +28,7 @@ dependencies:
   workmanager: ^0.8.0
   dynamic_color: ^1.7.0
   palette_generator: ^0.3.3+3
-  home_widget: ^0.5.0
+  home_widget: ^0.8.0
 
 dev_dependencies:
   build_runner: ^2.4.9
