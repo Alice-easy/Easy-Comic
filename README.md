@@ -98,7 +98,7 @@ graph TD
             
             E --> E_UP[上传 .json 并更新本地 ETag];
             E --> E_DOWN[更新本地数据库记录];
-            E --> E_CONFLICT[根据策略解决冲突<br/>(默认: 本地优先 -> 上传)];
+            E --> E_CONFLICT["根据策略解决冲突<br/>(默认: 本地优先 -> 上传)"];
         end
     end
 
