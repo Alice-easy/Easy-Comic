@@ -1,31 +1,60 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 class ComicArchive {
-  ComicArchive(this.path);
+  ComicArchive({this.path, this.bytes})
+    : assert(
+        path != null || bytes != null,
+        'Either path or bytes must be provided.',
+      );
 
-  final String path;
+  final String? path;
+  final Uint8List? bytes;
   Archive? _archive;
+
+  // In a real app, this would use a platform channel to read the URI content.
+  static Future<ComicArchive> fromUri(String uri) async {
+    // This is a mock implementation.
+    // A real implementation would use a platform channel like this:
+    // final Uint8List bytes = await MethodChannel('com.example.easy_comic/saf')
+    //     .invokeMethod('readFile', {'uri': uri});
+    // For now, we'll throw an error if we try to use a URI directly.
+    if (uri.startsWith('content://')) {
+      throw UnsupportedError(
+        'Reading from content URIs requires a platform channel implementation.',
+      );
+    }
+    // Fallback for regular paths for testing purposes.
+    final file = File(uri);
+    final bytes = await file.readAsBytes();
+    return ComicArchive(bytes: bytes, path: uri);
+  }
 
   Future<Archive> _getArchive() async {
     if (_archive != null) {
       return _archive!;
     }
 
-    final fileExtension = p.extension(path).toLowerCase();
+    final fileExtension = p.extension(path ?? 'file.cbz').toLowerCase();
     if (!_isSupportedFormat(fileExtension)) {
       throw UnsupportedError('Unsupported file type: $fileExtension');
     }
 
-    final file = File(path);
-    final bytes = await file.readAsBytes();
+    Uint8List fileBytes;
+    if (bytes != null) {
+      fileBytes = bytes!;
+    } else {
+      final file = File(path!);
+      fileBytes = await file.readAsBytes();
+    }
 
     if (fileExtension == '.cbr') {
       throw UnsupportedError('CBR format is not yet supported');
     } else {
-      _archive = ZipDecoder().decodeBytes(bytes);
+      _archive = ZipDecoder().decodeBytes(fileBytes);
     }
 
     return _archive!;
@@ -37,10 +66,11 @@ class ComicArchive {
   Future<List<String>> listPageNames() async {
     final archive = await _getArchive();
 
-    final imageFiles = archive.files
-        .where((file) => file.isFile && _isImageFile(file.name))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final imageFiles =
+        archive.files
+            .where((file) => file.isFile && _isImageFile(file.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
 
     return imageFiles.map((file) => file.name).toList();
   }
@@ -48,10 +78,11 @@ class ComicArchive {
   Future<List<Uint8List>> listPages() async {
     final archive = await _getArchive();
 
-    final imageFiles = archive.files
-        .where((file) => file.isFile && _isImageFile(file.name))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final imageFiles =
+        archive.files
+            .where((file) => file.isFile && _isImageFile(file.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
 
     final imageDataList = <Uint8List>[];
     for (final file in imageFiles) {

@@ -37,5 +37,6 @@ class SyncNotifier extends AsyncNotifier<SyncResult> {
   }
 }
 
-final syncProvider =
-    AsyncNotifierProvider<SyncNotifier, SyncResult>(SyncNotifier.new);
+final syncProvider = AsyncNotifierProvider<SyncNotifier, SyncResult>(
+  SyncNotifier.new,
+);

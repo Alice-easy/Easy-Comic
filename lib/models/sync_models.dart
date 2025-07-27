@@ -27,11 +27,11 @@ class SyncDataItem {
   });
 
   factory SyncDataItem.fromJson(Map<String, dynamic> json) => SyncDataItem(
-        fileHash: json['fileHash'] as String,
-        currentPage: json['currentPage'] as int,
-        totalPages: json['totalPages'] as int,
-        updatedAt: DateTime.parse(json['updatedAt'] as String),
-      );
+    fileHash: json['fileHash'] as String,
+    currentPage: json['currentPage'] as int,
+    totalPages: json['totalPages'] as int,
+    updatedAt: DateTime.parse(json['updatedAt'] as String),
+  );
 
   final String fileHash;
   final int currentPage;
@@ -41,9 +41,9 @@ class SyncDataItem {
   final String? remoteEtag;
 
   Map<String, dynamic> toJson() => {
-        'fileHash': fileHash,
-        'currentPage': currentPage,
-        'totalPages': totalPages,
-        'updatedAt': updatedAt.toIso8601String(),
-      };
+    'fileHash': fileHash,
+    'currentPage': currentPage,
+    'totalPages': totalPages,
+    'updatedAt': updatedAt.toIso8601String(),
+  };
 }

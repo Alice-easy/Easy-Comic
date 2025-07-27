@@ -62,14 +62,16 @@ class WebDAVService {
     try {
       final files = await _client.readDir(remotePath);
       return files
-          .map((file) => WebDAVFileInfo(
-                name: file.name ?? '',
-                path: file.path ?? '',
-                isDirectory: file.isDir ?? false,
-                size: file.size,
-                modifiedTime: file.mTime,
-                etag: file.eTag,
-              ))
+          .map(
+            (file) => WebDAVFileInfo(
+              name: file.name ?? '',
+              path: file.path ?? '',
+              isDirectory: file.isDir ?? false,
+              size: file.size,
+              modifiedTime: file.mTime,
+              etag: file.eTag,
+            ),
+          )
           .toList();
     } catch (e) {
       throw RemoteException(

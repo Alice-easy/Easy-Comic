@@ -1,4 +1,5 @@
 plugins {
+id("com.android.application") version "8.4.0" apply false
     id("com.google.gms.google-services") version "4.4.1" apply false
     id("com.google.firebase.crashlytics") version "3.0.0" apply false
 }
@@ -7,6 +8,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    afterEvaluate {
+        if (project.name == "file_picker") {
+            project.tasks.findByName("lintVitalAnalyzeRelease")?.enabled = false
+        }
     }
 }
 

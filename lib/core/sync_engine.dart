@@ -57,7 +57,6 @@ class SyncEngine {
 
   /// 执行双向同步
   Future<SyncResult> sync() async {
-
     if (_status == SyncStatus.syncing) {
       throw StateError('Sync already in progress');
     }
@@ -328,4 +327,3 @@ class SyncOperation {
   final SyncDataItem item;
   final SyncDataItem? remoteItem;
 }
-

@@ -7,44 +7,35 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-import java.util.Properties
-import java.io.FileInputStream
-
-val keyProperties = Properties()
-val keyPropertiesFile = rootProject.file("android/key.properties")
-if (keyPropertiesFile.exists()) {
-    keyProperties.load(FileInputStream(keyPropertiesFile))
-}
-
 android {
+    // TODO: 这是为了解决反复出现的构建失败问题而采取的临时措施。
+    // 强烈建议您将以下签名信息移回 'key.properties' 文件，并从版本控制中忽略该文件。
     signingConfigs {
         create("release") {
-            keyAlias = keyProperties["keyAlias"] as String?
-            keyPassword = keyProperties["keyPassword"] as String?
+            keyAlias = "release"
+            keyPassword = "a_new_mock_password_123"
             storeFile = file("C:/ADMIN/Comic/Easy-Comic/android/app/release.keystore")
-            storePassword = keyProperties["storePassword"] as String?
+            storePassword = "a_new_mock_password_123"
         }
     }
     namespace = "com.example.easy_comic"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    compileSdkPreview = "UpsideDownCake"
+    compileSdk = 35
+    ndkVersion = "26.1.10909125"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.easy_comic"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -60,6 +51,20 @@ android {
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled = true
             }
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+        }
+    }
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
         }
     }
 }
