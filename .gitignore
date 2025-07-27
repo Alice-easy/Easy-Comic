@@ -65,6 +65,3 @@
 .flutter-plugins-dependencies
 .flutter-plugins
 pubspec.lock
-
-# Allow APKs in the release folder
-!/build/app/outputs/apk/release/*.apk
