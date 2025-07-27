@@ -33,6 +33,9 @@ class _SettingsPageState extends State<SettingsPage> {
       await prefs.setString('webdav_host', _hostController.text);
       await prefs.setString('webdav_user', _userController.text);
       await prefs.setString('webdav_password', _passwordController.text);
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('设置已保存')));
@@ -40,55 +43,50 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('设置')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _hostController,
-                decoration: const InputDecoration(labelText: '主机'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入主机地址';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _userController,
-                decoration: const InputDecoration(labelText: '用户名'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入用户名';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: '密码'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '请输入密码';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveSettings,
-                child: const Text('保存'),
-              ),
-            ],
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('设置')),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _hostController,
+                  decoration: const InputDecoration(labelText: '主机'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入主机地址';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _userController,
+                  decoration: const InputDecoration(labelText: '用户名'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入用户名';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(labelText: '密码'),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入密码';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(onPressed: _saveSettings, child: const Text('保存')),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }
