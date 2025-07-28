@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -190,9 +189,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           return PhotoViewGallery.builder(
             scrollPhysics: const BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
-              final int firstPageIndex = index * 2;
-              final int secondPageIndex = firstPageIndex + 1;
-              final bool hasSecondPage = secondPageIndex < _pages!.length;
+              final firstPageIndex = index * 2;
+              final secondPageIndex = firstPageIndex + 1;
+              final hasSecondPage = secondPageIndex < _pages!.length;
 
               return PhotoViewGalleryPageOptions.customChild(
                 child: Row(

@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class SettingsStore with ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.system;
-  ThemeMode get themeMode => _themeMode;
-
   SettingsStore() {
     final dispatcher = SchedulerBinding.instance.platformDispatcher;
     dispatcher.onPlatformBrightnessChanged = () {
@@ -15,6 +12,8 @@ class SettingsStore with ChangeNotifier {
       notifyListeners();
     };
   }
+  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode get themeMode => _themeMode;
 
   void setThemeMode(ThemeMode mode) {
     _themeMode = mode;

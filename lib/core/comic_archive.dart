@@ -100,21 +100,22 @@ class ComicArchive {
         extension.endsWith('.gif') ||
         extension.endsWith('.webp');
   }
-  
+
   /// 获取漫画封面图像
   Future<Uint8List?> getCoverImage() async {
     final archive = await _getArchive();
-    
+
     // 查找第一个图像文件作为封面
-    final imageFiles = archive.files
-        .where((file) => file.isFile && _isImageFile(file.name))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
-      
+    final imageFiles =
+        archive.files
+            .where((file) => file.isFile && _isImageFile(file.name))
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+
     if (imageFiles.isEmpty) {
       return null;
     }
-    
+
     final firstImage = imageFiles.first;
     return Uint8List.fromList(firstImage.content as List<int>);
   }

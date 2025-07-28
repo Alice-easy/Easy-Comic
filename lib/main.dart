@@ -1,9 +1,6 @@
 import 'dart:ui';
 
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:easy_comic/data/drift_db.dart';
-import 'package:easy_comic/firebase_options.dart';
-import 'package:easy_comic/settings/settings_store.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -12,17 +9,20 @@ import 'package:home_widget/home_widget.dart';
 
 import 'core/background_task_manager.dart';
 import 'core/task_registrar.dart';
+import 'data/drift_db.dart';
+import 'firebase_options.dart';
 import 'home/home_page.dart';
+import 'settings/settings_store.dart';
 
 final seedColorProvider = StateProvider<Color>((ref) => Colors.deepPurple);
 final settingsStoreProvider = ChangeNotifierProvider((ref) => SettingsStore());
 final dbProvider = Provider((ref) => DriftDb());
 
-void updateWidget() async {
+Future<void> updateWidget() async {
   final db = DriftDb();
   final minutes = await db.getThisWeekReadingMinutes();
-  HomeWidget.saveWidgetData<int>('minutes', minutes);
-  HomeWidget.updateWidget(
+  await HomeWidget.saveWidgetData<int>('minutes', minutes);
+  await HomeWidget.updateWidget(
     name: 'ComicsWidgetProvider',
     androidName: 'ComicsWidgetProvider',
   );
@@ -30,7 +30,7 @@ void updateWidget() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HomeWidget.registerInteractivityCallback(backgroundCallback);
+  await HomeWidget.registerInteractivityCallback(backgroundCallback);
 
   // 初始化 Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -51,7 +51,7 @@ void main() async {
   // 注册后台任务
   await TaskRegistrar.registerTasks();
 
-  updateWidget();
+  await updateWidget();
 
   runApp(const ProviderScope(child: MyApp()));
 }

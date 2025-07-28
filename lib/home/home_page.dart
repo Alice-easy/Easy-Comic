@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 import 'package:palette_generator/palette_generator.dart';
-import 'package:easy_comic/main.dart';
+import 'package:path/path.dart' as p;
 
 import '../core/comic_archive.dart';
 import '../data/drift_db.dart';
-import '../models/sync_models.dart' hide Comic; // 隐藏导入的Comic类，避免与Drift生成的Comic类冲突
+import '../main.dart';
 import '../reader/reader_page.dart';
 import '../settings/settings_page.dart';
 import 'sync_provider.dart';
@@ -60,8 +60,12 @@ class HomePage extends ConsumerWidget {
     }
   }
 
-  void _openComic(BuildContext context, WidgetRef ref, Comic comic) async {
-    FirebaseAnalytics.instance.logEvent(name: 'read_start');
+  Future<void> _openComic(
+    BuildContext context,
+    WidgetRef ref,
+    Comic comic,
+  ) async {
+    await FirebaseAnalytics.instance.logEvent(name: 'read_start');
     final comicArchive = ComicArchive(path: comic.filePath);
     final coverImage = await comicArchive.getCoverImage();
     if (coverImage != null) {
@@ -75,6 +79,7 @@ class HomePage extends ConsumerWidget {
     }
 
     if (context.mounted) {
+      // ignore: unawaited_futures
       Navigator.push<void>(
         context,
         MaterialPageRoute(
