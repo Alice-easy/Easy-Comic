@@ -19,17 +19,36 @@ import 'sync_provider.dart';
 
 final dbProvider = Provider((ref) => DriftDb());
 
+enum SortOrder { byName, byDate, byProgress }
+
+final sortOrderProvider = StateProvider<SortOrder>((ref) => SortOrder.byName);
+final favoritesFilterProvider = StateProvider<bool>((ref) => false);
+
 final comicListProvider = FutureProvider<List<Comic>>((ref) async {
   final db = ref.watch(dbProvider);
-  return db.select(db.comics).get();
-});
+  final sortOrder = ref.watch(sortOrderProvider);
+  final showFavoritesOnly = ref.watch(favoritesFilterProvider);
 
-final comicProgressProvider = FutureProvider.family<ComicProgressData?, String>(
-  (ref, fileHash) async {
-    final db = ref.watch(dbProvider);
-    return db.getProgress(fileHash);
-  },
-);
+  final query = db.select(db.comics);
+
+  if (showFavoritesOnly) {
+    query.where((tbl) => tbl.isFavorite.equals(true));
+  }
+
+  switch (sortOrder) {
+    case SortOrder.byName:
+      query.orderBy([(tbl) => drift.OrderingTerm(expression: tbl.fileName)]);
+      break;
+    case SortOrder.byDate:
+      query.orderBy([(tbl) => drift.OrderingTerm(expression: tbl.lastReadAt, mode: drift.OrderingMode.desc)]);
+      break;
+    case SortOrder.byProgress:
+      query.orderBy([(tbl) => drift.OrderingTerm(expression: tbl.progress, mode: drift.OrderingMode.desc)]);
+      break;
+  }
+
+  return query.get();
+});
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -110,6 +129,27 @@ class HomePage extends ConsumerWidget {
             onPressed: () => _pickComicFile(ref),
             tooltip: '添加漫画',
           ),
+          PopupMenuButton<SortOrder>(
+            icon: const Icon(Icons.sort),
+            tooltip: '排序方式',
+            onSelected: (SortOrder result) {
+              ref.read(sortOrderProvider.notifier).state = result;
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<SortOrder>>[
+              const PopupMenuItem<SortOrder>(
+                value: SortOrder.byName,
+                child: Text('按名称'),
+              ),
+              const PopupMenuItem<SortOrder>(
+                value: SortOrder.byDate,
+                child: Text('按最近阅读'),
+              ),
+              const PopupMenuItem<SortOrder>(
+                value: SortOrder.byProgress,
+                child: Text('按进度'),
+              ),
+            ],
+          ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'settings') {
@@ -127,6 +167,16 @@ class HomePage extends ConsumerWidget {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              CheckedPopupMenuItem<bool>(
+                value: ref.watch(favoritesFilterProvider),
+                checked: ref.watch(favoritesFilterProvider),
+                child: const Text('仅显示收藏'),
+                onTap: () {
+                  final current = ref.read(favoritesFilterProvider);
+                  ref.read(favoritesFilterProvider.notifier).state = !current;
+                },
+              ),
+              const PopupMenuDivider(),
               const PopupMenuItem<String>(value: 'settings', child: Text('设置')),
               const PopupMenuItem<String>(value: 'about', child: Text('关于')),
             ],
@@ -192,7 +242,6 @@ class HomePage extends ConsumerWidget {
     itemCount: comics.length,
     itemBuilder: (context, index) {
       final comic = comics[index];
-      final fileHash = sha1.convert(utf8.encode(comic.filePath)).toString();
 
       return Card(
         elevation: 4,
@@ -261,6 +310,22 @@ class HomePage extends ConsumerWidget {
                               ),
                             ),
                             IconButton(
+                              icon: Icon(
+                                comic.isFavorite ? Icons.star : Icons.star_border,
+                                color: comic.isFavorite ? Colors.amber : Colors.grey,
+                                size: 20,
+                              ),
+                              onPressed: () async {
+                                final db = ref.read(dbProvider);
+                                await (db.update(db.comics)..where((tbl) => tbl.id.equals(comic.id))).write(
+                                  ComicsCompanion(isFavorite: drift.Value(!comic.isFavorite)),
+                                );
+                                ref.invalidate(comicListProvider);
+                              },
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            IconButton(
                               icon: const Icon(Icons.delete, size: 16),
                               onPressed: () => _removeComic(ref, comic),
                               padding: EdgeInsets.zero,
@@ -273,32 +338,19 @@ class HomePage extends ConsumerWidget {
                   ),
                 ],
               ),
-              Consumer(
-                builder: (context, ref, child) {
-                  final progress = ref.watch(comicProgressProvider(fileHash));
-                  return progress.when(
-                    data: (data) {
-                      if (data == null || data.totalPages == 0) {
-                        return const SizedBox.shrink();
-                      }
-                      return Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: LinearProgressIndicator(
-                          value: data.currentPage / data.totalPages,
-                          backgroundColor: Colors.grey[300],
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Colors.deepPurple,
-                          ),
-                        ),
-                      );
-                    },
-                    loading: () => const SizedBox.shrink(),
-                    error: (err, stack) => const SizedBox.shrink(),
-                  );
-                },
-              ),
+              if (comic.progress > 0 && comic.progress < 1)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(
+                    value: comic.progress,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Colors.deepPurple,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

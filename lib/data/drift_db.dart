@@ -14,6 +14,17 @@ class Comics extends Table {
   TextColumn get fileName => text()();
   TextColumn get coverImage => text().nullable()();
   DateTimeColumn get addedAt => dateTime()();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get lastReadAt => dateTime().nullable()();
+  RealColumn get progress => real().withDefault(const Constant(0.0))();
+}
+
+class Bookmarks extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get comicId => integer().references(Comics, #id)();
+  IntColumn get pageIndex => integer()();
+  TextColumn get label => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
 }
 
 class ComicProgress extends Table {
@@ -34,7 +45,7 @@ class ReadingSessions extends Table {
 }
 
 // Database class
-@DriftDatabase(tables: [Comics, ComicProgress, ReadingSessions])
+@DriftDatabase(tables: [Comics, ComicProgress, ReadingSessions, Bookmarks])
 class DriftDb extends _$DriftDb {
   DriftDb() : super(_openConnection());
 
@@ -42,7 +53,7 @@ class DriftDb extends _$DriftDb {
   DriftDb.withExecutor(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -57,6 +68,12 @@ class DriftDb extends _$DriftDb {
       }
       if (from < 4) {
         await m.createTable(readingSessions);
+      }
+      if (from < 5) {
+        await m.addColumn(comics, comics.isFavorite);
+        await m.addColumn(comics, comics.lastReadAt);
+        await m.addColumn(comics, comics.progress);
+        await m.createTable(bookmarks);
       }
     },
   );

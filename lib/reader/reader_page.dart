@@ -12,6 +12,13 @@ import '../core/comic_archive.dart';
 import '../data/drift_db.dart';
 import '../home/home_page.dart';
 
+final bookmarksProvider =
+    FutureProvider.family<List<Bookmark>, int>((ref, comicId) async {
+  final db = ref.watch(dbProvider);
+  return (db.select(db.bookmarks)..where((tbl) => tbl.comicId.equals(comicId)))
+      .get();
+});
+
 class ReaderPage extends ConsumerStatefulWidget {
   const ReaderPage({
     required this.comicArchive,
@@ -47,6 +54,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   void dispose() {
     _pageController.dispose();
     _saveReadingSession();
+    _updateProgress(isDisposing: true);
     super.dispose();
   }
 
@@ -92,10 +100,38 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     }
   }
 
+  Future<void> _updateProgress({bool isDisposing = false}) async {
+    if (_pages == null || _pages!.isEmpty) return;
+
+    final db = ref.read(dbProvider);
+    final fileHash =
+        sha1.convert(utf8.encode(widget.comicArchive.path!)).toString();
+    final progress = (_currentPage + 1) / _pages!.length;
+
+    // Find the comic id from file path
+    final comic = await (db.select(db.comics)
+          ..where((tbl) => tbl.filePath.equals(widget.comicArchive.path!)))
+        .getSingleOrNull();
+
+    if (comic != null) {
+      await (db.update(db.comics)..where((tbl) => tbl.id.equals(comic.id)))
+          .write(
+        ComicsCompanion(
+          progress: Value(progress),
+          lastReadAt: Value(DateTime.now()),
+        ),
+      );
+    }
+    if (!isDisposing) {
+      ref.invalidate(comicListProvider);
+    }
+  }
+
   void _onPageChanged(int index) {
     setState(() {
       _currentPage = index;
     });
+    _updateProgress();
     FirebaseAnalytics.instance.logEvent(
       name: 'page_flipped',
       parameters: {'page': index},
@@ -111,10 +147,106 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       title: _pages != null
           ? Text('${_currentPage + 1} / ${_pages!.length}')
           : const Text('漫画阅读器'),
-      actions: [if (_pages != null) _buildInfoButton()],
+      actions: [
+        if (_pages != null)
+          IconButton(
+            icon: const Icon(Icons.bookmark_add_outlined),
+            tooltip: '添加书签',
+            onPressed: _showAddBookmarkDialog,
+          ),
+        if (_pages != null)
+          IconButton(
+            icon: const Icon(Icons.bookmarks_outlined),
+            tooltip: '书签列表',
+            onPressed: _showBookmarks,
+          ),
+        if (_pages != null) _buildInfoButton()
+      ],
     ),
     body: _buildBody(),
   );
+
+  Future<void> _showAddBookmarkDialog() async {
+    final db = ref.read(dbProvider);
+    final comic = await (db.select(db.comics)
+          ..where((tbl) => tbl.filePath.equals(widget.comicArchive.path!)))
+        .getSingleOrNull();
+    if (comic == null) return;
+
+    final textController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('添加书签'),
+        content: TextField(
+          controller: textController,
+          decoration: const InputDecoration(hintText: '书签描述 (可选)'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('添加'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await db.into(db.bookmarks).insert(
+            BookmarksCompanion(
+              comicId: Value(comic.id),
+              pageIndex: Value(_currentPage),
+              label: Value(textController.text),
+              createdAt: Value(DateTime.now()),
+            ),
+          );
+      ref.invalidate(bookmarksProvider(comic.id));
+    }
+  }
+
+  Future<void> _showBookmarks() async {
+    final db = ref.read(dbProvider);
+    final comic = await (db.select(db.comics)
+          ..where((tbl) => tbl.filePath.equals(widget.comicArchive.path!)))
+        .getSingleOrNull();
+    if (comic == null) return;
+
+    final bookmarks = ref.watch(bookmarksProvider(comic.id));
+
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => bookmarks.when(
+        data: (data) => ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            final bookmark = data[index];
+            return ListTile(
+              title: Text('第 ${bookmark.pageIndex + 1} 页'),
+              subtitle: bookmark.label != null ? Text(bookmark.label!) : null,
+              onTap: () {
+                _pageController.jumpToPage(bookmark.pageIndex);
+                Navigator.of(context).pop();
+              },
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () async {
+                  await (db.delete(db.bookmarks)..where((tbl) => tbl.id.equals(bookmark.id))).go();
+                  ref.invalidate(bookmarksProvider(comic.id));
+                  Navigator.of(context).pop();
+                },
+              ),
+            );
+          },
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+      ),
+    );
+  }
 
   Widget _buildInfoButton() => IconButton(
     icon: const Icon(Icons.info_outline),
