@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/sync_engine.dart';
 import '../core/webdav_service.dart';
+import '../main.dart';
 import '../models/sync_models.dart';
-import 'home_page.dart';
 
 final webdavServiceProvider = Provider<WebDAVService>(
   (ref) => WebDAVService(

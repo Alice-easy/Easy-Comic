@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -17,9 +15,21 @@ import '../reader/reader_page.dart';
 import '../settings/settings_page.dart';
 import 'sync_provider.dart';
 
-final dbProvider = Provider((ref) => DriftDb());
-
+/// 漫画排序方式枚举
 enum SortOrder { byName, byDate, byProgress }
+
+/// 封面图片缓存Provider
+/// 
+/// 使用 FutureProvider.family 缓存每个漫画文件的封面图片，
+/// 避免重复读取和提高UI性能
+final coverImageProvider = FutureProvider.family<Uint8List?, String>((ref, filePath) async {
+  try {
+    final comicArchive = ComicArchive(path: filePath);
+    return await comicArchive.getCoverImage();
+  } catch (e) {
+    return null;
+  }
+});
 
 final sortOrderProvider = StateProvider<SortOrder>((ref) => SortOrder.byName);
 final favoritesFilterProvider = StateProvider<bool>((ref) => false);
@@ -50,9 +60,20 @@ final comicListProvider = FutureProvider<List<Comic>>((ref) async {
   return query.get();
 });
 
+/// 主页组件
+/// 
+/// 显示漫画库，包含以下功能：
+/// - 漫画文件管理（添加、删除、收藏）
+/// - 多种排序方式（按名称、日期、进度）
+/// - 同步功能
+/// - 设置和关于页面导航
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  /// 选择并添加漫画文件
+  /// 
+  /// 使用 FilePicker 选择 CBZ/ZIP 文件，支持多选，
+  /// 并将选中的文件添加到数据库中
   Future<void> _pickComicFile(WidgetRef ref) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -79,6 +100,10 @@ class HomePage extends ConsumerWidget {
     }
   }
 
+  /// 打开漫画阅读器
+  /// 
+  /// 提取封面图片生成主题色彩，然后导航到阅读器页面
+  /// 同时记录 Firebase Analytics 事件
   Future<void> _openComic(
     BuildContext context,
     WidgetRef ref,
@@ -108,6 +133,9 @@ class HomePage extends ConsumerWidget {
     }
   }
 
+  /// 从库中移除漫画
+  /// 
+  /// 从数据库中删除漫画记录并刷新列表
   void _removeComic(WidgetRef ref, Comic comic) {
     final db = ref.read(dbProvider);
     (db.delete(db.comics)..where((tbl) => tbl.id.equals(comic.id))).go();
@@ -164,17 +192,16 @@ class HomePage extends ConsumerWidget {
                   applicationVersion: '1.0.0',
                   applicationLegalese: '© 2024 The Easy Comic Authors',
                 );
+              } else if (value == 'toggle_favorites') {
+                final current = ref.read(favoritesFilterProvider);
+                ref.read(favoritesFilterProvider.notifier).state = !current;
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              CheckedPopupMenuItem<bool>(
-                value: ref.watch(favoritesFilterProvider),
+              CheckedPopupMenuItem<String>(
+                value: 'toggle_favorites',
                 checked: ref.watch(favoritesFilterProvider),
                 child: const Text('仅显示收藏'),
-                onTap: () {
-                  final current = ref.read(favoritesFilterProvider);
-                  ref.read(favoritesFilterProvider.notifier).state = !current;
-                },
               ),
               const PopupMenuDivider(),
               const PopupMenuItem<String>(value: 'settings', child: Text('设置')),
@@ -254,30 +281,54 @@ class HomePage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
-                    child: FutureBuilder<Uint8List?>(
-                      future: ComicArchive(
-                        path: comic.filePath,
-                      ).getCoverImage(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            snapshot.hasData &&
-                            snapshot.data != null) {
-                          return Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final coverAsync = ref.watch(coverImageProvider(comic.filePath));
+                        return coverAsync.when(
+                          data: (coverData) {
+                            if (coverData != null) {
+                              return Image.memory(
+                                coverData,
+                                fit: BoxFit.cover,
+                              );
+                            }
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                color: Colors.grey[200],
+                              ),
+                              child: const Icon(
+                                Icons.book,
+                                size: 80,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                          loading: () => Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              color: Colors.grey[200],
                             ),
-                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.book,
-                            size: 80,
-                            color: Colors.grey,
+                          error: (_, __) => Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              color: Colors.grey[200],
+                            ),
+                            child: const Icon(
+                              Icons.book,
+                              size: 80,
+                              color: Colors.grey,
+                            ),
                           ),
                         );
                       },
@@ -361,38 +412,38 @@ class HomePage extends ConsumerWidget {
   Future<void> _performSync(WidgetRef ref, BuildContext context) async {
     await ref.read(syncProvider.notifier).sync();
 
-    if (context.mounted) {
-      ref
-          .read(syncProvider)
-          .when(
-            data: (result) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '同步完成: 上传${result.uploaded}个，下载${result.downloaded}个',
-                    ),
-                    backgroundColor: Colors.green,
+    if (!context.mounted) return;
+
+    ref
+        .read(syncProvider)
+        .when(
+          data: (result) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '同步完成: 上传${result.uploaded}个，下载${result.downloaded}个',
                   ),
-                );
-            },
-            error: (error, stackTrace) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Text('同步失败: $error'),
-                    backgroundColor: Colors.red,
-                    action: SnackBarAction(
-                      label: 'Retry',
-                      onPressed: () => ref.read(syncProvider.notifier).sync(),
-                    ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('同步失败: $error'),
+                  backgroundColor: Colors.red,
+                  action: SnackBarAction(
+                    label: 'Retry',
+                    onPressed: () => ref.read(syncProvider.notifier).sync(),
                   ),
-                );
-            },
-            loading: () {},
-          );
-    }
+                ),
+              );
+          },
+          loading: () {},
+        );
   }
 }

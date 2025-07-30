@@ -1,0 +1,183 @@
+// @spec_version: 1.0
+// @project: Easy-Comic Reader Optimization
+// @author: Spec-Pseudocode Mode
+// @description: This specification outlines the functional enhancements and architectural refactoring for the comic reader feature. It is designed to align with the BLoC pattern, separating UI, business logic, and data layers.
+
+// =================================
+// 1. State Management (BLoC Core)
+// =================================
+// Defines the states and events for the reader, forming the core of the BLoC architecture.
+
+// 1.1. ReaderState
+// Represents the entire state of the reader UI at any given moment. It must be immutable.
+CLASS ReaderState:
+    PROPERTY comic: ComicInfo // Basic info of the comic being read
+    PROPERTY pages: List<Image> // Pre-loaded image data for pages
+    PROPERTY currentPage: Integer
+    PROPERTY totalPages: Integer
+    PROPERTY bookmarks: List<Bookmark>
+    PROPERTY isLoading: Boolean
+    PROPERTY error: String?
+    
+    // New properties for optimization
+    PROPERTY settings: ReaderSettings
+    PROPERTY isUiVisible: Boolean // Controls visibility of AppBar, BottomBar, etc.
+    PROPERTY zoomScale: Double
+
+// 1.2. ReaderEvent
+// Represents user interactions or lifecycle events that the BLoC will process.
+ABSTRACT CLASS ReaderEvent:
+
+CLASS LoadComicEvent EXTENDS ReaderEvent:
+    PROPERTY comicId: String
+
+CLASS PageChangedEvent EXTENDS ReaderEvent:
+    PROPERTY newPage: Integer
+
+CLASS ZoomChangedEvent EXTENDS ReaderEvent:
+    PROPERTY newScale: Double
+
+CLASS ToggleUiVisibilityEvent EXTENDS ReaderEvent:
+
+CLASS UpdateSettingEvent EXTENDS ReaderEvent:
+    PROPERTY newSettings: ReaderSettings
+
+CLASS AddBookmarkEvent EXTENDS ReaderEvent:
+    PROPERTY label: String?
+
+CLASS DeleteBookmarkEvent EXTENDS ReaderEvent:
+    PROPERTY bookmarkId: Integer
+
+// =================================
+// 2. Data & Service Layer
+// =================================
+// Abstracted repositories for data access.
+
+// 2.1. ComicRepository
+// Handles fetching comic data and pages.
+CLASS ComicRepository:
+    FUNCTION getComicInfo(comicId): ComicInfo
+    FUNCTION getComicPages(comicPath): List<Image>
+    FUNCTION getBookmarks(comicId): List<Bookmark>
+    FUNCTION saveBookmark(comicId, page, label): Bookmark
+    FUNCTION deleteBookmark(bookmarkId): Void
+    FUNCTION updateReadingProgress(comicId, page, totalPages): Void
+
+// 2.2. SettingsRepository
+// Manages persistence of user's reading preferences.
+CLASS SettingsRepository:
+    FUNCTION getReaderSettings(): ReaderSettings
+    FUNCTION saveReaderSettings(settings: ReaderSettings): Void
+
+// =================================
+// 3. Core Feature Modules (Conceptual)
+// =================================
+
+// 3.1. ReaderSettings
+// A data class to hold all customizable settings.
+CLASS ReaderSettings:
+    PROPERTY brightness: Double // 0.0 to 1.0
+    PROPERTY backgroundColor: Color // e.g., DAY, NIGHT, SEPIA
+    PROPERTY pageTurnMode: Enum // HORIZONTAL_SLIDE, VERTICAL_SCROLL
+    PROPERTY pageTurnAnimation: Enum // SLIDE, FADE, NONE
+
+// 3.2. UI Components (Widgets)
+// Describes the UI structure. Widgets are stateless and react to `ReaderState`.
+
+// 3.2.1. ReaderScreen (Main Widget)
+// The top-level widget that subscribes to the ReaderBloc.
+FUNCTION ReaderScreen(comicId):
+    INITIALIZE ReaderBloc with ComicRepository and SettingsRepository
+    DISPATCH LoadComicEvent(comicId)
+    
+    BUILD_WIDGET based on ReaderState:
+        IF state.isLoading:
+            RETURN LoadingIndicator
+        ELSE IF state.error:
+            RETURN ErrorMessage(error: state.error)
+        ELSE:
+            RETURN STACK:
+                - ReaderGestureDetector // Handles all gestures
+                - PageViewComponent(state) // Displays comic pages
+                - ScreenBrightnessOverlay(state.settings.brightness)
+                - TopMenuBar(state) // Visible if state.isUiVisible
+                - BottomProgressBar(state) // Visible if state.isUiVisible
+
+// 3.2.2. ReaderGestureDetector
+// Captures user input and dispatches events.
+FUNCTION ReaderGestureDetector(child):
+    ON singleTap:
+        DISPATCH ToggleUiVisibilityEvent()
+    ON doubleTap:
+        DISPATCH ZoomChangedEvent(newScale: current_scale * 2) // Or reset zoom
+    ON horizontalDrag / verticalDrag:
+        IF settings.pageTurnMode == VERTICAL_SCROLL:
+            // Handle vertical scroll
+        ELSE:
+            // Let PageView handle horizontal swipes
+    ON pinchZoom:
+        DISPATCH ZoomChangedEvent(newScale: event.scale)
+
+// 3.2.3. PageViewComponent
+// Displays pages based on current settings.
+FUNCTION PageViewComponent(state: ReaderState):
+    IF state.settings.pageTurnMode == VERTICAL_SCROLL:
+        RETURN ListView.builder(
+            itemCount: state.totalPages,
+            itemBuilder: (index) -> Page(image: state.pages[index])
+        )
+    ELSE: // HORIZONTAL_SLIDE
+        RETURN PhotoViewGallery.builder(
+            pageController: PageController(initialPage: state.currentPage),
+            itemCount: state.totalPages,
+            onPageChanged: (newPage) -> DISPATCH PageChangedEvent(newPage: newPage),
+            builder: (index) -> PhotoView(image: state.pages[index], scale: state.zoomScale)
+        )
+
+// 3.2.4. TopMenuBar
+// Displays title, page number, and action buttons.
+FUNCTION TopMenuBar(state: ReaderState):
+    RETURN AnimatedOpacity(
+        opacity: state.isUiVisible ? 1.0 : 0.0,
+        child: AppBar(
+            title: "${state.currentPage + 1} / ${state.totalPages}",
+            actions: [
+                SettingsButton(onClick: -> SHOW SettingsPanel),
+                BookmarksButton(onClick: -> SHOW BookmarksList)
+            ]
+        )
+    )
+
+// 3.2.5. BottomProgressBar
+// A draggable progress bar.
+FUNCTION BottomProgressBar(state: ReaderState):
+    RETURN AnimatedOpacity(
+        opacity: state.isUiVisible ? 1.0 : 0.0,
+        child: Slider(
+            value: state.currentPage,
+            max: state.totalPages - 1,
+            onChanged: (newPage) -> DISPATCH PageChangedEvent(newPage: newPage.toInt())
+        )
+    )
+
+// 3.2.6. SettingsPanel
+// A modal or bottom sheet for adjusting reading settings.
+FUNCTION SettingsPanel(currentSettings: ReaderSettings):
+    // Brightness Slider
+    SLIDER for brightness:
+        value: currentSettings.brightness
+        onChanged: (newBrightness) -> DISPATCH UpdateSettingEvent(settings.with(brightness: newBrightness))
+    
+    // Background Color Selector
+    BUTTON_GROUP for backgroundColor:
+        options: ["Day", "Night", "Sepia"]
+        selected: currentSettings.backgroundColor
+        onSelect: (newColor) -> DISPATCH UpdateSettingEvent(settings.with(backgroundColor: newColor))
+
+    // Page Turn Mode Selector
+    BUTTON_GROUP for pageTurnMode:
+        options: ["Horizontal", "Vertical"]
+        selected: currentSettings.pageTurnMode
+        onSelect: (newMode) -> DISPATCH UpdateSettingEvent(settings.with(pageTurnMode: newMode))
+
+END

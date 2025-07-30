@@ -162,10 +162,41 @@ class WebDAVService {
   /// 检查文件或目录是否存在
   Future<bool> exists(String remotePath) async {
     try {
-      await _client.read(remotePath);
-      return true;
+      // 使用更高效的 HEAD 请求风格检查（通过 getFileInfo）
+      final fileInfo = await getFileInfo(remotePath);
+      return fileInfo != null;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// 移动/重命名文件
+  Future<void> move(String fromPath, String toPath) async {
+    try {
+      // WebDAV客户端可能不支持move方法，使用copy + remove替代
+      await copy(fromPath, toPath);
+      await remove(fromPath);
+    } catch (e) {
+      throw RemoteException(
+        'Failed to move from $fromPath to $toPath',
+        e as Exception?,
+      );
+    }
+  }
+
+  /// 复制文件
+  Future<void> copy(String fromPath, String toPath) async {
+    try {
+      // 先下载文件，再上传到新位置
+      final tempFile = io.File('${io.Directory.systemTemp.path}/temp_copy_${DateTime.now().millisecondsSinceEpoch}');
+      await download(fromPath, tempFile.path);
+      await upload(tempFile.path, toPath);
+      await tempFile.delete();
+    } catch (e) {
+      throw RemoteException(
+        'Failed to copy from $fromPath to $toPath',
+        e as Exception?,
+      );
     }
   }
 }

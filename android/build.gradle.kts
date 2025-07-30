@@ -8,6 +8,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.aliyun.com/repository/public")
     }
     afterEvaluate {
         if (project.name == "file_picker") {

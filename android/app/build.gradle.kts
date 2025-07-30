@@ -39,7 +39,7 @@ android {
                 "proguard-rules.pro"
             )
             firebaseCrashlytics {
-                nativeSymbolUploadEnabled = true
+                nativeSymbolUploadEnabled = false
             }
         }
     }

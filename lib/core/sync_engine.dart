@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import '../data/drift_db.dart';
 import '../models/sync_models.dart';
+import 'constants.dart';
+import 'error_handler.dart';
 import 'webdav_service.dart';
 
 /// 同步冲突解决策略
@@ -123,7 +125,13 @@ class SyncEngine {
                 break;
             }
           } catch (e) {
-            errors.add('Failed to sync ${operation.item.fileHash}: $e');
+            final appError = ErrorHandler.convertToAppError(e);
+            errors.add('Failed to sync ${operation.item.fileHash}: ${appError.userMessage}');
+            await ErrorHandler.handleError(
+              e,
+              stackTrace: StackTrace.current,
+              context: 'SyncEngine._performSync',
+            );
           } finally {
             completedOperations++;
             _setProgress(0.4 + (completedOperations / totalOperations) * 0.6);
@@ -167,22 +175,22 @@ class SyncEngine {
   Future<Map<String, SyncDataItem>> _getRemoteData() async {
     try {
       // 确保远程目录存在
-      await webdavService.mkdir('/comic_progress/');
+      await webdavService.mkdir(AppConstants.syncProgressPath);
     } catch (e) {
       // 目录可能已存在，忽略错误
     }
 
     try {
-      final files = await webdavService.listDir('/comic_progress/');
+      final files = await webdavService.listDir(AppConstants.syncProgressPath);
       final result = <String, SyncDataItem>{};
 
       for (final file in files) {
-        if (!file.isDirectory && file.name.endsWith('.json')) {
+        if (!file.isDirectory && file.name.endsWith(AppConstants.jsonExtension)) {
           try {
             // 使用临时文件下载
             final tempFile = File(p.join(Directory.systemTemp.path, file.name));
             await webdavService.download(
-              '/comic_progress/${file.name}',
+              '${AppConstants.syncProgressPath}${file.name}',
               tempFile.path,
             );
             final content = await tempFile.readAsString();
@@ -251,8 +259,8 @@ class SyncEngine {
 
   /// 上传数据到远程
   Future<void> _uploadData(SyncDataItem item) async {
-    final fileName = '${item.fileHash}.json';
-    final remotePath = '/comic_progress/$fileName';
+    final fileName = '${item.fileHash}${AppConstants.jsonExtension}';
+    final remotePath = '${AppConstants.syncProgressPath}$fileName';
 
     // 创建临时文件
     final tempFile = File(p.join(Directory.systemTemp.path, fileName));

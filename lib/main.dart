@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 
 import 'core/background_task_manager.dart';
+import 'core/constants.dart';
 import 'core/task_registrar.dart';
 import 'data/drift_db.dart';
 import 'firebase_options.dart';
@@ -16,16 +17,24 @@ import 'settings/settings_store.dart';
 
 final seedColorProvider = StateProvider<Color>((ref) => Colors.deepPurple);
 final settingsStoreProvider = ChangeNotifierProvider((ref) => SettingsStore());
-final dbProvider = Provider((ref) => DriftDb());
+
+// 数据库单例Provider
+final dbProvider = Provider<DriftDb>((ref) {
+  final db = DriftDb();
+  ref.onDispose(() => db.close());
+  return db;
+});
 
 Future<void> updateWidget() async {
-  final db = DriftDb();
+  final container = ProviderContainer();
+  final db = container.read(dbProvider);
   final minutes = await db.getThisWeekReadingMinutes();
   await HomeWidget.saveWidgetData<int>('minutes', minutes);
   await HomeWidget.updateWidget(
-    name: 'ComicsWidgetProvider',
-    androidName: 'ComicsWidgetProvider',
+    name: AppConstants.comicsWidgetProvider,
+    androidName: AppConstants.comicsWidgetProvider,
   );
+  container.dispose();
 }
 
 void main() async {
@@ -43,8 +52,7 @@ void main() async {
   };
 
   // 模拟用户登录并设置用户ID
-  const userId = 'user-12345';
-  await FirebaseCrashlytics.instance.setUserIdentifier(userId);
+  await FirebaseCrashlytics.instance.setUserIdentifier(AppConstants.defaultUserId);
 
   // 初始化后台任务管理器
   await BackgroundTaskManager.initialize();
@@ -87,7 +95,7 @@ class MyApp extends ConsumerWidget {
         }
 
         return MaterialApp(
-          title: 'Easy Comic',
+          title: AppConstants.appName,
           theme: ThemeData(colorScheme: lightColorScheme, useMaterial3: true),
           darkTheme: ThemeData(
             colorScheme: darkColorScheme,
