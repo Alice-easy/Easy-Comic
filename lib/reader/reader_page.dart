@@ -14,17 +14,24 @@ import '../core/comic_archive.dart';
 import '../data/drift_db.dart';
 import '../home/home_page.dart';
 import '../main.dart';
+import '../models/reader_models.dart' as models;
+import '../core/brightness_service.dart';
+import 'widgets/reader_core.dart';
+import 'mixins/navigation_handler.dart';
+import 'mixins/settings_handler.dart';
 
 /// Riverpod Provider for managing bookmarks by comic ID
 final bookmarksProvider =
-    FutureProvider.family<List<Bookmark>, int>((ref, comicId) async {
+    FutureProvider.family<List<models.Bookmark>, int>((ref, comicId) async {
   final db = ref.watch(dbProvider);
-  return (db.select(db.bookmarks)..where((tbl) => tbl.comicId.equals(comicId)))
+  final bookmarksData = await (db.select(db.bookmarks)..where((tbl) => tbl.comicId.equals(comicId)))
       .get();
+  
+  return bookmarksData.map((data) => models.Bookmark.fromData(data)).toList();
 });
 
 /// 漫画阅读器页面
-/// 
+///
 /// 提供以下功能：
 /// - 显示漫画页面（支持单页和双页模式）
 /// - 翻页和缩放操作
@@ -46,17 +53,43 @@ class ReaderPage extends ConsumerStatefulWidget {
   ConsumerState<ReaderPage> createState() => _ReaderPageState();
 }
 
-class _ReaderPageState extends ConsumerState<ReaderPage> {
+class _ReaderPageState extends ConsumerState<ReaderPage> with NavigationHandler, SettingsHandler {
   late PageController _pageController;
   List<Uint8List>? _pages;
+  List<Uint8List>? _orderedPages; // Pages with custom order applied
   bool _isLoading = true;
   String? _error;
   int _currentPage = 0;
   late DateTime _startTime;
+  bool _showUi = true;
+  String? _sessionId;
+  int? _comicId;
+
+  // NavigationHandler implementation
+  @override
+  int get currentPage => _currentPage;
   
+  @override
+  int get totalPages => _orderedPages?.length ?? 0;
+  
+  @override
+  PageController get pageController => _pageController;
+  
+  @override
+  void updateCurrentPage(int page) {
+    setState(() {
+      _currentPage = page;
+    });
+  }
+  
+  @override
+  void updateProgress() {
+    _updateProgress();
+  }
+
   // 缓存文件哈希以避免重复计算
   String? _cachedFileHash;
-  
+
   // 用于批量更新进度的定时器
   Timer? _progressUpdateTimer;
   bool _hasPendingProgressUpdate = false;
@@ -66,9 +99,15 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     super.initState();
     _startTime = DateTime.now();
     _currentPage = widget.initialPage;
+    _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
     _pageController = PageController(initialPage: widget.initialPage);
-    _loadPages();
     
+    // Initialize after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeServices();
+      _loadPages();
+    });
+
     // 每2秒批量更新一次进度，避免频繁的数据库写入
     _progressUpdateTimer = Timer.periodic(const Duration(seconds: 2), (_) {
       if (_hasPendingProgressUpdate) {
@@ -76,6 +115,17 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
         _hasPendingProgressUpdate = false;
       }
     });
+  }
+
+  /// Initialize services
+  Future<void> _initializeServices() async {
+    final db = ref.read(dbProvider);
+    
+    // Find comic ID
+    final comic = await (db.select(db.comics)
+          ..where((tbl) => tbl.filePath.equals(widget.comicArchive.path!)))
+        .getSingleOrNull();
+    _comicId = comic?.id;
   }
 
   @override
@@ -86,7 +136,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     _updateProgress(isDisposing: true, force: true);
     super.dispose();
   }
-  
+
   /// 获取缓存的文件哈希
   String get _fileHash {
     _cachedFileHash ??= sha1
@@ -96,7 +146,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   }
 
   /// 保存阅读会话到数据库
-  /// 
+  ///
   /// 记录本次阅读的开始时间、结束时间和总时长
   Future<void> _saveReadingSession() async {
     final db = ref.read(dbProvider);
@@ -114,21 +164,53 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   }
 
   /// 加载漫画页面数据
-  /// 
-  /// 从 ComicArchive 中提取所有页面图片，并设置 Firebase Crashlytics 自定义键
+  ///
+  /// 从 ComicArchive 中提取所有页面图片，应用自定义排序，并设置 Firebase Crashlytics 自定义键
   Future<void> _loadPages() async {
     try {
       final pages = await widget.comicArchive.listPages();
+      
+      // Apply custom page order if available
+      List<Uint8List> orderedPages = pages;
+      if (_comicId != null) {
+        final db = ref.read(dbProvider);
+        final customOrder = await db.getCustomPageOrder(_comicId!);
+        if (customOrder.isNotEmpty) {
+          // Apply custom ordering based on database records
+          final Map<int, int> orderMap = {};
+          for (final order in customOrder) {
+            orderMap[order.originalIndex] = order.customIndex;
+          }
+          
+          final List<Uint8List> reorderedPages = List.filled(pages.length, pages[0]);
+          for (int i = 0; i < pages.length; i++) {
+            final newIndex = orderMap[i] ?? i;
+            if (newIndex < reorderedPages.length) {
+              reorderedPages[newIndex] = pages[i];
+            }
+          }
+          orderedPages = reorderedPages;
+        }
+      }
+      
       // 设置 fileHash 自定义键
       final fileName = widget.comicArchive.path?.split('/').last;
       if (fileName != null) {
         await FirebaseCrashlytics.instance.setCustomKey('fileName', fileName);
       }
+      
       if (mounted) {
         setState(() {
           _pages = pages;
+          _orderedPages = orderedPages;
           _isLoading = false;
         });
+        
+        // Add to reading history
+        if (_comicId != null && _sessionId != null) {
+          final db = ref.read(dbProvider);
+          await db.addToReadingHistory(_comicId!, _currentPage, _sessionId!);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -141,7 +223,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   }
 
   /// 更新阅读进度
-  /// 
+  ///
   /// 支持批量更新模式以减少数据库写入频率。
   /// - [isDisposing]: 是否正在销毁组件，如果是则强制更新
   /// - [force]: 是否强制立即更新，否则只标记待更新
@@ -175,50 +257,311 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     }
   }
 
-  /// 处理页面切换事件
-  /// 
-  /// 更新当前页面状态，触发进度更新，并记录 Firebase Analytics 事件
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
-    });
-    _updateProgress();
-    FirebaseAnalytics.instance.logEvent(
-      name: 'page_flipped',
-      parameters: {'page': index},
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch reader settings and UI state
+    final readerSettings = ref.watch(readerSettingsProvider);
+    final readerUIState = ref.watch(readerUIStateProvider);
+    final brightness = ref.watch(brightnessProvider);
+    
+    return readerSettings.when(
+      data: (settings) => _buildReader(context, settings, readerUIState, brightness),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 64),
+              const SizedBox(height: 16),
+              Text('加载设置失败: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(readerSettingsProvider),
+                child: const Text('重试'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.black,
-    appBar: AppBar(
-      backgroundColor: Colors.black.withAlpha((255 * 0.7).round()),
-      foregroundColor: Colors.white,
-      title: _pages != null
-          ? Text('${_currentPage + 1} / ${_pages!.length}')
-          : const Text('漫画阅读器'),
-      actions: [
-        if (_pages != null)
-          IconButton(
-            icon: const Icon(Icons.bookmark_add_outlined),
-            tooltip: '添加书签',
-            onPressed: _showAddBookmarkDialog,
+  Widget _buildReader(BuildContext context, models.ReaderSettings settings, models.ReaderUIState uiState, double brightness) {
+    final backgroundColor = uiState.brightnessOverlayEnabled && uiState.customBrightness != null
+        ? settings.backgroundTheme.color
+        : settings.backgroundTheme.color;
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AnimatedOpacity(
+          opacity: uiState.showControls ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: AppBar(
+            backgroundColor: backgroundColor.withAlpha((255 * 0.7).round()),
+            foregroundColor: _getForegroundColor(settings.backgroundTheme),
+            title: _orderedPages != null
+                ? Text('${_currentPage + 1} / ${_orderedPages!.length}')
+                : const Text('漫画阅读器'),
+            actions: [
+              if (_orderedPages != null) buildModeButton(settings),
+              if (_orderedPages != null) buildDirectionButton(settings),
+              if (_orderedPages != null) buildBrightnessButton(settings, uiState),
+              if (_orderedPages != null) buildBackgroundButton(settings),
+              if (_orderedPages != null)
+                IconButton(
+                  icon: const Icon(Icons.bookmark_add_outlined),
+                  tooltip: '添加书签',
+                  onPressed: _showAddBookmarkDialog,
+                ),
+              if (_orderedPages != null)
+                IconButton(
+                  icon: const Icon(Icons.bookmarks_outlined),
+                  tooltip: '书签列表',
+                  onPressed: _showBookmarks,
+                ),
+              if (_orderedPages != null) _buildInfoButton(),
+            ],
           ),
-        if (_pages != null)
-          IconButton(
-            icon: const Icon(Icons.bookmarks_outlined),
-            tooltip: '书签列表',
-            onPressed: _showBookmarks,
+        ),
+      ),
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              ref.read(readerUIStateProvider.notifier).toggleControls();
+            },
+            child: _buildBody(settings, uiState),
           ),
-        if (_pages != null) _buildInfoButton()
+          if (uiState.brightnessOverlayEnabled && uiState.customBrightness != null)
+            _buildBrightnessOverlay(uiState.customBrightness!),
+        ],
+      ),
+      bottomNavigationBar: AnimatedOpacity(
+        opacity: uiState.showProgress && uiState.showControls ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 200),
+        child: _orderedPages == null || _orderedPages!.isEmpty
+            ? null
+            : BottomAppBar(
+                color: backgroundColor.withAlpha((255 * 0.7).round()),
+                child: Slider(
+                  value: _currentPage.toDouble(),
+                  min: 0,
+                  max: (_orderedPages!.length - 1).toDouble(),
+                  activeColor: _getForegroundColor(settings.backgroundTheme),
+                  inactiveColor: _getForegroundColor(settings.backgroundTheme).withOpacity(0.3),
+                  onChanged: (value) {
+                    setState(() {
+                      _currentPage = value.toInt();
+                    });
+                  },
+                  onChangeEnd: (value) {
+                    _pageController.jumpToPage(value.toInt());
+                  },
+                ),
+              ),
+      ),
+    );
+  }
+
+  /// Get foreground color based on background theme
+  Color _getForegroundColor(models.BackgroundTheme theme) {
+    switch (theme) {
+      case models.BackgroundTheme.black:
+      case models.BackgroundTheme.grey:
+        return Colors.white;
+      case models.BackgroundTheme.white:
+      case models.BackgroundTheme.sepia:
+        return Colors.black;
+    }
+  }
+
+  /// Build reading mode button
+  Widget _buildModeButton(models.ReaderSettings settings) {
+    return PopupMenuButton<models.ReadingMode>(
+      icon: Icon(_getModeIcon(settings.readingMode)),
+      tooltip: '阅读模式',
+      onSelected: (mode) => ref.read(readerSettingsProvider.notifier).updateReadingMode(mode),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: models.ReadingMode.single,
+          child: Row(
+            children: [
+              Icon(_getModeIcon(models.ReadingMode.single)),
+              const SizedBox(width: 8),
+              const Text('单页模式'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: models.ReadingMode.dual,
+          child: Row(
+            children: [
+              Icon(_getModeIcon(models.ReadingMode.dual)),
+              const SizedBox(width: 8),
+              const Text('双页模式'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: models.ReadingMode.continuous,
+          child: Row(
+            children: [
+              Icon(_getModeIcon(models.ReadingMode.continuous)),
+              const SizedBox(width: 8),
+              const Text('连续滚动'),
+            ],
+          ),
+        ),
       ],
-    ),
-    body: _buildBody(),
-  );
+    );
+  }
+
+  /// Build navigation direction button
+  Widget _buildDirectionButton(models.ReaderSettings settings) {
+    return PopupMenuButton<models.NavigationDirection>(
+      icon: Icon(getDirectionIcon(settings.navigationDirection)),
+      tooltip: '阅读方向',
+      onSelected: (direction) => ref.read(readerSettingsProvider.notifier).updateNavigationDirection(direction),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: models.NavigationDirection.horizontal,
+          child: Row(
+            children: [
+              Icon(getDirectionIcon(models.NavigationDirection.horizontal)),
+              const SizedBox(width: 8),
+              const Text('从左到右'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: models.NavigationDirection.rtl,
+          child: Row(
+            children: [
+              Icon(getDirectionIcon(models.NavigationDirection.rtl)),
+              const SizedBox(width: 8),
+              const Text('从右到左'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: models.NavigationDirection.vertical,
+          child: Row(
+            children: [
+              Icon(getDirectionIcon(models.NavigationDirection.vertical)),
+              const SizedBox(width: 8),
+              const Text('从上到下'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build brightness button with slider
+  Widget _buildBrightnessButton(models.ReaderSettings settings, models.ReaderUIState uiState) {
+    return PopupMenuButton<void>(
+      icon: const Icon(Icons.brightness_6),
+      tooltip: '亮度调节',
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          enabled: false,
+          child: SizedBox(
+            width: 200,
+            child: Column(
+              children: [
+                Text('亮度: ${(settings.brightness * 100).round()}%'),
+                Slider(
+                  value: settings.brightness,
+                  onChanged: (value) => ref.read(readerSettingsProvider.notifier).updateBrightness(value),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => ref.read(brightnessProvider.notifier).autoAdjustBrightness(),
+                      child: const Text('自动'),
+                    ),
+                    TextButton(
+                      onPressed: () => ref.read(readerUIStateProvider.notifier).toggleBrightnessOverlay(),
+                      child: Text(uiState.brightnessOverlayEnabled ? '关闭覆盖' : '启用覆盖'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build background theme button
+  Widget _buildBackgroundButton(models.ReaderSettings settings) {
+    return PopupMenuButton<models.BackgroundTheme>(
+      icon: Icon(Icons.palette, color: settings.backgroundTheme.color == Colors.black ? Colors.white : Colors.black),
+      tooltip: '背景主题',
+      onSelected: (theme) => ref.read(readerSettingsProvider.notifier).updateBackgroundTheme(theme),
+      itemBuilder: (context) => models.BackgroundTheme.values.map((theme) => PopupMenuItem(
+        value: theme,
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: theme.color,
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(theme.displayName),
+            if (settings.backgroundTheme == theme)
+              const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Icon(Icons.check, size: 16),
+              ),
+          ],
+        ),
+      )).toList(),
+    );
+  }
+
+  /// Build brightness overlay
+  Widget _buildBrightnessOverlay(double brightness) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(1.0 - brightness),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Get icon for reading mode
+  IconData _getModeIcon(models.ReadingMode mode) {
+    switch (mode) {
+      case models.ReadingMode.single:
+        return Icons.crop_portrait;
+      case models.ReadingMode.dual:
+        return Icons.crop_landscape;
+      case models.ReadingMode.continuous:
+        return Icons.view_day;
+      case models.ReadingMode.vertical:
+        return Icons.view_stream;
+    }
+  }
 
   /// 显示添加书签对话框
-  /// 
+  ///
   /// 允许用户为当前页面添加书签，可选择提供标签描述
   Future<void> _showAddBookmarkDialog() async {
     final db = ref.read(dbProvider);
@@ -266,7 +609,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   }
 
   /// 显示书签列表底部弹出菜单
-  /// 
+  ///
   /// 用户可以查看所有书签，点击跳转到对应页面，或删除书签
   Future<void> _showBookmarks() async {
     final db = ref.read(dbProvider);
@@ -287,10 +630,10 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           itemBuilder: (context, index) {
             final bookmark = data[index];
             return ListTile(
-              title: Text('第 ${bookmark.pageIndex + 1} 页'),
-              subtitle: bookmark.label != null ? Text(bookmark.label!) : null,
+              title: Text('第 ${bookmark.page + 1} 页'),
+              subtitle: bookmark.label != null && bookmark.label!.isNotEmpty ? Text(bookmark.label!) : null,
               onTap: () {
-                _pageController.jumpToPage(bookmark.pageIndex);
+                _pageController.jumpToPage(bookmark.page);
                 if (mounted) {
                   Navigator.of(context).pop();
                 }
@@ -315,41 +658,44 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   }
 
   Widget _buildInfoButton() => IconButton(
-    icon: const Icon(Icons.info_outline),
-    onPressed: () {
-      showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('漫画信息'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('总页数: ${_pages!.length}'),
-              Text('当前页: ${_currentPage + 1}'),
-              Text('文件: ${widget.comicArchive.path?.split('/').last ?? 'N/A'}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('关闭'),
+        icon: const Icon(Icons.info_outline),
+        onPressed: () {
+          showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('漫画信息'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('总页数: ${_pages!.length}'),
+                  Text('当前页: ${_currentPage + 1}'),
+                  Text('文件: ${widget.comicArchive.path?.split('/').last ?? 'N/A'}'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('关闭'),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 
-  Widget _buildBody() {
+  Widget _buildBody(models.ReaderSettings settings, models.ReaderUIState uiState) {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 16),
-            Text('正在加载漫画...', style: TextStyle(color: Colors.white)),
+            CircularProgressIndicator(color: _getForegroundColor(settings.backgroundTheme)),
+            const SizedBox(height: 16),
+            Text(
+              '正在加载漫画...',
+              style: TextStyle(color: getForegroundColor(settings.backgroundTheme)),
+            ),
           ],
         ),
       );
@@ -364,7 +710,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
             const SizedBox(height: 16),
             Text(
               '加载失败: $_error',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: getForegroundColor(settings.backgroundTheme)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -374,91 +720,23 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       );
     }
 
-    if (_pages == null || _pages!.isEmpty) {
-      return const Center(
-        child: Text('没有找到漫画页面', style: TextStyle(color: Colors.white)),
+    if (_orderedPages == null || _orderedPages!.isEmpty) {
+      return Center(
+        child: Text(
+          '没有找到漫画页面',
+          style: TextStyle(color: getForegroundColor(settings.backgroundTheme)),
+        ),
       );
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
-          // 双页视图
-          return PhotoViewGallery.builder(
-            scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              final firstPageIndex = index * 2;
-              final secondPageIndex = firstPageIndex + 1;
-              final hasSecondPage = secondPageIndex < _pages!.length;
-
-              return PhotoViewGalleryPageOptions.customChild(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: PhotoView(
-                        imageProvider: MemoryImage(_pages![firstPageIndex]),
-                        initialScale: PhotoViewComputedScale.contained,
-                        minScale: PhotoViewComputedScale.contained * 0.5,
-                        maxScale: PhotoViewComputedScale.covered * 3.0,
-                        heroAttributes: PhotoViewHeroAttributes(
-                          tag: 'comic_page_$firstPageIndex',
-                        ),
-                      ),
-                    ),
-                    if (hasSecondPage)
-                      Expanded(
-                        child: PhotoView(
-                          imageProvider: MemoryImage(_pages![secondPageIndex]),
-                          initialScale: PhotoViewComputedScale.contained,
-                          minScale: PhotoViewComputedScale.contained * 0.5,
-                          maxScale: PhotoViewComputedScale.covered * 3.0,
-                          heroAttributes: PhotoViewHeroAttributes(
-                            tag: 'comic_page_$secondPageIndex',
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                initialScale: PhotoViewComputedScale.contained,
-                minScale: PhotoViewComputedScale.contained * 0.5,
-                maxScale: PhotoViewComputedScale.covered * 3.0,
-                heroAttributes: PhotoViewHeroAttributes(
-                  tag: 'dual_page_$index',
-                ),
-              );
-            },
-            itemCount: (_pages!.length / 2).ceil(),
-            loadingBuilder: (context, event) => const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-            pageController: _pageController,
-            onPageChanged: (index) => _onPageChanged(index * 2),
-            backgroundDecoration: const BoxDecoration(color: Colors.black),
-          );
-        } else {
-          // 单页视图
-          return PhotoViewGallery.builder(
-            scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) =>
-                PhotoViewGalleryPageOptions(
-                  imageProvider: MemoryImage(_pages![index]),
-                  initialScale: PhotoViewComputedScale.contained,
-                  minScale: PhotoViewComputedScale.contained * 0.5,
-                  maxScale: PhotoViewComputedScale.covered * 3.0,
-                  heroAttributes: PhotoViewHeroAttributes(
-                    tag: 'comic_page_$index',
-                  ),
-                ),
-            itemCount: _pages!.length,
-            loadingBuilder: (context, event) => const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-            pageController: _pageController,
-            onPageChanged: _onPageChanged,
-            backgroundDecoration: const BoxDecoration(color: Colors.black),
-          );
-        }
-      },
+    // Use reading mode and navigation direction from settings
+    return ReaderCore(
+      pages: _orderedPages!,
+      settings: settings,
+      pageController: _pageController,
+      currentPage: _currentPage,
+      onPageChanged: onPageChanged, // Use mixin method
+      onTap: () => ref.read(readerUIStateProvider.notifier).toggleControls(),
     );
   }
 

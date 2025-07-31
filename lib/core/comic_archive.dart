@@ -4,12 +4,39 @@ import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
+/// Performs a "natural sort" on strings, correctly handling numbers.
+/// For example, "page10.jpg" will come after "page2.jpg".
+int naturalCompare(String s1, String s2) {
+  final re = RegExp(r'([0-9]+|[^0-9]+)');
+  final s1parts = re.allMatches(s1).map((m) => m.group(0)!).toList();
+  final s2parts = re.allMatches(s2).map((m) => m.group(0)!).toList();
+
+  final len = s1parts.length < s2parts.length ? s1parts.length : s2parts.length;
+
+  for (var i = 0; i < len; i++) {
+    final p1 = s1parts[i];
+    final p2 = s2parts[i];
+    final n1 = int.tryParse(p1);
+    final n2 = int.tryParse(p2);
+
+    if (n1 != null && n2 != null) {
+      final cmp = n1.compareTo(n2);
+      if (cmp != 0) return cmp;
+    } else {
+      final cmp = p1.compareTo(p2);
+      if (cmp != 0) return cmp;
+    }
+  }
+
+  return s1parts.length.compareTo(s2parts.length);
+}
+
 class ComicArchive {
   ComicArchive({this.path, this.bytes})
-    : assert(
-        path != null || bytes != null,
-        'Either path or bytes must be provided.',
-      );
+      : assert(
+          path != null || bytes != null,
+          'Either path or bytes must be provided.',
+        );
 
   final String? path;
   final Uint8List? bytes;
@@ -66,11 +93,10 @@ class ComicArchive {
   Future<List<String>> listPageNames() async {
     final archive = await _getArchive();
 
-    final imageFiles =
-        archive.files
-            .where((file) => file.isFile && _isImageFile(file.name))
-            .toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
+    final imageFiles = archive.files
+        .where((file) => file.isFile && _isImageFile(file.name))
+        .toList()
+      ..sort((a, b) => naturalCompare(a.name, b.name));
 
     return imageFiles.map((file) => file.name).toList();
   }
@@ -78,11 +104,10 @@ class ComicArchive {
   Future<List<Uint8List>> listPages() async {
     final archive = await _getArchive();
 
-    final imageFiles =
-        archive.files
-            .where((file) => file.isFile && _isImageFile(file.name))
-            .toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
+    final imageFiles = archive.files
+        .where((file) => file.isFile && _isImageFile(file.name))
+        .toList()
+      ..sort((a, b) => naturalCompare(a.name, b.name));
 
     final imageDataList = <Uint8List>[];
     for (final file in imageFiles) {
@@ -106,17 +131,15 @@ class ComicArchive {
     final archive = await _getArchive();
 
     // 查找第一个图像文件作为封面
-    final imageFiles =
-        archive.files
-            .where((file) => file.isFile && _isImageFile(file.name))
-            .toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
+    final imageFiles = archive.files
+        .where((file) => file.isFile && _isImageFile(file.name))
+        .toList()
+      ..sort((a, b) => naturalCompare(a.name, b.name));
 
     if (imageFiles.isEmpty) {
       return null;
     }
 
-    final firstImage = imageFiles.first;
-    return Uint8List.fromList(firstImage.content as List<int>);
+    return Uint8List.fromList(imageFiles.first.content as List<int>);
   }
 }

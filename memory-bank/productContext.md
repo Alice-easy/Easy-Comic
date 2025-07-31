@@ -25,6 +25,10 @@ This file provides a high-level overview of the project and the expected product
     *   多种预设背景颜色（如护眼模式、夜间模式）。
     *   *   可选择不同的翻页动画效果（如拟物、平移、淡入淡出）。
 
+*   **页面排序与导航**:
+    *   添加可拖动的翻页进度条，用于快速导航。
+    *   支持基于文件名的页面自动排序。
+    *   支持用户通过拖拽缩略图进行手动页面排序，并持久化保存该设置。
 ## Key Features
 
 *   

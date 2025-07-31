@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- 兼容 Android 13 以下版本 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    
+    <!-- 亮度控制权限 -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:label="Easy Comic"
