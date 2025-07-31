@@ -7,6 +7,7 @@ This file tracks the project's progress using a task list format.
 
 ## Completed Tasks
 
+* [2025-07-31T21:54:48Z] - **Completed Task**: Performed project cleanup by removing unused dependencies and legacy code related to the old Riverpod architecture.
 * [2025-07-30 09:23:10] - Successfully packaged APK.
 
 ## Current Tasks
@@ -15,7 +16,13 @@ This file tracks the project's progress using a task list format.
 
 ## Next Steps
 
-*
+* [2025-07-31T18:54:00Z] - **READY FOR IMPLEMENTATION**: 规范文档完成，建议Code模式开始实现第一优先级功能（核心MVP）
+* 实现顺序建议：
+  1. 基础文件加载和页面显示
+  2. 手势控制和导航
+  3. BLoC架构搭建
+  4. 基本UI界面
+  5. 设置存储功能
 * [2025-07-30T08:25:54Z] - **Completed Task**: 根据规范文档更新了 Reader BLoC 的基础结构 (`ReaderState`, `ReaderEvent`, `ReaderBloc`)。
 * [2025-07-30T08:30:35Z] - **Completed Task**: 在 `ReaderBloc` 中为 `LoadComicEvent` 事件实现了业务逻辑，包括加载状态管理和模拟数据生成。
 * [2025-07-30T08:33:58Z] - **Completed Task**: 在 `ReaderBloc` 中完成了 `PageChangedEvent` 的业务逻辑实现。
@@ -38,3 +45,125 @@ This file tracks the project's progress using a task list format.
 - [START] 2025-07-30T16:43:05Z - Creating Android signing and packaging guide.
 - [END] 2025-07-30T16:43:55Z - Finished creating Android signing and packaging guide.
 - [2025-07-30T17:13:01.898Z] - SUCCESS: Android release APK build completed. Files are located in `build/app/outputs/flutter-apk/`.
+
+## Recent Completed Tasks (2025-07-31)
+
+* [2025-07-31T18:49:00Z] - **COMPLETED**: 创建了全面的Flutter漫画阅读器技术规范文档，包含8个主要功能模块的详细设计
+* [2025-07-31T18:52:00Z] - **COMPLETED**: 设计并实现了1340+行的模块化伪代码架构，涵盖完整的BLoC模式实现
+* [2025-07-31T18:53:00Z] - **COMPLETED**: 更新Memory Bank文档，反映项目当前状态和下一步行动计划
+* **SPECIFICATIONS CREATED**:
+  - [`specs/flutter_comic_reader_comprehensive_spec.md`](../specs/flutter_comic_reader_comprehensive_spec.md) - 完整技术规范(1089行)
+  - [`specs/flutter_comic_reader_pseudocode.pseudo`](../specs/flutter_comic_reader_pseudocode.pseudo) - 模块化伪代码(1343行)
+## Architecture Design Phase Completed
+
+### Completed Tasks
+* [2025-07-31T19:07:39Z] - 完成技术规范文档分析（1248行完整规范）
+* [2025-07-31T19:07:39Z] - 完成伪代码架构分析（1499行模块化实现）
+* [2025-07-31T19:07:39Z] - 完成现有项目结构分析（main.dart, pubspec.yaml, database schema）
+* [2025-07-31T19:07:39Z] - 创建系统整体架构文档（flutter_comic_reader_system_architecture.md, 674行）
+* [2025-07-31T19:07:39Z] - 创建核心组件架构文档（core_components_architecture.md, 675行）
+* [2025-07-31T19:07:39Z] - 设计三层架构：UI层 → BLoC层 → Data层
+* [2025-07-31T19:07:39Z] - 设计Repository模式数据访问抽象
+* [2025-07-31T19:07:39Z] - 设计GetIt依赖注入策略
+* [2025-07-31T19:07:39Z] - 设计多级智能缓存系统（内存缓存+磁盘缓存+预加载队列）
+* [2025-07-31T19:07:39Z] - 设计内存压力监控机制（80%/90%/95%阈值）
+* [2025-07-31T19:07:39Z] - 设计平台适配架构（Android/iOS抽象接口）
+* [2025-07-31T19:07:39Z] - 更新Memory Bank架构信息（decisionLog.md, systemPatterns.md）
+
+### Current Tasks
+* [2025-07-31T19:07:39Z] - 生成最终架构文档（整合所有架构设计成果）
+
+### Next Steps
+* [2025-07-31T19:07:39Z] - 准备进入代码实现阶段
+## 核心阅读组件实现阶段完成 (2025-07-31)
+
+### Completed Tasks - 数据层实现
+* [2025-07-31T20:24:48Z] - 完成ComicRepositoryImpl实现（50行），支持漫画数据的完整CRUD操作
+* [2025-07-31T20:25:03Z] - 完成SettingsRepositoryImpl实现（42行），集成SharedPreferences支持
+* [2025-07-31T20:25:27Z] - 完成BookmarkRepositoryImpl实现（38行），支持书签管理功能
+* [2025-07-31T20:26:07Z] - 完成CacheServiceImpl智能缓存系统实现（179行）：
+  - LRU内存缓存算法
+  - 内存压力监控（80%/90%/95%阈值）
+  - 自动缓存清理策略
+  - 优先级预加载队列
+* [2025-07-31T20:26:34Z] - 完成NavigationServiceImpl导航服务实现（93行），支持手势识别和自动翻页
+* [2025-07-31T20:26:50Z] - 完成ThemeServiceImpl主题服务实现（48行），支持亮度和主题管理
+* [2025-07-31T20:27:13Z] - 完成AutoPageServiceImpl自动翻页服务实现（88行），支持定时器控制和事件流
+
+### Completed Tasks - UI层组件实现
+* [2025-07-31T20:29:05Z] - 完成ReaderScreen新BLoC架构页面实现（135行）：
+  - 完整的BLoC状态管理集成
+  - 错误处理和加载状态显示
+  - UI组件的协调和事件分发
+* [2025-07-31T20:29:45Z] - 完成ReaderCore核心阅读组件实现（192行）：
+  - PhotoViewGallery多阅读模式支持（左右翻页、垂直滚动、长条漫画）
+  - 智能手势识别和点击区域检测
+  - 图像缩放和平移功能集成
+  - 错误处理和加载指示器
+* [2025-07-31T20:30:28Z] - 完成ReaderAppBar顶部应用栏实现（241行）：
+  - 亮度控制对话框
+  - 阅读设置菜单
+  - 漫画信息显示
+  - 完整的菜单选项（书签、分享、信息）
+* [2025-07-31T20:31:10Z] - 完成ReaderBottomBar底部控制栏实现（246行）：
+  - 页面滑动控制器
+  - 书签和自动翻页切换
+  - 跳转页面对话框
+  - 阅读进度统计显示
+
+### Completed Tasks - 架构修复和集成
+* [2025-07-31T20:28:08Z] - 修复ComicRepositoryImpl构造函数，增加CacheService依赖
+* [2025-07-31T20:28:22Z] - 修复SettingsRepositoryImpl构造函数，增加SharedPreferences支持
+* [2025-07-31T20:28:35Z] - 修复ThemeServiceImpl构造函数，增加SettingsRepository依赖
+
+### 架构完整性成果
+* ✅ 完整的BLoC + Repository + Service三层架构实现
+* ✅ 智能缓存系统：LRU算法 + 内存压力监控 + 优先级预加载
+* ✅ 现代化UI组件：PhotoView集成 + 手势识别 + 响应式设计
+* ✅ 完整的依赖注入配置：GetIt服务定位器模式
+* ✅ 事件驱动架构：完整的Event-State系统
+* ✅ 错误处理机制：统一的异常处理和用户反馈
+* [2025-07-31T21:05:29Z] - **Completed Task**: Implemented `SettingsService` with `shared_preferences` for persistence.
+  - Created `SettingsServiceImpl` to manage reading mode, direction, theme, and auto-page interval.
+  - Configured dependency injection in `injection_container.dart` for the new service.
+  - Updated `SettingsRepository` and `SettingsLocalDataSource` to align with the new service.
+* [2025-07-31T21:12:36Z] - **Completed Task**: Implemented `ArchiveService` for handling .zip and .cbz comic files.
+  - Created `ArchiveService` interface and `ArchiveServiceImpl` in `lib/core/services/archive_service.dart`.
+  - Added robust error handling for file-not-found and unsupported formats.
+  - Registered the service as a singleton in `lib/injection_container.dart`.
+  - Resolved dependency conflicts in `pubspec.yaml` to ensure project stability.
+* [2025-07-31T21:21:07Z] - **Completed Task**: Implemented `ComicRepository` with `ArchiveService`.
+  - Defined `ComicRepository` interface in the domain layer.
+  - Implemented `ComicRepositoryImpl` in the data layer to extract comic pages from archive files.
+  - Used `Either` for robust error handling.
+  - Updated entity definitions for `Comic` and `ComicPage`.
+  - Registered the repository in the dependency injection container.
+* [2025-07-31T21:23:45Z] - **Completed Task**: Implemented the core business logic for `ReaderBloc`.
+  - Created `ReaderEvent` with `LoadComic` event.
+  - Created `ReaderState` with `ReaderInitial`, `ReaderLoading`, `ReaderLoaded`, and `ReaderError` states.
+  - Implemented `ReaderBloc` to handle the `LoadComic` event, interact with `ComicRepository`, and emit appropriate states.
+  - Registered `ReaderBloc` in the dependency injection container.
+* [2025-07-31T21:25:31Z] - **Completed Task**: Implemented the core UI page `ReaderScreen`.
+  - Created `ReaderScreen` as a `StatelessWidget`.
+  - Used `BlocProvider` to create and provide `ReaderBloc`.
+  - Implemented `BlocBuilder` to display different UI based on `ReaderState` (Loading, Loaded, Error).
+  - Integrated `PageView.builder` to display comic pages.
+  - Set `ReaderScreen` as the home page in `main.dart` for testing.
+* [2025-07-31T21:29:46Z] - **Completed Task**: Implemented core reader interactions in `ReaderScreen`.
+  - Added `NextPage`, `PreviousPage`, `PageChanged`, and `ToggleUIVisibility` events to `ReaderBloc`.
+  - Updated `ReaderLoaded` state with `currentPageIndex` and `isUIVisible`.
+  - Implemented `PageController` to sync `PageView` with `ReaderBloc` state.
+  - Wrapped page images in `InteractiveViewer` for zoom and pan functionality.
+  - Added `GestureDetector` to handle tap gestures for page navigation and UI visibility toggling.
+* [2025-07-31T21:32:23Z] - **Completed Task**: Created and integrated `ReaderAppBar` and `ReaderBottomBar` widgets into `ReaderScreen` to replace temporary UI controls.
+* [2025-07-31T21:38:08Z] - **Completed Task**: 集成了高级用户设置功能，包括主题切换、阅读方向、屏幕常亮和沉浸式全屏。
+* [2025-07-31T21:41:42Z] - **Completed Task**: Implemented SettingsScreen and navigation.
+  - Created `SettingsScreen` with theme and reading direction controls.
+  - Added a settings button to `ReaderAppBar` to navigate to `SettingsScreen`.
+  - Implemented logic to reload the comic in `ReaderScreen` after returning from `SettingsScreen` to apply changes.
+* [2025-07-31T21:46:00Z] - **Completed Task**: Implemented HomeScreen with file picker integration.
+  - Created `HomeScreen` to allow users to select comic files (`.zip`, `.cbz`).
+  - Modified `ReaderScreen` and `ReaderBloc` to load comics from a file path.
+  - Set `HomeScreen` as the new entry point of the application in `main.dart`.
+* [2025-07-31T21:57:21Z] - **Completed Task**: Archived obsolete architecture documents (`reader_v2_architecture.md`, `system_architecture.md`) to `architecture/archive/`.
+- [2025-07-31T22:18:26.564Z] - APK build successful. Files are located in `build/app/outputs/flutter-apk/`.
