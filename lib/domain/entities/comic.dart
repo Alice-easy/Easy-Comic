@@ -4,6 +4,8 @@ import 'package:equatable/equatable.dart';
 
 class Comic extends Equatable {
   final String id;
+  final String title;
+  final String path;
   final String filePath;
   final String fileName;
   final String coverPath;
@@ -18,6 +20,8 @@ class Comic extends Equatable {
 
   const Comic({
     required this.id,
+    required this.title,
+    required this.path,
     required this.filePath,
     required this.fileName,
     required this.coverPath,
@@ -34,6 +38,8 @@ class Comic extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        title,
+        path,
         filePath,
         fileName,
         coverPath,
@@ -50,6 +56,8 @@ class Comic extends Equatable {
   factory Comic.fromJson(Map<String, dynamic> json) {
     return Comic(
       id: json['id'],
+      title: json['title'],
+      path: json['path'],
       filePath: json['filePath'],
       fileName: json['fileName'],
       coverPath: json['coverPath'],
@@ -67,6 +75,8 @@ class Comic extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'title': title,
+      'path': path,
       'filePath': filePath,
       'fileName': fileName,
       'coverPath': coverPath,

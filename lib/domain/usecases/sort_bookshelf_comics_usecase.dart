@@ -1,17 +1,16 @@
 import 'package:dartz/dartz.dart';
 import 'package:easy_comic/core/error/failures.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
-import 'package:easy_comic/domain/repositories/bookshelf_repository.dart';
-
-enum SortType { dateAdded, title, author }
+import 'package:easy_comic/domain/repositories/comic_repository.dart';
 
 class SortBookshelfComicsUsecase {
-  final BookshelfRepository repository;
+  final ComicRepository repository;
 
   SortBookshelfComicsUsecase(this.repository);
 
   Future<Either<Failure, List<Comic>>> call(
       String bookshelfId, SortType sortType) async {
-    return await repository.sortComicsInBookshelf(bookshelfId, sortType);
+    final int id = int.tryParse(bookshelfId) ?? 1;
+    return await repository.sortComicsInBookshelf(id, sortType);
   }
 }

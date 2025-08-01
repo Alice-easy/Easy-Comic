@@ -173,6 +173,25 @@ class FavoritesDao extends DatabaseAccessor<AppDatabase> with _$FavoritesDaoMixi
       batch.insertAll(favorites, entries);
     });
   }
+
+  Future<int> createFavorite(FavoritesCompanion entry) => into(favorites).insert(entry);
+
+  Future<void> deleteFavorite(int id) => (delete(favorites)..where((tbl) => tbl.id.equals(id))).go();
+
+  Future<void> removeComicFromFavorite(String comicId, int favoriteId) {
+    return (delete(comicFavoriteLinks)
+          ..where((tbl) => tbl.comicId.equals(comicId) & tbl.favoriteId.equals(favoriteId)))
+        .go();
+  }
+
+  Future<List<ComicModel>> getComicsInFavorite(int favoriteId) {
+    final query = select(comics).join([
+      innerJoin(comicFavoriteLinks, comicFavoriteLinks.comicId.equalsExp(comics.id))
+    ])
+      ..where(comicFavoriteLinks.favoriteId.equals(favoriteId));
+    
+    return query.map((row) => row.readTable(comics)).get();
+  }
 }
 
 

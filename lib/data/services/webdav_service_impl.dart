@@ -22,7 +22,7 @@ class WebDAVServiceImpl implements WebDAVService {
       await client.write(fileName, data);
       return const Right(unit);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -38,9 +38,9 @@ class WebDAVServiceImpl implements WebDAVService {
         password: config.password,
       );
       final data = await client.read(fileName);
-      return Right(data);
+      return Right(Uint8List.fromList(data));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

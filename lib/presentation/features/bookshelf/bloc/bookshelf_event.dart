@@ -1,6 +1,7 @@
 // lib/presentation/features/bookshelf/bloc/bookshelf_event.dart
 
 import 'package:easy_comic/domain/usecases/sort_bookshelf_comics_usecase.dart';
+import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class BookshelfEvent extends Equatable {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/utils/either.dart';
+import 'package:dartz/dartz.dart';
 import 'package:easy_comic/data/datasources/local/comic_local_datasource.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
 import 'package:easy_comic/domain/repositories/comic_repository.dart';
@@ -86,6 +86,8 @@ class ComicRepositoryImpl implements ComicRepository {
   Comic _modelToEntity(db.ComicModel model) {
     return Comic(
       id: model.id,
+      title: model.fileName.split('.').first,
+      path: model.filePath,
       filePath: model.filePath,
       fileName: model.fileName,
       coverPath: model.coverPath,
@@ -103,6 +105,7 @@ class ComicRepositoryImpl implements ComicRepository {
   db.ComicsCompanion _entityToCompanion(Comic entity) {
     return db.ComicsCompanion(
       id: Value(entity.id),
+      // title and path are not in the database model, so they are not mapped here.
       filePath: Value(entity.filePath),
       fileName: Value(entity.fileName),
       coverPath: Value(entity.coverPath),
@@ -127,5 +130,17 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<void> clearAndInsertComics(List<Comic> comics) async {
     final companions = comics.map(_entityToCompanion).toList();
     await localDataSource.clearAndInsertComics(companions);
+  }
+
+  @override
+  Future<Either<Failure, List<Comic>>> searchComicsInBookshelf(int bookshelfId, String query) async {
+    // TODO: Implement search in LocalDataSource and DAO
+    return Right([]);
+  }
+
+  @override
+  Future<Either<Failure, List<Comic>>> sortComicsInBookshelf(int bookshelfId, SortType sortType) async {
+    // TODO: Implement sort in LocalDataSource and DAO
+    return Right([]);
   }
 }

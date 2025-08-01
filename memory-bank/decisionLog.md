@@ -58,3 +58,16 @@
 - 所有未来的功能开发和重构工作都必须遵循 [`architecture/FINAL_ARCHITECTURE_BLUEPRINT.md`](../architecture/FINAL_ARCHITECTURE_BLUEPRINT.md) 中定义的原则和模式。
 - 开发团队应首先熟悉该蓝图，再开始具体的编码任务。
 - `systemPatterns.md` 已同步更新，以反映这一最终架构决策。
+---
+### 决策 (部署)
+[2025-08-01T18:00:05Z] - **推送到 GitHub**
+
+**决策:**
+- 将本地所有已提交的更改推送到远程 GitHub 仓库的 `main` 分支。
+
+**理由:**
+- 在完成了大量功能开发、架构重构和文档更新后，需要将这些成果同步到中央代码仓库，以作备份并方便团队协作。
+
+**后续行动:**
+- 确认推送成功。
+- 更新 `progress.md` 和 `activeContext.md` 以反映部署状态。

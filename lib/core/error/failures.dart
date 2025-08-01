@@ -18,3 +18,21 @@ class ServerFailure extends Failure {
 class CacheFailure extends Failure {
   const CacheFailure(String message) : super(message);
 }
+
+class DatabaseFailure extends Failure {
+  const DatabaseFailure(String message) : super(message);
+}
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure(String message) : super(message);
+}
+
+class DatabaseException implements Exception {
+  final String message;
+  DatabaseException(this.message);
+}
+
+class CacheException implements Exception {
+  final String message;
+  CacheException(this.message);
+}

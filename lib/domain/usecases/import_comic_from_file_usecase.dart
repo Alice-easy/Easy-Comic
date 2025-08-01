@@ -1,5 +1,5 @@
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/utils/either.dart';
+import 'package:dartz/dartz.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
 import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import 'package:path/path.dart' as p;
@@ -16,6 +16,8 @@ class ImportComicFromFileUsecase {
       final fileName = p.basename(filePath);
       final comic = Comic(
         id: DateTime.now().millisecondsSinceEpoch.toString(), // Temporary ID
+        title: fileName.split('.').first,
+        path: filePath,
         filePath: filePath,
         fileName: fileName,
         coverPath: '', // TODO: Generate or extract cover

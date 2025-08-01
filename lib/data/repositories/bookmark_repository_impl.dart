@@ -1,5 +1,5 @@
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/utils/either.dart';
+import 'package:dartz/dartz.dart';
 
 import '../../domain/entities/bookmark.dart';
 import '../../domain/repositories/bookmark_repository.dart';

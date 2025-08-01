@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+enum WebDAVOperation { backup, restore }
+
 abstract class WebDAVState extends Equatable {
   const WebDAVState();
 
@@ -9,7 +11,14 @@ abstract class WebDAVState extends Equatable {
 
 class WebDAVInitial extends WebDAVState {}
 
-class WebDAVInProgress extends WebDAVState {}
+class WebDAVInProgress extends WebDAVState {
+  final WebDAVOperation operation;
+
+  const WebDAVInProgress(this.operation);
+
+  @override
+  List<Object> get props => [operation];
+}
 
 class WebDAVSuccess extends WebDAVState {
   final String message;

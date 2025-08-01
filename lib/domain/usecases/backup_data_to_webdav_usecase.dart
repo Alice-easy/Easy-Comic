@@ -42,7 +42,7 @@ class BackupDataToWebdavUseCase {
         data: data,
       );
     } catch (e) {
-      return Left(CacheFailure(message: 'Failed to create backup file.'));
+      return Left(CacheFailure('Failed to create backup file.'));
     }
   }
 }

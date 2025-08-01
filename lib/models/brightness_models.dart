@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../core/brightness_errors.dart';
-import '../services/brightness_service.dart';
+import '../core/brightness_service.dart';
 
 part 'brightness_models.g.dart';
 part 'brightness_models.freezed.dart';
@@ -40,8 +40,7 @@ class BrightnessState with _$BrightnessState {
     @Default(BrightnessMode.manual) BrightnessMode mode,
     @Default(false) bool isInitialized,
     @Default(false) bool isLoading,
-    BrightnessError? error,
-    BrightnessPlatformInfo? platformInfo,
+    @BrightnessErrorConverter() BrightnessError? error
   }) = _BrightnessState;
 
   factory BrightnessState.fromJson(Map<String, dynamic> json) =>

@@ -26,7 +26,7 @@ class WebDAVBloc extends Bloc<WebDAVEvent, WebDAVState> {
 
   Future<void> _onBackupData(BackupDataEvent event, Emitter<WebDAVState> emit) async {
     try {
-      emit(WebDAVInProgress());
+      emit(WebDAVInProgress(WebDAVOperation.backup));
       final config = await settingsRepository.getWebDAVConfig();
       final result = await backupDataToWebdavUseCase(config);
       result.fold(
@@ -45,7 +45,7 @@ class WebDAVBloc extends Bloc<WebDAVEvent, WebDAVState> {
 
   Future<void> _onRestoreData(RestoreDataEvent event, Emitter<WebDAVState> emit) async {
     try {
-      emit(WebDAVInProgress());
+      emit(WebDAVInProgress(WebDAVOperation.restore));
       final config = await settingsRepository.getWebDAVConfig();
       final result = await restoreDataFromWebdavUseCase(config);
       result.fold(

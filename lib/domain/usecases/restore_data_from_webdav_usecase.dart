@@ -48,12 +48,12 @@ class RestoreDataFromWebdavUseCase {
 
             return const Right(unit);
           } catch (e) {
-            return Left(CacheFailure(message: 'Failed to parse backup file.'));
+            return Left(CacheFailure('Failed to parse backup file.'));
           }
         },
       );
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to restore data.'));
+      return Left(ServerFailure('Failed to restore data.'));
     }
   }
 }

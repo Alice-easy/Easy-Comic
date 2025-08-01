@@ -14,7 +14,7 @@ class ReaderSettings extends Equatable {
   final AppTheme appTheme;
   final ReadingDirection readingDirection;
   final int autoPageInterval;
-  final WebDavConfig? webDavConfig;
+  final WebDAVConfig? webDavConfig;
   // Can add more settings here in the future
 
   const ReaderSettings({
@@ -36,7 +36,7 @@ class ReaderSettings extends Equatable {
     AppTheme? appTheme,
     ReadingDirection? readingDirection,
     int? autoPageInterval,
-    WebDavConfig? webDavConfig,
+    WebDAVConfig? webDavConfig,
   }) {
     return ReaderSettings(
       appTheme: appTheme ?? this.appTheme,
@@ -54,7 +54,7 @@ class ReaderSettings extends Equatable {
       readingDirection: ReadingDirection.values[json['readingDirection'] ?? ReadingDirection.LTR.index],
       autoPageInterval: json['autoPageInterval'] ?? 5,
       webDavConfig: json['webDavConfig'] != null
-          ? WebDavConfig.fromJson(json['webDavConfig'])
+          ? WebDAVConfig.fromJson(json['webDavConfig'])
           : null,
     );
   }

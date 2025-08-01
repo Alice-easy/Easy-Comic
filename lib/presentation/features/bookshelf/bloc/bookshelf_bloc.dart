@@ -139,8 +139,9 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
+        final int bookshelfId = int.tryParse(event.bookshelfId) ?? 1;
         final failureOrSuccess =
-            await importComicFromFile(filePath, event.bookshelfId);
+            await importComicFromFile(filePath, bookshelfId);
 
         failureOrSuccess.fold(
           (failure) {

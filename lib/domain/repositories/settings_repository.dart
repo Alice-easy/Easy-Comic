@@ -1,7 +1,7 @@
 // lib/domain/repositories/settings_repository.dart
 import 'package:flutter/material.dart';
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/utils/either.dart';
+import 'package:dartz/dartz.dart';
 import 'package:easy_comic/domain/entities/reader_settings.dart';
 import 'package:easy_comic/domain/entities/webdav_config.dart';
 

@@ -1,5 +1,6 @@
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/utils/either.dart';
+import 'package:dartz/dartz.dart';
+import 'package:easy_comic/domain/entities/comic.dart';
 import 'package:easy_comic/domain/entities/favorite.dart';
 
 abstract class FavoriteRepository {
@@ -7,4 +8,8 @@ abstract class FavoriteRepository {
   Future<Either<Failure, void>> addComicToFavorite(String comicId, int favoriteId);
   Future<List<Favorite>> getFavorites();
   Future<void> clearAndInsertFavorites(List<Favorite> favorites);
+  Future<Either<Failure, int>> createFavorite(String name);
+  Future<Either<Failure, void>> deleteFavorite(int id);
+  Future<Either<Failure, void>> removeComicFromFavorite(String comicId, int favoriteId);
+  Future<Either<Failure, List<Comic>>> getComicsInFavorite(int favoriteId);
 }

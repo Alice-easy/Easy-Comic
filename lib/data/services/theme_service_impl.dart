@@ -45,7 +45,10 @@ class ThemeServiceImpl implements ThemeService {
 
   @override
   Future<bool> isFullscreen() async {
-    return (await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive)) == null;
+    // This is a simplification. A more robust solution would involve a platform channel
+    // to query the current UI mode, as SystemChrome.setEnabledSystemUIMode is a setter.
+    // For now, we'll assume it's not in fullscreen by default if we haven't explicitly set it.
+    return false;
   }
 
   @override
