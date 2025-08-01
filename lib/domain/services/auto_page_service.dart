@@ -1,4 +1,5 @@
 import 'package:easy_comic/domain/entities/reader_settings.dart';
+import '../entities/auto_page_config.dart';
 
 abstract class AutoPageService {
   /// 开始自动翻页

@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_comic/domain/usecases/import_comic_from_file_usecase.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_comic/core/services/logging_service.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
 import 'package:easy_comic/domain/usecases/get_bookshelf_comics_usecase.dart';
@@ -32,6 +31,8 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
     on<SortComics>(_onSortComics);
     on<ImportComicEvent>(_onImportComic);
     on<LoadMoreComics>(_onLoadMoreComics);
+    on<DeleteComic>(_onDeleteComic);
+    on<ClearSearch>(_onClearSearch);
   }
 
   Future<void> _onLoadBookshelf(
@@ -47,7 +48,11 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
           loggingService.error(errorMessage);
           emit(BookshelfError(message: '无法加载书架，请稍后重试。'));
         },
-        (comics) => emit(BookshelfLoaded(comics: comics, hasReachedMax: comics.length < 20)),
+        (comics) => emit(BookshelfLoaded(
+          comics: comics,
+          hasReachedMax: comics.length < 20,
+          originalComics: comics,
+        )),
       );
     } catch (e, s) {
       loggingService.error('Unhandled error in _onLoadBookshelf', e, s);
@@ -91,8 +96,13 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
 
   Future<void> _onSearchComics(
       SearchComics event, Emitter<BookshelfState> emit) async {
+    final currentState = state;
+    if (currentState is! BookshelfLoaded) return;
+    
     try {
-      emit(BookshelfLoading());
+      // 显示搜索中状态
+      emit(currentState.copyWith(isSearching: true));
+      
       final failureOrComics =
           await searchBookshelfComics(_currentBookshelfId, event.query);
       failureOrComics.fold(
@@ -101,7 +111,12 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
           loggingService.error(errorMessage);
           emit(BookshelfError(message: '搜索失败，请稍后重试。'));
         },
-        (comics) => emit(BookshelfLoaded(comics: comics)),
+        (comics) => emit(currentState.copyWith(
+          comics: comics,
+          isSearching: false,
+          searchQuery: event.query,
+          hasReachedMax: true, // 搜索结果不支持分页
+        )),
       );
     } catch (e, s) {
       loggingService.error('Unhandled error in _onSearchComics', e, s);
@@ -111,6 +126,9 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
 
   Future<void> _onSortComics(
       SortComics event, Emitter<BookshelfState> emit) async {
+    final currentState = state;
+    if (currentState is! BookshelfLoaded) return;
+    
     try {
       emit(BookshelfLoading());
       final failureOrComics =
@@ -121,11 +139,61 @@ class BookshelfBloc extends Bloc<BookshelfEvent, BookshelfState> {
           loggingService.error(errorMessage);
           emit(BookshelfError(message: '排序失败，请稍后重试。'));
         },
-        (comics) => emit(BookshelfLoaded(comics: comics)),
+        (comics) => emit(BookshelfLoaded(
+          comics: comics,
+          hasReachedMax: comics.length < 20,
+          currentSortType: event.sortType,
+          originalComics: comics,
+        )),
       );
     } catch (e, s) {
       loggingService.error('Unhandled error in _onSortComics', e, s);
       emit(BookshelfError(message: '发生未知错误。'));
+    }
+  }
+
+  Future<void> _onDeleteComic(
+      DeleteComic event, Emitter<BookshelfState> emit) async {
+    final currentState = state;
+    if (currentState is! BookshelfLoaded) return;
+    
+    try {
+      // 这里需要添加删除漫画的Repository方法
+      // 目前先从UI列表中移除
+      final updatedComics = currentState.comics
+          .where((comic) => comic.id != event.comicId)
+          .toList();
+      
+      emit(currentState.copyWith(comics: updatedComics));
+      
+      // TODO: 实际删除漫画文件和数据库记录
+      loggingService.info('Comic ${event.comicId} removed from display');
+    } catch (e, s) {
+      loggingService.error('Unhandled error in _onDeleteComic', e, s);
+      emit(BookshelfError(message: '删除失败。'));
+    }
+  }
+
+  Future<void> _onClearSearch(
+      ClearSearch event, Emitter<BookshelfState> emit) async {
+    final currentState = state;
+    if (currentState is! BookshelfLoaded) return;
+    
+    try {
+      if (currentState.originalComics != null) {
+        emit(currentState.copyWith(
+          comics: currentState.originalComics!,
+          isSearching: false,
+          searchQuery: '',
+          hasReachedMax: currentState.originalComics!.length < 20,
+        ));
+      } else {
+        // 重新加载书架数据
+        add(LoadBookshelf(_currentBookshelfId));
+      }
+    } catch (e, s) {
+      loggingService.error('Unhandled error in _onClearSearch', e, s);
+      emit(BookshelfError(message: '清除搜索失败。'));
     }
   }
 

@@ -50,3 +50,16 @@ class ImportComicEvent extends BookshelfEvent {
 class LoadMoreComics extends BookshelfEvent {
   const LoadMoreComics();
 }
+
+class DeleteComic extends BookshelfEvent {
+  final String comicId;
+
+  const DeleteComic(this.comicId);
+
+  @override
+  List<Object> get props => [comicId];
+}
+
+class ClearSearch extends BookshelfEvent {
+  const ClearSearch();
+}

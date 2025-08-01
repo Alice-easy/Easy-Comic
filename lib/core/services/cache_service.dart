@@ -1,85 +1,83 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:archive/archive.dart';
-import 'package:crypto/crypto.dart';
-import 'package:easy_comic/domain/services/cache_service.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:path/path.dart' as p;
+/// Cache service interface for managing image and data caching
+abstract class ICacheService {
+  /// Get cached image data by key
+  Future<Uint8List?> getCachedImage(String key);
+  
+  /// Cache image data with key
+  Future<void> cacheImage(String key, Uint8List data);
+  
+  /// Clear specific cache entry
+  Future<void> clearCache(String key);
+  
+  /// Clear all cache
+  Future<void> clearAllCache();
+  
+  /// Get cache size in bytes
+  Future<int> getCacheSize();
+  
+  /// Check if key exists in cache
+  Future<bool> hasCachedImage(String key);
+}
 
-class CacheServiceImpl implements CacheService {
-  final BaseCacheManager _cacheManager;
-
-  CacheServiceImpl({BaseCacheManager? cacheManager})
-      : _cacheManager = cacheManager ?? DefaultCacheManager();
+/// Implementation of cache service
+class CacheService implements ICacheService {
+  final Map<String, Uint8List> _memoryCache = {};
+  final int _maxCacheSize;
+  
+  CacheService({int maxCacheSize = 100 * 1024 * 1024}) // 100MB default
+      : _maxCacheSize = maxCacheSize;
 
   @override
-  Future<File> getCoverImage(String comicPath) async {
-    final cacheKey = _generateCacheKey(comicPath);
-
-    final fileInfo = await _cacheManager.getFileFromCache(cacheKey);
-    if (fileInfo != null && await fileInfo.file.exists()) {
-      return fileInfo.file;
-    }
-
-    final coverData = await _extractFirstImageFromArchive(comicPath);
-    if (coverData == null) {
-      throw Exception('Could not extract cover from $comicPath');
-    }
-
-    final file = await _cacheManager.putFile(
-      cacheKey,
-      coverData,
-      fileExtension: _getFileExtensionFromData(coverData) ?? 'jpg',
-    );
-    return file;
+  Future<Uint8List?> getCachedImage(String key) async {
+    return _memoryCache[key];
   }
 
-  String _generateCacheKey(String comicPath) {
-    return sha256.convert(utf8.encode(comicPath)).toString();
+  @override
+  Future<void> cacheImage(String key, Uint8List data) async {
+    // Simple LRU implementation
+    if (_getCurrentCacheSize() + data.length > _maxCacheSize) {
+      _evictOldEntries();
+    }
+    _memoryCache[key] = data;
   }
 
-  String? _getFileExtensionFromData(Uint8List data) {
-    if (data.length > 2 && data[0] == 0xFF && data[1] == 0xD8) {
-      return 'jpg';
-    }
-    if (data.length > 8 &&
-        data[0] == 0x89 &&
-        data[1] == 0x50 &&
-        data[2] == 0x4E &&
-        data[3] == 0x47 &&
-        data[4] == 0x0D &&
-        data[5] == 0x0A &&
-        data[6] == 0x1A &&
-        data[7] == 0x0A) {
-      return 'png';
-    }
-    if (data.length > 4 && data[0] == 0x47 && data[1] == 0x49 && data[2] == 0x46) {
-      return 'gif';
-    }
-    if (data.length > 12 && data[8] == 0x57 && data[9] == 0x45 && data[10] == 0x42 && data[11] == 0x50) {
-      return 'webp';
-    }
-    return null;
+  @override
+  Future<void> clearCache(String key) async {
+    _memoryCache.remove(key);
   }
 
-  Future<Uint8List?> _extractFirstImageFromArchive(String path) async {
-    final bytes = await File(path).readAsBytes();
-    final archive = ZipDecoder().decodeBytes(bytes);
+  @override
+  Future<void> clearAllCache() async {
+    _memoryCache.clear();
+  }
 
-    for (final file in archive) {
-      if (file.isFile) {
-        final lowerCaseName = file.name.toLowerCase();
-        if (lowerCaseName.endsWith('.jpg') ||
-            lowerCaseName.endsWith('.jpeg') ||
-            lowerCaseName.endsWith('.png') ||
-            lowerCaseName.endsWith('.webp') ||
-            lowerCaseName.endsWith('.gif')) {
-          return file.content as Uint8List;
-        }
-      }
+  @override
+  Future<int> getCacheSize() async {
+    return _getCurrentCacheSize();
+  }
+
+  @override
+  Future<bool> hasCachedImage(String key) async {
+    return _memoryCache.containsKey(key);
+  }
+
+  /// Clear all cache entries
+  Future<void> clearAll() async {
+    await clearAllCache();
+  }
+
+  int _getCurrentCacheSize() {
+    return _memoryCache.values.fold(0, (total, data) => total + data.length);
+  }
+
+  void _evictOldEntries() {
+    // Simple eviction: remove half of entries
+    final keys = _memoryCache.keys.toList();
+    final half = keys.length ~/ 2;
+    for (int i = 0; i < half; i++) {
+      _memoryCache.remove(keys[i]);
     }
-    return null;
   }
 }

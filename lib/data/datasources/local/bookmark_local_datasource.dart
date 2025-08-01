@@ -10,7 +10,7 @@ abstract class BookmarkLocalDataSource {
 }
 
 class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
-  final DriftDb database;
+  final AppDatabase database;
   
   BookmarkLocalDataSourceImpl({required this.database});
 

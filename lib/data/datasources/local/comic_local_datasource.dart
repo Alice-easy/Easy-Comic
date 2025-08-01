@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import '../../drift_db.dart';
 
 abstract class ComicLocalDataSource {
@@ -11,6 +12,8 @@ abstract class ComicLocalDataSource {
   Future<void> deleteComic(String id);
   Future<List<ComicModel>> getAllComics();
   Future<void> clearAndInsertComics(List<ComicsCompanion> comics);
+  Future<List<ComicModel>> searchComicsInBookshelf(int bookshelfId, String query);
+  Future<List<ComicModel>> sortComicsInBookshelf(int bookshelfId, SortType sortType);
 }
 
 class ComicLocalDataSourceImpl implements ComicLocalDataSource {
@@ -85,6 +88,24 @@ class ComicLocalDataSourceImpl implements ComicLocalDataSource {
   Future<void> clearAndInsertComics(List<ComicsCompanion> comics) async {
     try {
       await db.comicsDao.clearAndInsertComics(comics);
+    } catch (e) {
+      throw DatabaseException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ComicModel>> searchComicsInBookshelf(int bookshelfId, String query) async {
+    try {
+      return await db.comicsDao.searchComicsInBookshelf(bookshelfId, query);
+    } catch (e) {
+      throw DatabaseException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ComicModel>> sortComicsInBookshelf(int bookshelfId, SortType sortType) async {
+    try {
+      return await db.comicsDao.sortComicsInBookshelf(bookshelfId, sortType);
     } catch (e) {
       throw DatabaseException(e.toString());
     }

@@ -108,6 +108,7 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
       final entities = models.map((model) => Comic(
         id: model.id,
         title: model.fileName.split('.').first,
+        author: 'Unknown Author', // Default author
         path: model.filePath,
         filePath: model.filePath,
         fileName: model.fileName,
@@ -120,6 +121,12 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
         isFavorite: model.isFavorite,
         tags: List<String>.from(jsonDecode(model.tags)),
         metadata: Map<String, dynamic>.from(jsonDecode(model.metadata)),
+        // Additional required properties
+        addedAt: model.addTime,
+        lastReadAt: model.lastReadTime ?? DateTime.now(),
+        currentPage: model.progress,
+        totalPages: model.pageCount,
+        pages: const [],
       )).toList();
       return Right(entities);
     } on DatabaseException catch (e) {

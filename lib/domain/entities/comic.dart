@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:easy_comic/domain/entities/comic_page.dart';
 
 class Comic extends Equatable {
   final String id;
@@ -17,6 +18,14 @@ class Comic extends Equatable {
   final bool isFavorite;
   final List<String> tags;
   final Map<String, dynamic> metadata;
+  
+  // 新增属性以支持构建要求
+  final String author;
+  final DateTime? addedAt;
+  final DateTime? lastReadAt;
+  final int? currentPage;
+  final int? totalPages;
+  final List<ComicPage> pages;
 
   const Comic({
     required this.id,
@@ -33,6 +42,12 @@ class Comic extends Equatable {
     required this.isFavorite,
     required this.tags,
     required this.metadata,
+    required this.author,
+    this.addedAt,
+    this.lastReadAt,
+    this.currentPage,
+    this.totalPages,
+    this.pages = const [],
   });
 
   @override
@@ -51,6 +66,12 @@ class Comic extends Equatable {
         isFavorite,
         tags,
         metadata,
+        author,
+        addedAt,
+        lastReadAt,
+        currentPage,
+        totalPages,
+        pages,
       ];
 
   factory Comic.fromJson(Map<String, dynamic> json) {
@@ -69,6 +90,14 @@ class Comic extends Equatable {
       isFavorite: json['isFavorite'],
       tags: List<String>.from(jsonDecode(json['tags'])),
       metadata: jsonDecode(json['metadata']),
+      author: json['author'] ?? '',
+      addedAt: json['addedAt'] != null ? DateTime.parse(json['addedAt']) : null,
+      lastReadAt: json['lastReadAt'] != null ? DateTime.parse(json['lastReadAt']) : null,
+      currentPage: json['currentPage'],
+      totalPages: json['totalPages'],
+      pages: json['pages'] != null
+          ? (jsonDecode(json['pages']) as List).map((p) => ComicPage.fromJson(p)).toList()
+          : const [],
     );
   }
 
@@ -88,6 +117,12 @@ class Comic extends Equatable {
       'isFavorite': isFavorite,
       'tags': jsonEncode(tags),
       'metadata': jsonEncode(metadata),
+      'author': author,
+      'addedAt': addedAt?.toIso8601String(),
+      'lastReadAt': lastReadAt?.toIso8601String(),
+      'currentPage': currentPage,
+      'totalPages': totalPages,
+      'pages': jsonEncode(pages.map((p) => p.toJson()).toList()),
     };
   }
 }

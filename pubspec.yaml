@@ -39,6 +39,9 @@ dependencies:
   cached_network_image: ^3.3.1
   flutter_cache_manager: ^3.3.1
   json_annotation: ^4.9.0
+  connectivity_plus: ^6.0.5
+  url_launcher: ^6.3.0
+  device_info_plus: ^10.1.2
 
 dev_dependencies:
   build_runner: ^2.4.9
@@ -48,6 +51,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: ^2.4.7
+  integration_test:
+    sdk: flutter
   json_serializable: ^6.7.1
   mocktail: ^1.0.0
   

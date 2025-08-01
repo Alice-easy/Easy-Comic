@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -134,6 +135,39 @@ class ComicsDao extends DatabaseAccessor<AppDatabase> with _$ComicsDaoMixin {
       batch.deleteAll(comics);
       batch.insertAll(comics, entries);
     });
+  }
+
+  Future<List<ComicModel>> searchComicsInBookshelf(int bookshelfId, String query) {
+    if (query.isEmpty) {
+      return getComicsInBookshelf(bookshelfId);
+    }
+    
+    final lowercaseQuery = query.toLowerCase();
+    final searchQuery = select(comics)
+      ..where((tbl) => tbl.bookshelfId.equals(bookshelfId) &
+          tbl.fileName.lower().contains(lowercaseQuery))
+      ..orderBy([(t) => OrderingTerm(expression: t.lastReadTime, mode: OrderingMode.desc)]);
+    
+    return searchQuery.get();
+  }
+
+  Future<List<ComicModel>> sortComicsInBookshelf(int bookshelfId, SortType sortType) {
+    final query = select(comics)..where((tbl) => tbl.bookshelfId.equals(bookshelfId));
+    
+    switch (sortType) {
+      case SortType.dateAdded:
+        query.orderBy([(t) => OrderingTerm(expression: t.addTime, mode: OrderingMode.desc)]);
+        break;
+      case SortType.title:
+        query.orderBy([(t) => OrderingTerm(expression: t.fileName, mode: OrderingMode.asc)]);
+        break;
+      case SortType.author:
+        // 由于我们没有作者字段，按文件名排序作为替代
+        query.orderBy([(t) => OrderingTerm(expression: t.fileName, mode: OrderingMode.asc)]);
+        break;
+    }
+    
+    return query.get();
   }
 }
 

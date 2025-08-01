@@ -87,6 +87,7 @@ class ComicRepositoryImpl implements ComicRepository {
     return Comic(
       id: model.id,
       title: model.fileName.split('.').first,
+      author: 'Unknown Author', // Default author since not in database model
       path: model.filePath,
       filePath: model.filePath,
       fileName: model.fileName,
@@ -99,6 +100,12 @@ class ComicRepositoryImpl implements ComicRepository {
       isFavorite: model.isFavorite,
       tags: List<String>.from(jsonDecode(model.tags)),
       metadata: Map<String, dynamic>.from(jsonDecode(model.metadata)),
+      // Additional required Comic properties with defaults
+      addedAt: model.addTime,
+      lastReadAt: model.lastReadTime ?? DateTime.now(),
+      currentPage: model.progress,
+      totalPages: model.pageCount,
+      pages: const [], // Empty list as pages are loaded separately
     );
   }
 
@@ -134,13 +141,37 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<Either<Failure, List<Comic>>> searchComicsInBookshelf(int bookshelfId, String query) async {
-    // TODO: Implement search in LocalDataSource and DAO
-    return Right([]);
+    try {
+      final models = await localDataSource.searchComicsInBookshelf(bookshelfId, query);
+      final entities = models.map(_modelToEntity).toList();
+      return Right(entities);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
   }
 
   @override
   Future<Either<Failure, List<Comic>>> sortComicsInBookshelf(int bookshelfId, SortType sortType) async {
-    // TODO: Implement sort in LocalDataSource and DAO
-    return Right([]);
+    try {
+      final models = await localDataSource.sortComicsInBookshelf(bookshelfId, sortType);
+      final entities = models.map(_modelToEntity).toList();
+      return Right(entities);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Comic>> getComicById(String id) async {
+    try {
+      final model = await localDataSource.getComic(id);
+      if (model != null) {
+        return Right(_modelToEntity(model));
+      } else {
+        return Left(NotFoundFailure('Comic not found'));
+      }
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
   }
 }

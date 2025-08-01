@@ -28,6 +28,10 @@ class LoggingService {
     _logger.e(message, error: error, stackTrace: stackTrace);
   }
 
+  void logError(String message, [dynamic error, StackTrace? stackTrace]) {
+    _logger.e(message, error: error, stackTrace: stackTrace);
+  }
+
   void fatal(String message, [dynamic error, StackTrace? stackTrace]) {
     _logger.f(message, error: error, stackTrace: stackTrace);
   }

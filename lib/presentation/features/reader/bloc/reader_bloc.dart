@@ -98,8 +98,22 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
         comic = Comic(
           id: event.filePath!,
           title: _extractTitleFromPath(event.filePath!),
+          author: 'Unknown Author', // Default author
+          path: event.filePath!,
           filePath: event.filePath!,
+          fileName: _extractTitleFromPath(event.filePath!),
+          coverPath: '',
+          pageCount: pages.length,
+          addTime: DateTime.now(),
+          lastReadTime: DateTime.now(),
+          progress: 0,
+          bookshelfId: 0,
+          isFavorite: false,
+          tags: [],
+          metadata: {},
           pages: pages,
+          totalPages: pages.length,
+          currentPage: 0,
         );
       } else {
         throw Exception('No comic ID or file path provided');
@@ -152,7 +166,7 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     if (currentState is! ReaderLoaded) return;
     
     // Check bounds
-    if (event.newIndex < 0 || event.newIndex >= currentState.comic.totalPages) {
+    if (event.newIndex < 0 || event.newIndex >= (currentState.comic.totalPages ?? 0)) {
       return;
     }
     
@@ -170,7 +184,7 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     ));
     
     // Check if reached last page for auto-page
-    if (event.newIndex >= currentState.comic.totalPages - 1) {
+    if (event.newIndex >= (currentState.comic.totalPages ?? 1) - 1) {
       await _autoPageManager.handleLastPageReached();
     }
   }
@@ -190,7 +204,7 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     if (currentState is! ReaderLoaded) return;
     
     final newIndex = currentState.currentPageIndex + 1;
-    if (newIndex < currentState.comic.totalPages) {
+    if (newIndex < (currentState.comic.totalPages ?? 0)) {
       add(PageChanged(newIndex));
     }
   }

@@ -1,4 +1,5 @@
 import 'package:easy_comic/data/datasources/local/bookshelf_local_datasource.dart';
+import 'package:easy_comic/data/datasources/local/bookmark_local_datasource.dart';
 import 'package:easy_comic/data/datasources/local/comic_local_datasource.dart';
 import 'package:easy_comic/data/datasources/local/favorite_local_datasource.dart';
 import 'package:easy_comic/data/datasources/local/settings_local_datasource.dart';
@@ -7,15 +8,32 @@ import 'package:easy_comic/domain/services/webdav_service.dart';
 import 'package:easy_comic/domain/usecases/backup_data_to_webdav_usecase.dart';
 import 'package:easy_comic/domain/usecases/restore_data_from_webdav_usecase.dart';
 import 'package:easy_comic/core/services/cache_service.dart';
-import 'package:easy_comic/domain/services/cache_service.dart';
 import 'package:easy_comic/presentation/features/settings/webdav/bloc/webdav_bloc.dart';
 import 'package:easy_comic/core/services/logging_service.dart';
+import 'package:easy_comic/core/services/error_handler_service.dart';
+import 'package:easy_comic/core/services/message_service.dart';
+import 'package:easy_comic/core/services/network_service.dart';
+import 'package:easy_comic/core/services/global_error_handler.dart';
+import 'package:easy_comic/core/services/global_state_manager.dart';
+import 'package:easy_comic/core/services/real_time_notification_service.dart';
+import 'package:easy_comic/core/services/data_flow_optimizer.dart';
+import 'package:easy_comic/core/services/unified_cache_manager.dart';
+import 'package:easy_comic/core/services/webdav_sync_state_manager.dart';
+import 'package:easy_comic/core/services/offline_queue_manager.dart';
+import 'package:easy_comic/data/services/archive_service_impl.dart';
+import 'package:easy_comic/domain/services/archive_service.dart';
+import 'package:easy_comic/data/services/auto_page_service_impl.dart';
+import 'package:easy_comic/domain/services/auto_page_service.dart';
+import 'package:easy_comic/presentation/features/reader/bloc/reader_bloc.dart';
+import 'package:easy_comic/core/comic_archive.dart';
 import 'package:easy_comic/data/drift_db.dart';
 import 'package:easy_comic/data/repositories/bookshelf_repository_impl.dart';
+import 'package:easy_comic/data/repositories/bookmark_repository_impl.dart';
 import 'package:easy_comic/data/repositories/comic_repository_impl.dart';
 import 'package:easy_comic/data/repositories/favorite_repository_impl.dart';
 import 'package:easy_comic/data/repositories/settings_repository_impl.dart';
 import 'package:easy_comic/domain/repositories/bookshelf_repository.dart';
+import 'package:easy_comic/domain/repositories/bookmark_repository.dart';
 import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import 'package:easy_comic/domain/repositories/favorite_repository.dart';
 import 'package:easy_comic/domain/repositories/settings_repository.dart';
@@ -33,7 +51,9 @@ import 'package:easy_comic/presentation/features/bookshelf/bloc/bookshelf_bloc.d
 import 'package:easy_comic/data/services/theme_service_impl.dart';
 import 'package:easy_comic/domain/services/theme_service.dart';
 import 'package:easy_comic/presentation/features/favorites/bloc/favorites_bloc.dart';
+import 'package:easy_comic/presentation/features/favorites/bloc/favorite_comics_bloc.dart';
 import 'package:easy_comic/presentation/features/settings/theme/bloc/theme_bloc.dart';
+import 'package:easy_comic/presentation/features/settings/general/bloc/settings_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,9 +72,15 @@ Future<void> init() async {
   sl.registerFactory(() => FavoritesBloc(
         createFavoriteUseCase: sl(),
         getFavoritesUseCase: sl(),
+        getFavoriteComicsUseCase: sl(),
         addComicToFavoriteUseCase: sl(),
         removeComicFromFavoriteUseCase: sl(),
         deleteFavoriteUseCase: sl(),
+        loggingService: sl(),
+      ));
+  sl.registerFactory(() => FavoriteComicsBloc(
+        getFavoriteComicsUseCase: sl(),
+        removeComicFromFavoriteUseCase: sl(),
         loggingService: sl(),
       ));
   sl.registerFactory(() => WebDAVBloc(
@@ -64,6 +90,21 @@ Future<void> init() async {
         loggingService: sl(),
       ));
   sl.registerFactory(() => ThemeBloc(themeService: sl()));
+  sl.registerFactory(() => SettingsBloc(
+        settingsRepository: sl(),
+        cacheService: sl(),
+        loggingService: sl(),
+      ));
+  
+  // ReaderBloc - needs special dependencies
+  sl.registerFactory(() => ReaderBloc(
+        comicRepository: sl(),
+        settingsRepository: sl(),
+        bookmarkRepository: sl(),
+        autoPageService: sl(),
+        cacheService: sl(),
+        comicArchive: sl(),
+      ));
   // #endregion
 
   // #region Domain
@@ -71,7 +112,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetBookshelfComicsUsecase(sl<ComicRepository>()));
   sl.registerLazySingleton(() => SearchBookshelfComicsUsecase(sl()));
   sl.registerLazySingleton(() => SortBookshelfComicsUsecase(sl()));
-  sl.registerLazySingleton(() => ImportComicFromFileUsecase(sl()));
+  sl.registerLazySingleton(() => ImportComicFromFileUsecase(sl(), sl()));
   sl.registerLazySingleton(() => CreateFavoriteUseCase(sl()));
   sl.registerLazySingleton(() => GetFavoritesUseCase(sl()));
   sl.registerLazySingleton(() => AddComicToFavoriteUseCase(sl()));
@@ -99,11 +140,16 @@ Future<void> init() async {
       () => FavoriteRepositoryImpl(localDataSource: sl()));
   sl.registerLazySingleton<SettingsRepository>(
       () => SettingsRepositoryImpl(localDataSource: sl()));
+  sl.registerLazySingleton<BookmarkRepository>(
+      () => BookmarkRepositoryImpl(localDataSource: sl()));
   
   // Services
   sl.registerLazySingleton<WebDAVService>(() => WebDAVServiceImpl());
   sl.registerLazySingleton<ThemeService>(() => ThemeServiceImpl(settingsRepository: sl()));
-  sl.registerLazySingleton<CacheService>(() => CacheServiceImpl());
+  sl.registerLazySingleton<CacheService>(() => CacheService());
+  sl.registerLazySingleton<ArchiveService>(() => ArchiveServiceImpl());
+  sl.registerLazySingleton<AutoPageService>(() => AutoPageServiceImpl());
+  sl.registerFactory(() => ComicArchive());
   // #endregion
 
   // #region Data
@@ -116,6 +162,8 @@ Future<void> init() async {
       () => FavoriteLocalDataSourceImpl(db: sl()));
   sl.registerLazySingleton<SettingsLocalDataSource>(
       () => SettingsLocalDataSourceImpl(prefs: sl()));
+  sl.registerLazySingleton<BookmarkLocalDataSource>(
+      () => BookmarkLocalDataSourceImpl(database: sl()));
 
   // Database
   sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
@@ -125,10 +173,21 @@ Future<void> init() async {
   // #endregion
 
   // #region Core
- // Services
- sl.registerLazySingleton(() => LoggingService());
- // sl.registerLazySingleton<ArchiveService>(() => ArchiveServiceImpl());
- // #endregion
+  // Services
+  sl.registerLazySingleton(() => LoggingService());
+  sl.registerLazySingleton(() => MessageService());
+  sl.registerLazySingleton(() => NetworkService(
+        messageService: sl(),
+        loggingService: sl(),
+      ));
+  sl.registerLazySingleton(() => ErrorHandlerService(
+        loggingService: sl(),
+        messageService: sl(),
+      ));
+sl.registerLazySingleton(() => OfflineQueueManager.instance);
+sl.registerLazySingleton(() => DataFlowOptimizer.instance);
+  sl.registerLazySingleton(() => GlobalErrorHandler.instance);
+  // #endregion
 
   // #region External
   final sharedPreferences = await SharedPreferences.getInstance();

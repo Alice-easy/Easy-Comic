@@ -23,14 +23,27 @@ class UnsupportedArchiveFormatException implements Exception {
 
 // --- Service Interface ---
 
-/// A service for handling comic archive files (.zip, .cbz).
+/// A service for handling comic archive files (.zip, .cbz, .rar, .cbr).
 abstract class ArchiveService {
   /// Extracts all image files from a given archive file path.
   ///
-  /// Takes a [filePath] to a .zip or .cbz file.
+  /// Takes a [filePath] to a .zip, .cbz, .rar, or .cbr file.
   /// Returns a list of [Uint8List], where each list item is the byte data of an image.
+  /// Images are sorted naturally by filename.
   ///
   /// Throws [ArchiveFileNotFoundException] if the file does not exist.
-  /// Throws [UnsupportedArchiveFormatException] if the file is not a .zip or .cbz file.
+  /// Throws [UnsupportedArchiveFormatException] if the file format is not supported.
   Future<List<Uint8List>> extractImages(String filePath);
+
+  /// Extracts the first image from an archive as a cover image.
+  ///
+  /// Returns null if no images are found or extraction fails.
+  Future<Uint8List?> extractCoverImage(String filePath);
+
+  /// Gets the page count without extracting all images.
+  ///
+  /// More efficient than extracting all images when only count is needed.
+  ///
+  /// Throws [ArchiveFileNotFoundException] if the file does not exist.
+  Future<int> getPageCount(String filePath);
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../../domain/services/auto_page_service.dart';
 import '../../domain/entities/reader_settings.dart';
+import '../../domain/entities/auto_page_config.dart';
 
 class AutoPageServiceImpl implements AutoPageService {
   Timer? _autoPageTimer;

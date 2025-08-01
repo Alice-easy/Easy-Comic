@@ -250,6 +250,7 @@ class ComicArchive {
         final page = ComicPage(
           pageIndex: i,
           imageData: imageData,
+          path: file.name,
         );
 
         pages.add(page);

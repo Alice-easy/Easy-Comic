@@ -8,6 +8,7 @@ abstract class ComicRepository {
   Future<Either<Failure, List<Comic>>> getComicsInBookshelf(int bookshelfId, {int limit, int offset});
   Stream<Either<Failure, List<Comic>>> watchComicsInBookshelf(int bookshelfId);
   Future<Either<Failure, Comic>> getComic(String id);
+  Future<Either<Failure, Comic>> getComicById(String id);
   Future<Either<Failure, void>> addComic(Comic comic);
   Future<Either<Failure, void>> updateComic(Comic comic);
   Future<Either<Failure, void>> deleteComic(String id);
