@@ -24,7 +24,7 @@ class ComicRepositoryImpl implements ComicRepository {
           .toList();
 
       final comic = Comic(
-        id: filePath.hashCode,
+        id: filePath,
         filePath: filePath,
         title: p.basenameWithoutExtension(filePath),
         pages: pages,
@@ -36,5 +36,11 @@ class ComicRepositoryImpl implements ComicRepository {
       // and return more specific Failures if needed.
       return Left(ServerFailure('Could not extract comic file.'));
     }
+  }
+
+  @override
+  Future<Either<Failure, Comic>> getComicById(String id) {
+    // TODO: implement getComicById
+    throw UnimplementedError();
   }
 }

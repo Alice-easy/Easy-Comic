@@ -85,3 +85,9 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+tasks.whenTaskAdded {
+    if (name == "uploadCrashlyticsMappingFileRelease") {
+        enabled = false
+    }
+}

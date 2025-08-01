@@ -1,11 +1,19 @@
+import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/core/utils/either.dart';
 import '../entities/bookmark.dart';
 
 abstract class BookmarkRepository {
   /// 获取指定漫画的所有书签
-  Future<List<Bookmark>> getBookmarks(String comicId);
+  Future<Either<Failure, List<Bookmark>>> getBookmarksForComic(String comicId);
 
   /// 添加书签
-  Future<void> addBookmark(Bookmark bookmark);
+  Future<Either<Failure, void>> addBookmark(Bookmark bookmark);
+
+  /// 删除书签
+  Future<Either<Failure, void>> removeBookmark(String comicId, int pageIndex);
+
+  /// 获取指定漫画的所有书签
+  Future<List<Bookmark>> getBookmarks(String comicId);
 
   /// 删除书签
   Future<void> deleteBookmark(String bookmarkId);

@@ -75,3 +75,9 @@ enum MemoryPressureLevel {
   critical,  // 90-95%
   emergency, // > 95%
 }
+
+enum CachePriority {
+  low,
+  normal,
+  high,
+}

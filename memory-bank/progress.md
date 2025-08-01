@@ -167,3 +167,7 @@ This file tracks the project's progress using a task list format.
   - Set `HomeScreen` as the new entry point of the application in `main.dart`.
 * [2025-07-31T21:57:21Z] - **Completed Task**: Archived obsolete architecture documents (`reader_v2_architecture.md`, `system_architecture.md`) to `architecture/archive/`.
 - [2025-07-31T22:18:26.564Z] - APK build successful. Files are located in `build/app/outputs/flutter-apk/`.
+- [START] 2025-08-01T06:13:27Z - Start building release APK.
+- [FAIL] 2025-08-01T06:14:45Z - Release APK build failed due to multiple compilation errors.
+* [2025-08-01 06:42:18Z] - **已完成任务**：修复了 `flutter build apk --release` 期间的所有 Dart 编译错误。
+- [SUCCESS] 2025-08-01T06:50:05Z - Release APKs built successfully.

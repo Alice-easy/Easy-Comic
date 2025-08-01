@@ -1,4 +1,4 @@
-import '../../../data/drift_db.dart';
+import '../../../data/drift_db.dart' hide Bookmark;
 import '../../../domain/entities/bookmark.dart';
 
 abstract class BookmarkLocalDataSource {

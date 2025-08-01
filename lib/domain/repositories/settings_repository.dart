@@ -1,16 +1,9 @@
 // lib/domain/repositories/settings_repository.dart
-import 'package:easy_comic/core/services/settings_service.dart';
+import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/core/utils/either.dart';
+import 'package:easy_comic/domain/entities/reader_settings.dart';
 
 abstract class SettingsRepository {
-  Future<ReadingMode> getReadingMode();
-  Future<void> setReadingMode(ReadingMode mode);
-
-  Future<ReadingDirection> getReadingDirection();
-  Future<void> setReadingDirection(ReadingDirection direction);
-
-  Future<AppTheme> getAppTheme();
-  Future<void> setAppTheme(AppTheme theme);
-
-  Future<int> getAutoPageInterval();
-  Future<void> setAutoPageInterval(int interval);
+  Future<Either<Failure, ReaderSettings>> getReaderSettings();
+  Future<Either<Failure, void>> saveReaderSettings(ReaderSettings settings);
 }

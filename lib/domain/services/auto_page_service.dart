@@ -1,3 +1,5 @@
+import 'package:easy_comic/domain/entities/reader_settings.dart';
+
 abstract class AutoPageService {
   /// 开始自动翻页
   Future<void> startAutoPage(int intervalSeconds);
@@ -53,25 +55,31 @@ class AutoPageState {
   });
 }
 
-enum AutoPageEvent {
+class AutoPageEvent {
+  final AutoPageEventType type;
+  final dynamic data;
+
+  const AutoPageEvent(this.type, {this.data});
+
+  factory AutoPageEvent.nextPage() => AutoPageEvent(AutoPageEventType.nextPage);
+  factory AutoPageEvent.pageChanged(int newPage) =>
+      AutoPageEvent(AutoPageEventType.pageChanged, data: newPage);
+  factory AutoPageEvent.completed() => AutoPageEvent(AutoPageEventType.completed);
+  factory AutoPageEvent.started() => AutoPageEvent(AutoPageEventType.started);
+  factory AutoPageEvent.stop() => AutoPageEvent(AutoPageEventType.stop);
+  factory AutoPageEvent.pause() => AutoPageEvent(AutoPageEventType.pause);
+  factory AutoPageEvent.resume() => AutoPageEvent(AutoPageEventType.resume);
+  factory AutoPageEvent.intervalChanged(Duration interval) =>
+      AutoPageEvent(AutoPageEventType.intervalChanged, data: interval);
+}
+
+enum AutoPageEventType {
   nextPage,
   pause,
   resume,
   stop,
-}
-
-class AutoPageConfig {
-  final int defaultInterval;
-  final bool pauseOnUserInteraction;
-  final bool pauseOnAppBackground;
-  final bool pauseOnLowBattery;
-  final bool stopAtLastPage;
-
-  const AutoPageConfig({
-    this.defaultInterval = 5,
-    this.pauseOnUserInteraction = true,
-    this.pauseOnAppBackground = true,
-    this.pauseOnLowBattery = true,
-    this.stopAtLastPage = true,
-  });
+  pageChanged,
+  completed,
+  started,
+  intervalChanged,
 }

@@ -1,127 +1,132 @@
 import 'dart:async';
 import '../../domain/services/auto_page_service.dart';
+import '../../domain/entities/reader_settings.dart';
 
 class AutoPageServiceImpl implements AutoPageService {
   Timer? _autoPageTimer;
-  StreamController<AutoPageEvent>? _eventController;
-  Duration _interval = const Duration(seconds: 5);
-  bool _isActive = false;
-  int _currentPage = 0;
-  int _totalPages = 0;
+  final StreamController<AutoPageEvent> _eventController = StreamController<AutoPageEvent>.broadcast();
+  final StreamController<AutoPageState> _stateController = StreamController<AutoPageState>.broadcast();
+  
+  AutoPageState _state = const AutoPageState(
+    isActive: false,
+    isPaused: false,
+    intervalSeconds: 5,
+    remainingSeconds: 5,
+  );
 
   @override
-  Future<void> startAutoPage(int currentPage, int totalPages, Duration interval) async {
+  Stream<AutoPageEvent> get autoPageEventStream => _eventController.stream;
+
+  @override
+  int get currentInterval => _state.intervalSeconds;
+
+  @override
+  bool get isAutoPageActive => _state.isActive;
+
+  @override
+  bool get isAutoPagePaused => _state.isPaused;
+
+  @override
+  Future<void> pauseForUserInteraction() {
+    // TODO: implement pauseForUserInteraction
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> resetTimer() {
+    // TODO: implement resetTimer
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setAutoPageConfig(AutoPageConfig config) {
+    // TODO: implement setAutoPageConfig
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<AutoPageState> watchAutoPageState() => _stateController.stream;
+
+  @override
+  Future<void> startAutoPage(int intervalSeconds) async {
     await stopAutoPage();
-    
-    _currentPage = currentPage;
-    _totalPages = totalPages;
-    _interval = interval;
-    _isActive = true;
-    
-    _eventController ??= StreamController<AutoPageEvent>.broadcast();
-    
-    _autoPageTimer = Timer.periodic(_interval, (timer) {
-      if (_currentPage < _totalPages - 1) {
-        _currentPage++;
-        _eventController?.add(AutoPageEvent.pageChanged(_currentPage));
-      } else {
-        // Reached the end, stop auto page
-        stopAutoPage();
-        _eventController?.add(AutoPageEvent.completed());
-      }
-    });
-    
-    _eventController?.add(AutoPageEvent.started());
+    _updateState(_state.copyWith(
+      isActive: true,
+      isPaused: false,
+      intervalSeconds: intervalSeconds,
+      remainingSeconds: intervalSeconds,
+    ));
+    _startTimer();
+    _eventController.add(AutoPageEvent.started());
   }
 
   @override
   Future<void> stopAutoPage() async {
-    if (_autoPageTimer != null) {
-      _autoPageTimer!.cancel();
-      _autoPageTimer = null;
-      _isActive = false;
-      _eventController?.add(AutoPageEvent.stopped());
-    }
+    _autoPageTimer?.cancel();
+    _updateState(_state.copyWith(isActive: false, isPaused: false));
+    _eventController.add(AutoPageEvent.stop());
   }
 
   @override
   Future<void> pauseAutoPage() async {
-    if (_isActive && _autoPageTimer != null) {
-      _autoPageTimer!.cancel();
-      _autoPageTimer = null;
-      _eventController?.add(AutoPageEvent.paused());
-    }
+    if (!_state.isActive) return;
+    _autoPageTimer?.cancel();
+    _updateState(_state.copyWith(isPaused: true));
+    _eventController.add(AutoPageEvent.pause());
   }
 
   @override
   Future<void> resumeAutoPage() async {
-    if (_isActive && _autoPageTimer == null) {
-      _autoPageTimer = Timer.periodic(_interval, (timer) {
-        if (_currentPage < _totalPages - 1) {
-          _currentPage++;
-          _eventController?.add(AutoPageEvent.pageChanged(_currentPage));
-        } else {
-          stopAutoPage();
-          _eventController?.add(AutoPageEvent.completed());
-        }
-      });
-      _eventController?.add(AutoPageEvent.resumed());
+    if (!_state.isActive || !_state.isPaused) return;
+    _updateState(_state.copyWith(isPaused: false));
+    _startTimer();
+    _eventController.add(AutoPageEvent.resume());
+  }
+
+  @override
+  Future<void> setInterval(int intervalSeconds) async {
+    _updateState(_state.copyWith(intervalSeconds: intervalSeconds));
+    if (_state.isActive && !_state.isPaused) {
+      _autoPageTimer?.cancel();
+      _startTimer();
     }
   }
 
-  @override
-  Future<bool> isActive() async {
-    return _isActive;
-  }
-
-  @override
-  Future<bool> isPaused() async {
-    return _isActive && _autoPageTimer == null;
-  }
-
-  @override
-  Future<Duration> getInterval() async {
-    return _interval;
-  }
-
-  @override
-  Future<void> setInterval(Duration interval) async {
-    if (_interval != interval) {
-      _interval = interval;
-      
-      // If currently running, restart with new interval
-      if (_isActive && _autoPageTimer != null) {
-        _autoPageTimer!.cancel();
-        _autoPageTimer = Timer.periodic(_interval, (timer) {
-          if (_currentPage < _totalPages - 1) {
-            _currentPage++;
-            _eventController?.add(AutoPageEvent.pageChanged(_currentPage));
-          } else {
-            stopAutoPage();
-            _eventController?.add(AutoPageEvent.completed());
-          }
-        });
+  void _startTimer() {
+    _autoPageTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_state.remainingSeconds <= 1) {
+        _eventController.add(AutoPageEvent.nextPage());
+        _updateState(_state.copyWith(remainingSeconds: _state.intervalSeconds));
+      } else {
+        _updateState(_state.copyWith(remainingSeconds: _state.remainingSeconds - 1));
       }
-      
-      _eventController?.add(AutoPageEvent.intervalChanged(interval));
-    }
+    });
   }
 
-  @override
-  Stream<AutoPageEvent> watchAutoPageEvents() {
-    _eventController ??= StreamController<AutoPageEvent>.broadcast();
-    return _eventController!.stream;
+  void _updateState(AutoPageState newState) {
+    _state = newState;
+    _stateController.add(_state);
   }
 
-  @override
-  Future<void> updateCurrentPage(int page) async {
-    _currentPage = page;
-  }
-
-  @override
   void dispose() {
-    stopAutoPage();
-    _eventController?.close();
-    _eventController = null;
+    _autoPageTimer?.cancel();
+    _eventController.close();
+    _stateController.close();
+  }
+}
+
+extension on AutoPageState {
+  AutoPageState copyWith({
+    bool? isActive,
+    bool? isPaused,
+    int? intervalSeconds,
+    int? remainingSeconds,
+  }) {
+    return AutoPageState(
+      isActive: isActive ?? this.isActive,
+      isPaused: isPaused ?? this.isPaused,
+      intervalSeconds: intervalSeconds ?? this.intervalSeconds,
+      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+    );
   }
 }

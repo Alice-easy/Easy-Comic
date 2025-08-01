@@ -4,4 +4,5 @@ import 'package:easy_comic/domain/entities/comic.dart';
 
 abstract class ComicRepository {
   Future<Either<Failure, Comic>> getComic(String filePath);
+  Future<Either<Failure, Comic>> getComicById(String id);
 }

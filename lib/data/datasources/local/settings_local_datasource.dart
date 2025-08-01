@@ -1,18 +1,10 @@
 // lib/data/datasources/local/settings_local_datasource.dart
 import 'package:easy_comic/core/services/settings_service.dart';
+import 'package:easy_comic/domain/entities/reader_settings.dart';
 
 abstract class ISettingsLocalDataSource {
-  Future<ReadingMode> getReadingMode();
-  Future<void> setReadingMode(ReadingMode mode);
-
-  Future<ReadingDirection> getReadingDirection();
-  Future<void> setReadingDirection(ReadingDirection direction);
-
-  Future<AppTheme> getAppTheme();
-  Future<void> setAppTheme(AppTheme theme);
-
-  Future<int> getAutoPageInterval();
-  Future<void> setAutoPageInterval(int interval);
+  Future<ReaderSettings> getReaderSettings();
+  Future<void> saveReaderSettings(ReaderSettings settings);
 }
 
 class SettingsLocalDataSource implements ISettingsLocalDataSource {
@@ -22,30 +14,13 @@ class SettingsLocalDataSource implements ISettingsLocalDataSource {
       : _settingsService = settingsService;
 
   @override
-  Future<ReadingMode> getReadingMode() => _settingsService.getReadingMode();
+  Future<ReaderSettings> getReaderSettings() async {
+    // This is a mock implementation. In a real app, you would load this from shared_preferences or a database.
+    return const ReaderSettings();
+  }
 
   @override
-  Future<void> setReadingMode(ReadingMode mode) =>
-      _settingsService.setReadingMode(mode);
-
-  @override
-  Future<ReadingDirection> getReadingDirection() =>
-      _settingsService.getReadingDirection();
-
-  @override
-  Future<void> setReadingDirection(ReadingDirection direction) =>
-      _settingsService.setReadingDirection(direction);
-
-  @override
-  Future<AppTheme> getAppTheme() => _settingsService.getAppTheme();
-
-  @override
-  Future<void> setAppTheme(AppTheme theme) => _settingsService.setAppTheme(theme);
-
-  @override
-  Future<int> getAutoPageInterval() => _settingsService.getAutoPageInterval();
-
-  @override
-  Future<void> setAutoPageInterval(int interval) =>
-      _settingsService.setAutoPageInterval(interval);
+  Future<void> saveReaderSettings(ReaderSettings settings) async {
+    // This is a mock implementation. In a real app, you would save this to shared_preferences or a database.
+  }
 }

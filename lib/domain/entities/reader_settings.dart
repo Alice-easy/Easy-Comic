@@ -2,28 +2,28 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 enum ReadingMode {
-  single,
-  dual,
-  continuous,
-  vertical;
+  leftToRight,
+  rightToLeft,
+  vertical,
+  webtoon;
 
   String get displayName {
     switch (this) {
-      case ReadingMode.single:
-        return '单页模式';
-      case ReadingMode.dual:
-        return '双页模式';
-      case ReadingMode.continuous:
-        return '连续滚动';
+      case ReadingMode.leftToRight:
+        return '从左到右';
+      case ReadingMode.rightToLeft:
+        return '从右到左';
       case ReadingMode.vertical:
         return '垂直阅读';
+      case ReadingMode.webtoon:
+        return '长条模式';
     }
   }
 
   static ReadingMode fromString(String value) {
     return ReadingMode.values.firstWhere(
       (mode) => mode.name == value,
-      orElse: () => ReadingMode.single,
+      orElse: () => ReadingMode.leftToRight,
     );
   }
 }
@@ -120,22 +120,30 @@ enum TransitionType {
 }
 
 class TapZoneConfig extends Equatable {
+  final double leftZoneSize;
+  final double rightZoneSize;
   final double leftZoneRatio;
   final double rightZoneRatio;
   final bool enableTapToFlip;
 
   const TapZoneConfig({
+    this.leftZoneSize = 0.25,
+    this.rightZoneSize = 0.25,
     this.leftZoneRatio = 0.25,
     this.rightZoneRatio = 0.25,
     this.enableTapToFlip = true,
   });
 
   TapZoneConfig copyWith({
+    double? leftZoneSize,
+    double? rightZoneSize,
     double? leftZoneRatio,
     double? rightZoneRatio,
     bool? enableTapToFlip,
   }) {
     return TapZoneConfig(
+      leftZoneSize: leftZoneSize ?? this.leftZoneSize,
+      rightZoneSize: rightZoneSize ?? this.rightZoneSize,
       leftZoneRatio: leftZoneRatio ?? this.leftZoneRatio,
       rightZoneRatio: rightZoneRatio ?? this.rightZoneRatio,
       enableTapToFlip: enableTapToFlip ?? this.enableTapToFlip,
@@ -143,7 +151,176 @@ class TapZoneConfig extends Equatable {
   }
 
   @override
-  List<Object?> get props => [leftZoneRatio, rightZoneRatio, enableTapToFlip];
+  List<Object?> get props => [leftZoneSize, rightZoneSize, leftZoneRatio, rightZoneRatio, enableTapToFlip];
+}
+
+class AutoPageConfig extends Equatable {
+  final int defaultInterval;
+  final bool pauseOnUserInteraction;
+  final bool pauseOnAppBackground;
+  final bool showProgressIndicator;
+  final bool stopAtLastPage;
+  final Duration interactionPauseDelay;
+
+  const AutoPageConfig({
+    this.defaultInterval = 5,
+    this.pauseOnUserInteraction = true,
+    this.pauseOnAppBackground = true,
+    this.showProgressIndicator = true,
+    this.stopAtLastPage = true,
+    this.interactionPauseDelay = const Duration(seconds: 3),
+  });
+
+  AutoPageConfig copyWith({
+    int? defaultInterval,
+    bool? pauseOnUserInteraction,
+    bool? pauseOnAppBackground,
+    bool? showProgressIndicator,
+    bool? stopAtLastPage,
+    Duration? interactionPauseDelay,
+  }) {
+    return AutoPageConfig(
+      defaultInterval: defaultInterval ?? this.defaultInterval,
+      pauseOnUserInteraction: pauseOnUserInteraction ?? this.pauseOnUserInteraction,
+      pauseOnAppBackground: pauseOnAppBackground ?? this.pauseOnAppBackground,
+      showProgressIndicator: showProgressIndicator ?? this.showProgressIndicator,
+      stopAtLastPage: stopAtLastPage ?? this.stopAtLastPage,
+      interactionPauseDelay: interactionPauseDelay ?? this.interactionPauseDelay,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    defaultInterval,
+    pauseOnUserInteraction,
+    pauseOnAppBackground,
+    showProgressIndicator,
+    stopAtLastPage,
+    interactionPauseDelay,
+  ];
+}
+
+class CacheConfig extends Equatable {
+  final int memoryCacheSizeMB;
+  final int diskCacheSizeMB;
+  final int preloadDistance;
+  final FilterQuality defaultQuality;
+  final bool enableAdaptiveQuality;
+
+  const CacheConfig({
+    this.memoryCacheSizeMB = 50,
+    this.diskCacheSizeMB = 200,
+    this.preloadDistance = 3,
+    this.defaultQuality = FilterQuality.high,
+    this.enableAdaptiveQuality = true,
+  });
+
+  CacheConfig copyWith({
+    int? memoryCacheSizeMB,
+    int? diskCacheSizeMB,
+    int? preloadDistance,
+    FilterQuality? defaultQuality,
+    bool? enableAdaptiveQuality,
+  }) {
+    return CacheConfig(
+      memoryCacheSizeMB: memoryCacheSizeMB ?? this.memoryCacheSizeMB,
+      diskCacheSizeMB: diskCacheSizeMB ?? this.diskCacheSizeMB,
+      preloadDistance: preloadDistance ?? this.preloadDistance,
+      defaultQuality: defaultQuality ?? this.defaultQuality,
+      enableAdaptiveQuality: enableAdaptiveQuality ?? this.enableAdaptiveQuality,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    memoryCacheSizeMB,
+    diskCacheSizeMB,
+    preloadDistance,
+    defaultQuality,
+    enableAdaptiveQuality,
+  ];
+}
+
+class GestureConfig extends Equatable {
+  final TapZoneConfig tapZoneConfig;
+  final double pinchSensitivity;
+  final double panSensitivity;
+  final bool enableHapticFeedback;
+  final Duration doubleTapTimeout;
+
+  const GestureConfig({
+    this.tapZoneConfig = const TapZoneConfig(),
+    this.pinchSensitivity = 1.0,
+    this.panSensitivity = 1.0,
+    this.enableHapticFeedback = true,
+    this.doubleTapTimeout = const Duration(milliseconds: 300),
+  });
+
+  GestureConfig copyWith({
+    TapZoneConfig? tapZoneConfig,
+    double? pinchSensitivity,
+    double? panSensitivity,
+    bool? enableHapticFeedback,
+    Duration? doubleTapTimeout,
+  }) {
+    return GestureConfig(
+      tapZoneConfig: tapZoneConfig ?? this.tapZoneConfig,
+      pinchSensitivity: pinchSensitivity ?? this.pinchSensitivity,
+      panSensitivity: panSensitivity ?? this.panSensitivity,
+      enableHapticFeedback: enableHapticFeedback ?? this.enableHapticFeedback,
+      doubleTapTimeout: doubleTapTimeout ?? this.doubleTapTimeout,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    tapZoneConfig,
+    pinchSensitivity,
+    panSensitivity,
+    enableHapticFeedback,
+    doubleTapTimeout,
+  ];
+}
+
+class PerformanceConfig extends Equatable {
+  final bool enableProgressiveLoading;
+  final bool enableMemoryOptimization;
+  final double maxMemoryUsageMB;
+  final int targetFPS;
+  final bool enableHardwareAcceleration;
+
+  const PerformanceConfig({
+    this.enableProgressiveLoading = true,
+    this.enableMemoryOptimization = true,
+    this.maxMemoryUsageMB = 100.0,
+    this.targetFPS = 60,
+    this.enableHardwareAcceleration = true,
+  });
+
+  PerformanceConfig copyWith({
+    bool? enableProgressiveLoading,
+    bool? enableMemoryOptimization,
+    double? maxMemoryUsageMB,
+    int? targetFPS,
+    bool? enableHardwareAcceleration,
+  }) {
+    return PerformanceConfig(
+      enableProgressiveLoading: enableProgressiveLoading ?? this.enableProgressiveLoading,
+      enableMemoryOptimization: enableMemoryOptimization ?? this.enableMemoryOptimization,
+      maxMemoryUsageMB: maxMemoryUsageMB ?? this.maxMemoryUsageMB,
+      targetFPS: targetFPS ?? this.targetFPS,
+      enableHardwareAcceleration: enableHardwareAcceleration ?? this.enableHardwareAcceleration,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    enableProgressiveLoading,
+    enableMemoryOptimization,
+    maxMemoryUsageMB,
+    targetFPS,
+    enableHardwareAcceleration,
+  ];
 }
 
 class ReaderSettings extends Equatable {
@@ -162,9 +339,15 @@ class ReaderSettings extends Equatable {
   final double zoomSensitivity;
   final bool enableDoubleTapZoom;
   final bool enableFullscreen;
+  
+  // Enhanced configuration properties
+  final AutoPageConfig autoPageConfig;
+  final CacheConfig cacheConfig;
+  final GestureConfig gestureConfig;
+  final PerformanceConfig performanceConfig;
 
   const ReaderSettings({
-    this.readingMode = ReadingMode.single,
+    this.readingMode = ReadingMode.leftToRight,
     this.navigationDirection = NavigationDirection.horizontal,
     this.backgroundTheme = BackgroundTheme.black,
     this.transitionType = TransitionType.none,
@@ -179,6 +362,10 @@ class ReaderSettings extends Equatable {
     this.zoomSensitivity = 1.0,
     this.enableDoubleTapZoom = true,
     this.enableFullscreen = false,
+    this.autoPageConfig = const AutoPageConfig(),
+    this.cacheConfig = const CacheConfig(),
+    this.gestureConfig = const GestureConfig(),
+    this.performanceConfig = const PerformanceConfig(),
   });
 
   ReaderSettings copyWith({
@@ -197,6 +384,10 @@ class ReaderSettings extends Equatable {
     double? zoomSensitivity,
     bool? enableDoubleTapZoom,
     bool? enableFullscreen,
+    AutoPageConfig? autoPageConfig,
+    CacheConfig? cacheConfig,
+    GestureConfig? gestureConfig,
+    PerformanceConfig? performanceConfig,
   }) {
     return ReaderSettings(
       readingMode: readingMode ?? this.readingMode,
@@ -214,6 +405,10 @@ class ReaderSettings extends Equatable {
       zoomSensitivity: zoomSensitivity ?? this.zoomSensitivity,
       enableDoubleTapZoom: enableDoubleTapZoom ?? this.enableDoubleTapZoom,
       enableFullscreen: enableFullscreen ?? this.enableFullscreen,
+      autoPageConfig: autoPageConfig ?? this.autoPageConfig,
+      cacheConfig: cacheConfig ?? this.cacheConfig,
+      gestureConfig: gestureConfig ?? this.gestureConfig,
+      performanceConfig: performanceConfig ?? this.performanceConfig,
     );
   }
 
@@ -234,5 +429,9 @@ class ReaderSettings extends Equatable {
         zoomSensitivity,
         enableDoubleTapZoom,
         enableFullscreen,
+        autoPageConfig,
+        cacheConfig,
+        gestureConfig,
+        performanceConfig,
       ];
 }

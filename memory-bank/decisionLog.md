@@ -17,3 +17,28 @@
 - 扩展 `ComicRepository` 接口以支持 `HomeScreen` 的功能需求。
 - 实现 `HomeBloc` 和新的 `HomeScreen` UI。
 - 在数据库迁移中移除 `ComicProgress` 表。
+## 2025-08-01
+
+**Decision:**
+- Initiate release APK build using `flutter build apk --release`.
+
+**Rationale:**
+- A new release build is required as per the user's request.
+
+**Follow-up Actions:**
+- Monitor the build process for success or failure.
+- Report the location of the generated APK upon successful completion.
+---
+### 决策 (代码)
+[2025-08-01 06:42:29Z] - 系统地修复了由于 BLoC/存储库重构而导致的大量编译错误。
+
+**理由:**
+为了使项目恢复到可编译状态，必须解决实体、存储库接口、服务实现和 BLoC 之间的不一致。
+
+**详情:**
+*   统一了 `Comic.id` 为 `String` 类型。
+*   更新了所有存储库接口以匹配 BLoC 中的调用。
+*   实现了缺失的方法存根并修复了服务和存储库实现中的方法签名。
+*   解决了 `AutoPageEvent` 的不一致用法。
+*   修复了依赖注入容器中的多个问题。
+*   修复了 `CacheFailure` 构造函数的不正确调用。

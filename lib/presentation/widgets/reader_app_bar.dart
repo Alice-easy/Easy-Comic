@@ -7,7 +7,7 @@ import '../pages/settings_screen.dart';
 class ReaderAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String comicTitle;
   final String pageIndicatorText;
-  final int comicId;
+  final String comicId;
 
   const ReaderAppBar({
     super.key,
