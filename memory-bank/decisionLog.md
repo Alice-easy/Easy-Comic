@@ -42,3 +42,19 @@
 *   解决了 `AutoPageEvent` 的不一致用法。
 *   修复了依赖注入容器中的多个问题。
 *   修复了 `CacheFailure` 构造函数的不正确调用。
+---
+### 决策 (架构)
+[2025-08-01T16:15:24Z] - **采纳并文档化最终的应用架构**
+
+**决策:**
+- 正式采纳并创建了详细的架构蓝图 (`architecture/FINAL_ARCHITECTURE_BLUEPRINT.md`)，该蓝图基于整洁架构（Clean Architecture），并明确了技术选型，包括 BLoC、GetIt、Drift 和 UseCases 模式。
+
+**理由:**
+- 随着项目功能的复杂化（如 `specs/comprehensive_feature_spec.pseudo` 所述），团队需要一个统一、权威的架构指南来确保代码质量、可维护性和可扩展性。
+- 此前的开发周期中出现了架构不一致和实现混乱的问题，这份最终蓝图旨在解决这些问题，为所有开发者提供一个清晰的“单一事实来源”。
+- 确立的架构模式（特别是 Clean Architecture 和 BLoC）是业界处理复杂 Flutter 应用的最佳实践，能够有效隔离关注点，提高可测试性。
+
+**后续行动:**
+- 所有未来的功能开发和重构工作都必须遵循 [`architecture/FINAL_ARCHITECTURE_BLUEPRINT.md`](../architecture/FINAL_ARCHITECTURE_BLUEPRINT.md) 中定义的原则和模式。
+- 开发团队应首先熟悉该蓝图，再开始具体的编码任务。
+- `systemPatterns.md` 已同步更新，以反映这一最终架构决策。

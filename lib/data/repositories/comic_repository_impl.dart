@@ -1,46 +1,131 @@
-import 'dart:typed_data';
-import 'package:path/path.dart' as p;
+import 'dart:convert';
+import 'package:drift/drift.dart';
 import 'package:easy_comic/core/error/failures.dart';
-import 'package:easy_comic/core/services/archive_service.dart';
 import 'package:easy_comic/core/utils/either.dart';
+import 'package:easy_comic/data/datasources/local/comic_local_datasource.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
-import 'package:easy_comic/domain/entities/comic_page.dart';
 import 'package:easy_comic/domain/repositories/comic_repository.dart';
+import '../drift_db.dart' as db;
 
 class ComicRepositoryImpl implements ComicRepository {
-  final ArchiveService archiveService;
+  final ComicLocalDataSource localDataSource;
 
-  ComicRepositoryImpl({required this.archiveService});
+  ComicRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<Failure, Comic>> getComic(String filePath) async {
+  Future<Either<Failure, List<Comic>>> getComicsInBookshelf(int bookshelfId, {int limit = 20, int offset = 0}) async {
     try {
-      final List<Uint8List> imageBytesList = await archiveService.extractImages(filePath);
-
-      final pages = imageBytesList
-          .asMap()
-          .map((index, data) => MapEntry(index, ComicPage(pageIndex: index, imageData: data)))
-          .values
-          .toList();
-
-      final comic = Comic(
-        id: filePath,
-        filePath: filePath,
-        title: p.basenameWithoutExtension(filePath),
-        pages: pages,
-      );
-
-      return Right(comic);
-    } catch (e) {
-      // Here you could check for specific exception types from ArchiveService
-      // and return more specific Failures if needed.
-      return Left(ServerFailure('Could not extract comic file.'));
+      final models = await localDataSource.getComicsInBookshelf(bookshelfId, limit: limit, offset: offset);
+      final entities = models.map(_modelToEntity).toList();
+      return Right(entities);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
     }
   }
 
   @override
-  Future<Either<Failure, Comic>> getComicById(String id) {
-    // TODO: implement getComicById
-    throw UnimplementedError();
+  Stream<Either<Failure, List<Comic>>> watchComicsInBookshelf(int bookshelfId) {
+    return localDataSource.watchComicsInBookshelf(bookshelfId).map(
+      (models) {
+        final entities = models.map(_modelToEntity).toList();
+        return Right<Failure, List<Comic>>(entities);
+      },
+    ).handleError((error) {
+      return Left<Failure, List<Comic>>(DatabaseFailure(error.toString()));
+    });
+  }
+
+  @override
+  Future<Either<Failure, Comic>> getComic(String id) async {
+    try {
+      final model = await localDataSource.getComic(id);
+      if (model != null) {
+        return Right(_modelToEntity(model));
+      } else {
+        return Left(NotFoundFailure('Comic not found.'));
+      }
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addComic(Comic comic) async {
+    try {
+      final companion = _entityToCompanion(comic);
+      await localDataSource.addComic(companion);
+      return const Right(null);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateComic(Comic comic) async {
+    try {
+      final companion = _entityToCompanion(comic);
+      await localDataSource.updateComic(companion);
+      return const Right(null);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteComic(String id) async {
+    try {
+      await localDataSource.deleteComic(id);
+      return const Right(null);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  // --- Mappers ---
+
+  Comic _modelToEntity(db.ComicModel model) {
+    return Comic(
+      id: model.id,
+      filePath: model.filePath,
+      fileName: model.fileName,
+      coverPath: model.coverPath,
+      pageCount: model.pageCount,
+      addTime: model.addTime,
+      lastReadTime: model.lastReadTime,
+      progress: model.progress,
+      bookshelfId: model.bookshelfId,
+      isFavorite: model.isFavorite,
+      tags: List<String>.from(jsonDecode(model.tags)),
+      metadata: Map<String, dynamic>.from(jsonDecode(model.metadata)),
+    );
+  }
+
+  db.ComicsCompanion _entityToCompanion(Comic entity) {
+    return db.ComicsCompanion(
+      id: Value(entity.id),
+      filePath: Value(entity.filePath),
+      fileName: Value(entity.fileName),
+      coverPath: Value(entity.coverPath),
+      pageCount: Value(entity.pageCount),
+      addTime: Value(entity.addTime),
+      lastReadTime: Value(entity.lastReadTime),
+      progress: Value(entity.progress),
+      bookshelfId: Value(entity.bookshelfId),
+      isFavorite: Value(entity.isFavorite),
+      tags: Value(jsonEncode(entity.tags)),
+      metadata: Value(jsonEncode(entity.metadata)),
+    );
+  }
+
+  @override
+  Future<List<Comic>> getAllComics() async {
+    final models = await localDataSource.getAllComics();
+    return models.map(_modelToEntity).toList();
+  }
+
+  @override
+  Future<void> clearAndInsertComics(List<Comic> comics) async {
+    final companions = comics.map(_entityToCompanion).toList();
+    await localDataSource.clearAndInsertComics(companions);
   }
 }

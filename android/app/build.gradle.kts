@@ -18,7 +18,6 @@ if (keyPropertiesFile.exists()) {
 
 android {
     namespace = "com.example.easy_comic"
-    compileSdkPreview = "UpsideDownCake"
     compileSdk = 35
     ndkVersion = "26.1.10909125"
 

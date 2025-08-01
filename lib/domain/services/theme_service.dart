@@ -1,33 +1,27 @@
-import '../entities/reader_settings.dart';
+import 'package:flutter/material.dart';
 
 abstract class ThemeService {
-  /// 应用主题
-  Future<void> applyTheme(BackgroundTheme theme);
+  /// 应用主题模式
+  Future<void> setThemeMode(ThemeMode mode);
 
-  /// 获取当前主题
-  BackgroundTheme getCurrentTheme();
+  /// 获取当前主题模式
+  Future<ThemeMode> getThemeMode();
 
-  /// 监听主题变化
-  Stream<BackgroundTheme> watchThemeChanges();
+  /// 监听主题模式变化
+  Stream<ThemeMode> watchThemeMode();
 
   /// 设置亮度
   Future<void> setBrightness(double brightness);
 
   /// 获取当前亮度
-  double getCurrentBrightness();
+  Future<double> getBrightness();
+
+  /// 监听亮度变化
+  Stream<double> watchBrightness();
 
   /// 启用/禁用全屏模式
   Future<void> setFullscreenMode(bool enabled);
 
   /// 检查是否为全屏模式
-  bool isFullscreenMode();
-
-  /// 自动调整亮度
-  Future<void> autoAdjustBrightness();
-
-  /// 获取系统亮度
-  Future<double> getSystemBrightness();
-
-  /// 重置亮度设置
-  Future<void> resetBrightness();
+  Future<bool> isFullscreen();
 }

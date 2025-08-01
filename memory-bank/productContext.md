@@ -120,3 +120,17 @@ This file provides a high-level overview of the project and the expected product
 A detailed functional specification has been created to translate user requirements into a concrete development plan. This document breaks down all features into modular components, defines their responsibilities, provides pseudocode, and lists necessary third-party libraries.
 
 *   **[View Full Specification](specs/flutter_comic_reader_functional_spec.md)**
+
+## Core Application Features (2025-08-01 Update)
+
+* **书架管理 (Bookshelf Management)**:
+  * 导入本地漫画文件到应用书架。
+  * 创建、重命名和管理多个书架（例如“阅读中”、“已完成”）。
+  * 在网格或列表视图中浏览漫画，并支持排序和搜索。
+* **收藏夹 (Favorites)**:
+  * 将漫画标记为收藏，并在专门的视图中快速访问。
+* **WebDAV 同步 (WebDAV Sync)**:
+  * 通过 WebDAV 协议在多个设备间同步阅读进度、书签和部分设置。
+  * 提供双向数据合并以解决冲突。
+
+*   **[View Comprehensive Specification](specs/flutter_comic_reader_comprehensive_spec.md)**

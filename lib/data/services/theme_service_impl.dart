@@ -1,63 +1,63 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../domain/services/theme_service.dart';
 import '../../domain/repositories/settings_repository.dart';
 
 class ThemeServiceImpl implements ThemeService {
   final SettingsRepository settingsRepository;
-  bool _isDarkMode = false;
-  double _brightness = 0.5;
-  StreamController<bool>? _themeController;
-  StreamController<double>? _brightnessController;
+  final _themeModeController = StreamController<ThemeMode>.broadcast();
 
   ThemeServiceImpl({required this.settingsRepository});
 
   @override
-  Future<bool> isDarkMode() async {
-    return _isDarkMode;
+  Future<ThemeMode> getThemeMode() async {
+    return await settingsRepository.getThemeMode();
   }
 
   @override
-  Future<void> setDarkMode(bool isDark) async {
-    if (_isDarkMode != isDark) {
-      _isDarkMode = isDark;
-      _themeController?.add(isDark);
-    }
+  Future<void> setThemeMode(ThemeMode mode) async {
+    await settingsRepository.setThemeMode(mode);
+    _themeModeController.add(mode);
   }
 
   @override
-  Future<void> toggleTheme() async {
-    await setDarkMode(!_isDarkMode);
-  }
-
-  @override
-  Stream<bool> watchThemeChanges() {
-    _themeController ??= StreamController<bool>.broadcast();
-    return _themeController!.stream;
+  Stream<ThemeMode> watchThemeMode() {
+    return _themeModeController.stream;
   }
 
   @override
   Future<double> getBrightness() async {
-    return _brightness;
+    return await settingsRepository.getBrightness();
   }
 
   @override
   Future<void> setBrightness(double brightness) async {
-    final clampedBrightness = brightness.clamp(0.0, 1.0);
-    if (_brightness != clampedBrightness) {
-      _brightness = clampedBrightness;
-      _brightnessController?.add(clampedBrightness);
+    await settingsRepository.setBrightness(brightness);
+  }
+
+  @override
+  Stream<double> watchBrightness() {
+    // This should ideally be implemented in SettingsRepository if it needs to be reactive
+    // For now, returning an empty stream as the repository doesn't support watching.
+    return Stream.value(0.5);
+  }
+
+  @override
+  Future<bool> isFullscreen() async {
+    return (await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive)) == null;
+  }
+
+  @override
+  Future<void> setFullscreenMode(bool enabled) async {
+    if (enabled) {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    } else {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
   }
 
-  @override
-  Stream<double> watchBrightnessChanges() {
-    _brightnessController ??= StreamController<double>.broadcast();
-    return _brightnessController!.stream;
-  }
-
-  @override
   void dispose() {
-    _themeController?.close();
-    _brightnessController?.close();
+    _themeModeController.close();
   }
 }

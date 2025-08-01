@@ -252,4 +252,3 @@ class _ReaderCoreState extends State<ReaderCore> with TickerProviderStateMixin {
     }
   }
 }
-}

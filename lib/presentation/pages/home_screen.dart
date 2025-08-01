@@ -1,36 +1,72 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:easy_comic/presentation/features/bookshelf/view/bookshelf_screen.dart';
+import 'package:easy_comic/presentation/features/favorites/view/favorites_screen.dart';
+import 'package:easy_comic/presentation/pages/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:easy_comic/presentation/pages/reader_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  static const List<Widget> _pages = <Widget>[
+    BookshelfScreen(),
+    FavoritesScreen(),
+    SettingsScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    _pageController.jumpToPage(index);
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Easy Comic'),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: _pages,
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            final result = await FilePicker.platform.pickFiles(
-              type: FileType.custom,
-              allowedExtensions: ['zip', 'cbz'],
-            );
-
-            if (result != null && result.files.single.path != null) {
-              final filePath = result.files.single.path!;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReaderScreen(filePath: filePath),
-                ),
-              );
-            }
-          },
-          child: const Text('选择漫画'),
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: '书架',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: '收藏',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '设置',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }

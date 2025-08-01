@@ -4,311 +4,211 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 part 'drift_db.g.dart';
 
-// Table definitions
+// --- 数据表定义 (MOD-02) ---
+
+/// 漫画核心信息表
+@DataClassName('ComicModel')
+@TableIndex(name: 'comics_last_read_time_idx', columns: {#lastReadTime})
 class Comics extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  /// 主键，使用 UUID
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
+  /// 文件路径，唯一
   TextColumn get filePath => text().unique()();
+  /// 文件名
   TextColumn get fileName => text()();
-  TextColumn get coverImage => text().nullable()();
-  DateTimeColumn get addedAt => dateTime()();
+  /// 封面图片本地缓存路径
+  TextColumn get coverPath => text()();
+  /// 页面总数
+  IntColumn get pageCount => integer()();
+  /// 添加时间
+  DateTimeColumn get addTime => dateTime()();
+  /// 最后阅读时间
+  DateTimeColumn get lastReadTime => dateTime()();
+  /// 阅读进度 (已读页数)
+  IntColumn get progress => integer()();
+  /// 所属书架ID
+  IntColumn get bookshelfId => integer().references(Bookshelves, #id)();
+  /// 是否为收藏
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get lastReadAt => dateTime().nullable()();
-  RealColumn get progress => real().withDefault(const Constant(0.0))();
-}
+  /// 标签 (JSON 编码的列表)
+  TextColumn get tags => text().withDefault(const Constant('[]'))();
+  /// 元数据 (JSON 编码)
+  TextColumn get metadata => text().withDefault(const Constant('{}'))();
 
-class Bookmarks extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get comicId => integer().references(Comics, #id)();
-  IntColumn get pageIndex => integer()();
-  TextColumn get label => text().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-}
-
-class ComicProgress extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get fileHash => text().unique()();
-  IntColumn get currentPage => integer()();
-  IntColumn get totalPages => integer()();
-  DateTimeColumn get updatedAt => dateTime()();
-  TextColumn get etag => text().nullable()(); // 用于同步
-}
-
-class ReadingSessions extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get fileHash => text()();
-  DateTimeColumn get startTime => dateTime()();
-  DateTimeColumn get endTime => dateTime()();
-  IntColumn get durationInSeconds => integer()();
-}
-
-// Reader settings table for enhanced reading features
-class ReaderSettings extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get userId => text().nullable()(); // For future multi-user support
-  TextColumn get readingMode => text().withDefault(const Constant('single'))();
-  TextColumn get navigationDirection => text().withDefault(const Constant('horizontal'))();
-  TextColumn get backgroundTheme => text().withDefault(const Constant('black'))();
-  TextColumn get transitionType => text().withDefault(const Constant('none'))();
-  RealColumn get brightness => real().withDefault(const Constant(1.0))();
-  BoolColumn get showThumbnails => boolean().withDefault(const Constant(true))();
-  DateTimeColumn get updatedAt => dateTime()();
-  TextColumn get etag => text().nullable()(); // For WebDAV sync
-}
-
-// Page custom ordering for drag-and-drop reordering
-class PageCustomOrder extends Table {
-  IntColumn get comicId => integer().references(Comics, #id)();
-  IntColumn get originalIndex => integer()();
-  IntColumn get customIndex => integer()();
-  DateTimeColumn get createdAt => dateTime()();
-  
   @override
-  Set<Column> get primaryKey => {comicId, originalIndex};
+  Set<Column> get primaryKey => {id};
 }
 
-// Enhanced reading history with session tracking
+/// 书架表
+@DataClassName('BookshelfModel')
+class Bookshelves extends Table {
+  /// 主键，自增
+  IntColumn get id => integer().autoIncrement()();
+  /// 名称 (e.g., "阅读中", "已完成")
+  TextColumn get name => text().unique()();
+  /// 封面图片路径
+  TextColumn get coverImage => text().nullable()();
+  /// 创建时间
+  DateTimeColumn get createTime => dateTime()();
+}
+
+/// 收藏夹表 (文件夹)
+@DataClassName('FavoriteModel')
+class Favorites extends Table {
+  /// 主键，自增
+  IntColumn get id => integer().autoIncrement()();
+  /// 收藏夹名称
+  TextColumn get name => text()();
+  /// 父ID，用于实现层级结构
+  IntColumn get parentId => integer().nullable().references(Favorites, #id)();
+  /// 描述
+  TextColumn get description => text().nullable()();
+  /// 创建时间
+  DateTimeColumn get createTime => dateTime()();
+}
+
+/// 漫画与收藏夹的关联表
+class ComicFavoriteLinks extends Table {
+  /// 漫画ID
+  TextColumn get comicId => text().references(Comics, #id)();
+  /// 收藏夹ID
+  IntColumn get favoriteId => integer().references(Favorites, #id)();
+
+  @override
+  Set<Column> get primaryKey => {comicId, favoriteId};
+}
+
+/// 阅读历史记录表
+@DataClassName('ReadingHistoryModel')
 class ReadingHistory extends Table {
+  /// 主键，自增
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get comicId => integer().references(Comics, #id)();
-  IntColumn get lastPageRead => integer()();
-  DateTimeColumn get lastReadAt => dateTime()();
-  IntColumn get totalTimeSeconds => integer()();
-  TextColumn get sessionId => text()(); // For session grouping
+  /// 漫画ID
+  TextColumn get comicId => text().references(Comics, #id)();
+  /// 阅读到的页码
+  IntColumn get pageNumber => integer()();
+  /// 时间戳
+  DateTimeColumn get timestamp => dateTime()();
 }
 
-// Bookmark thumbnails for visual bookmark navigation
-class BookmarkThumbnails extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get bookmarkId => integer().references(Bookmarks, #id)();
-  TextColumn get thumbnailPath => text()(); // Local file path
-  DateTimeColumn get createdAt => dateTime()();
+
+// --- 数据库访问对象 (DAO) ---
+
+@DriftAccessor(tables: [Comics, ComicFavoriteLinks])
+class ComicsDao extends DatabaseAccessor<AppDatabase> with _$ComicsDaoMixin {
+  ComicsDao(AppDatabase db) : super(db);
+
+  Stream<List<ComicModel>> watchComicsInBookshelf(int bookshelfId) {
+    return (select(comics)..where((tbl) => tbl.bookshelfId.equals(bookshelfId))).watch();
+  }
+
+  Future<List<ComicModel>> getComicsInBookshelf(int bookshelfId, {int limit = 20, int offset = 0}) {
+    final query = select(comics)
+      ..where((tbl) => tbl.bookshelfId.equals(bookshelfId))
+      ..orderBy([(t) => OrderingTerm(expression: t.lastReadTime, mode: OrderingMode.desc)])
+      ..limit(limit, offset: offset);
+    return query.get();
+  }
+
+  Future<void> addComic(ComicsCompanion entry) => into(comics).insert(entry);
+
+  Future<void> updateComic(ComicsCompanion entry) => update(comics).replace(entry);
+
+  Future<void> deleteComic(String id) => (delete(comics)..where((tbl) => tbl.id.equals(id))).go();
+  
+  Future<ComicModel?> getComic(String id) => (select(comics)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+
+  Future<bool> comicExists(String filePath) async {
+    final result = await (select(comics)..where((tbl) => tbl.filePath.equals(filePath))).get();
+    return result.isNotEmpty;
+  }
+
+  Future<List<ComicModel>> getAllComics() => select(comics).get();
+
+  Future<void> clearAndInsertComics(List<ComicsCompanion> entries) async {
+    await batch((batch) {
+      batch.deleteAll(comics);
+      batch.insertAll(comics, entries);
+    });
+  }
 }
 
-// Database class
-@DriftDatabase(tables: [Comics, ComicProgress, ReadingSessions, Bookmarks, ReaderSettings, PageCustomOrder, ReadingHistory, BookmarkThumbnails])
-class DriftDb extends _$DriftDb {
-  DriftDb() : super(_openConnection());
+@DriftAccessor(tables: [Bookshelves])
+class BookshelvesDao extends DatabaseAccessor<AppDatabase> with _$BookshelvesDaoMixin {
+  BookshelvesDao(AppDatabase db) : super(db);
 
-  // Constructor for testing
-  DriftDb.withExecutor(super.executor);
+  Stream<List<BookshelfModel>> watchAllBookshelves() => select(bookshelves).watch();
+
+  Future<int> addBookshelf(BookshelvesCompanion entry) => into(bookshelves).insert(entry);
+
+  Future<void> updateBookshelf(BookshelvesCompanion entry) => update(bookshelves).replace(entry);
+
+  Future<void> deleteBookshelf(int id) => (delete(bookshelves)..where((tbl) => tbl.id.equals(id))).go();
+}
+
+@DriftAccessor(tables: [Favorites, ComicFavoriteLinks])
+class FavoritesDao extends DatabaseAccessor<AppDatabase> with _$FavoritesDaoMixin {
+  FavoritesDao(AppDatabase db) : super(db);
+
+  Stream<List<FavoriteModel>> watchAllFavorites() => select(favorites).watch();
+
+  Future<void> addComicToFavorite(String comicId, int favoriteId) {
+    return into(comicFavoriteLinks).insert(
+      ComicFavoriteLinksCompanion(
+        comicId: Value(comicId),
+        favoriteId: Value(favoriteId),
+      ),
+    );
+  }
+
+  Future<List<FavoriteModel>> getAllFavorites() => select(favorites).get();
+
+  Future<void> clearAndInsertFavorites(List<FavoritesCompanion> entries) async {
+    await batch((batch) {
+      batch.deleteAll(favorites);
+      batch.insertAll(favorites, entries);
+    });
+  }
+}
+
+
+// --- 数据库主类 ---
+
+@DriftDatabase(
+  tables: [Comics, Bookshelves, Favorites, ComicFavoriteLinks, ReadingHistory],
+  daos: [ComicsDao, BookshelvesDao, FavoritesDao],
+)
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
+
+  AppDatabase.forTesting(DatabaseConnection connection) : super(connection);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) => m.createAll(),
-    onUpgrade: (Migrator m, int from, int to) async {
-      if (from < 2) {
-        await m.addColumn(comicProgress, comicProgress.etag);
-      }
-      if (from < 3) {
-        await m.createTable(comics);
-        await m.addColumn(comicProgress, comicProgress.totalPages);
-      }
-      if (from < 4) {
-        await m.createTable(readingSessions);
-      }
-      if (from < 5) {
-        await m.addColumn(comics, comics.isFavorite);
-        await m.addColumn(comics, comics.lastReadAt);
-        await m.addColumn(comics, comics.progress);
-        await m.createTable(bookmarks);
-      }
-      if (from < 6) {
-        await m.createTable(readerSettings);
-        await m.createTable(pageCustomOrder);
-        await m.createTable(readingHistory);
-        await m.createTable(bookmarkThumbnails);
-        
-        // Create default reader settings entry
-        await into(readerSettings).insert(
-          ReaderSettingsCompanion(
-            readingMode: const Value('single'),
-            navigationDirection: const Value('horizontal'),
-            backgroundTheme: const Value('black'),
-            transitionType: const Value('none'),
-            brightness: const Value(1.0),
-            showThumbnails: const Value(true),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
-      }
+    onCreate: (m) async {
+      await m.createAll();
+      // 创建一个默认书架
+      await into(bookshelves).insert(
+        BookshelvesCompanion(
+          name: const Value('默认书架'),
+          createTime: Value(DateTime.now()),
+        ),
+      );
     },
   );
-
-  // DAO methods
-  Future<void> upsertProgress(
-    String fileHash,
-    int currentPage,
-    int totalPages, {
-    String? etag,
-  }) async {
-    final existing = await getProgress(fileHash);
-    if (existing != null) {
-      await (update(
-        comicProgress,
-      )..where((tbl) => tbl.fileHash.equals(fileHash))).write(
-        ComicProgressCompanion(
-          currentPage: Value(currentPage),
-          totalPages: Value(totalPages),
-          updatedAt: Value(DateTime.now()),
-          etag: Value(etag),
-        ),
-      );
-    } else {
-      await into(comicProgress).insert(
-        ComicProgressCompanion(
-          fileHash: Value(fileHash),
-          currentPage: Value(currentPage),
-          totalPages: Value(totalPages),
-          updatedAt: Value(DateTime.now()),
-          etag: Value(etag),
-        ),
-      );
-    }
-  }
-
-  Future<ComicProgressData?> getProgress(String fileHash) => (select(
-    comicProgress,
-  )..where((tbl) => tbl.fileHash.equals(fileHash))).getSingleOrNull();
-
-  Future<void> addReadingSession(ReadingSession session) =>
-      into(readingSessions).insert(session);
-
-  Future<int> getThisWeekReadingMinutes() async {
-    final now = DateTime.now();
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final endOfWeek = startOfWeek.add(const Duration(days: 7));
-    final sessions =
-        await (select(readingSessions)..where(
-              (tbl) =>
-                  tbl.startTime.isBiggerOrEqualValue(startOfWeek) &
-                  tbl.endTime.isSmallerOrEqualValue(endOfWeek),
-            ))
-            .get();
-    final totalSeconds = sessions.fold<int>(
-      0,
-      (previousValue, element) => previousValue + element.durationInSeconds,
-    );
-    return totalSeconds ~/ 60;
-  }
-
-  // Reader Settings DAO methods
-  Future<ReaderSetting?> getReaderSettings([String? userId]) async {
-    final query = select(readerSettings);
-    if (userId != null) {
-      query.where((tbl) => tbl.userId.equals(userId));
-    } else {
-      query.where((tbl) => tbl.userId.isNull());
-    }
-    return await query.getSingleOrNull();
-  }
-
-  Future<void> updateReaderSettings(ReaderSetting settings) async {
-    await (update(readerSettings)..where((tbl) => tbl.id.equals(settings.id)))
-        .write(settings.toCompanion(true).copyWith(updatedAt: Value(DateTime.now())));
-  }
-
-  // Page Custom Order DAO methods
-  Future<List<PageCustomOrderData>> getCustomPageOrder(int comicId) async {
-    return await (select(pageCustomOrder)
-          ..where((tbl) => tbl.comicId.equals(comicId))
-          ..orderBy([(tbl) => OrderingTerm.asc(tbl.customIndex)]))
-        .get();
-  }
-
-  Future<void> setCustomPageOrder(int comicId, List<int> newOrder) async {
-    await transaction(() async {
-      // Delete existing custom order
-      await (delete(pageCustomOrder)..where((tbl) => tbl.comicId.equals(comicId))).go();
-      
-      // Insert new order
-      for (int i = 0; i < newOrder.length; i++) {
-        await into(pageCustomOrder).insert(PageCustomOrderCompanion(
-          comicId: Value(comicId),
-          originalIndex: Value(newOrder[i]),
-          customIndex: Value(i),
-          createdAt: Value(DateTime.now()),
-        ));
-      }
-    });
-  }
-
-  Future<void> clearCustomPageOrder(int comicId) async {
-    await (delete(pageCustomOrder)..where((tbl) => tbl.comicId.equals(comicId))).go();
-  }
-
-  // Reading History DAO methods
-  Future<void> addToReadingHistory(int comicId, int pageRead, String sessionId) async {
-    final existing = await (select(readingHistory)
-          ..where((tbl) => tbl.comicId.equals(comicId))
-          ..orderBy([(tbl) => OrderingTerm.desc(tbl.lastReadAt)])
-          ..limit(1))
-        .getSingleOrNull();
-
-    if (existing != null) {
-      await (update(readingHistory)..where((tbl) => tbl.id.equals(existing.id)))
-          .write(ReadingHistoryCompanion(
-        lastPageRead: Value(pageRead),
-        lastReadAt: Value(DateTime.now()),
-        sessionId: Value(sessionId),
-      ));
-    } else {
-      await into(readingHistory).insert(ReadingHistoryCompanion(
-        comicId: Value(comicId),
-        lastPageRead: Value(pageRead),
-        lastReadAt: Value(DateTime.now()),
-        totalTimeSeconds: const Value(0),
-        sessionId: Value(sessionId),
-      ));
-    }
-  }
-
-  Future<List<ReadingHistoryData>> getReadingHistory({int limit = 50}) async {
-    return await (select(readingHistory)
-          ..orderBy([(tbl) => OrderingTerm.desc(tbl.lastReadAt)])
-          ..limit(limit))
-        .get();
-  }
-
-  Future<void> cleanupReadingHistory({int keepCount = 50}) async {
-    final allHistory = await (select(readingHistory)
-          ..orderBy([(tbl) => OrderingTerm.desc(tbl.lastReadAt)]))
-        .get();
-    
-    if (allHistory.length > keepCount) {
-      final toDelete = allHistory.skip(keepCount).map((h) => h.id).toList();
-      await (delete(readingHistory)..where((tbl) => tbl.id.isIn(toDelete))).go();
-    }
-  }
-
-  // Bookmark Thumbnails DAO methods
-  Future<void> addBookmarkThumbnail(int bookmarkId, String thumbnailPath) async {
-    await into(bookmarkThumbnails).insert(BookmarkThumbnailsCompanion(
-      bookmarkId: Value(bookmarkId),
-      thumbnailPath: Value(thumbnailPath),
-      createdAt: Value(DateTime.now()),
-    ));
-  }
-
-  Future<BookmarkThumbnail?> getBookmarkThumbnail(int bookmarkId) async {
-    return await (select(bookmarkThumbnails)
-          ..where((tbl) => tbl.bookmarkId.equals(bookmarkId)))
-        .getSingleOrNull();
-  }
-
-  Future<void> deleteBookmarkThumbnail(int bookmarkId) async {
-    await (delete(bookmarkThumbnails)..where((tbl) => tbl.bookmarkId.equals(bookmarkId))).go();
-  }
 }
 
-// Connection setup
-LazyDatabase _openConnection() => LazyDatabase(() async {
-  final dbFolder = await getApplicationDocumentsDirectory();
-  final file = File(p.join(dbFolder.path, 'comic_progress.db'));
-  return NativeDatabase(file);
-});
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'easy_comic.db'));
+    return NativeDatabase(file);
+  });
+}

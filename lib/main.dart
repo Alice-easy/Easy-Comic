@@ -1,49 +1,38 @@
-import 'dart:ui';
-
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:easy_comic/presentation/features/settings/theme/bloc/theme_bloc.dart';
+import 'dart:async';
+import 'package:easy_comic/core/services/logging_service.dart';
+import 'package:easy_comic/presentation/pages/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_comic/injection_container.dart' as di;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:home_widget/home_widget.dart';
-
-import 'core/background_task_manager.dart';
 import 'core/constants.dart';
-import 'core/services/settings_service.dart';
-import 'core/task_registrar.dart';
-import 'data/drift_db.dart';
-import 'firebase_options.dart';
-import 'injection_container.dart' as di;
-import 'presentation/features/reader/bloc/reader_bloc.dart';
-import 'presentation/pages/home_screen.dart';
+import 'injection_container.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await di.init();
-  // await HomeWidget.registerInteractivityCallback(backgroundCallback);
+  runZonedGuarded<Future<void>>(() async {
+    // Ensure that widget binding is initialized
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // 初始化 Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // Initialize dependency injection
+    await di.init();
 
-  // 设置 Crashlytics 错误处理器
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+    // Set up error handling
+    FlutterError.onError = (FlutterErrorDetails details) {
+      // Forward to the zone's error handler
+      Zone.current.handleUncaughtError(details.exception, details.stack ?? StackTrace.current);
+    };
 
-  // 模拟用户登录并设置用户ID
-  await FirebaseCrashlytics.instance
-      .setUserIdentifier(AppConstants.defaultUserId);
-
-  // 初始化后台任务管理器
-  await BackgroundTaskManager.initialize();
-  // 注册后台任务
-  await TaskRegistrar.registerTasks();
-
-  // await updateWidget();
-
-  runApp(const MyApp());
+    // Run the app
+    runApp(const MyApp());
+  }, (error, stackTrace) {
+    // This is the global error handler.
+    // Use the LoggingService to record the error.
+    final loggingService = sl<LoggingService>();
+    loggingService.error('Unhandled error caught by runZonedGuarded', error, stackTrace);
+    // You might also want to report this to a remote service like Firebase Crashlytics
+    // For example: FirebaseCrashlytics.instance.recordError(error, stackTrace, fatal: true);
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -51,42 +40,46 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderBloc>(
-          create: (context) => di.sl<ReaderBloc>(),
-        ),
-      ],
-      child: DynamicColorBuilder(
-        builder: (lightDynamic, darkDynamic) {
-          ColorScheme lightColorScheme;
-          ColorScheme darkColorScheme;
+    return BlocProvider(
+      create: (_) => sl<ThemeBloc>()..add(GetTheme()),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return DynamicColorBuilder(
+            builder: (lightDynamic, darkDynamic) {
+              final colorScheme = _createColorScheme(lightDynamic, darkDynamic);
+              final darkColorScheme =
+                  _createColorScheme(lightDynamic, darkDynamic, isDark: true);
 
-          if (lightDynamic != null && darkDynamic != null) {
-            lightColorScheme = lightDynamic;
-            darkColorScheme = darkDynamic;
-          } else {
-            lightColorScheme =
-                ColorScheme.fromSeed(seedColor: Colors.deepPurple);
-            darkColorScheme = ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple,
-              brightness: Brightness.dark,
-            );
-          }
-
-          return MaterialApp(
-            title: AppConstants.appName,
-            theme:
-                ThemeData(colorScheme: lightColorScheme, useMaterial3: true),
-            darkTheme: ThemeData(
-              colorScheme: darkColorScheme,
-              useMaterial3: true,
-            ),
-            themeMode: ThemeMode.system, // Or load from settings
-            home: const HomeScreen(),
+              return MaterialApp(
+                title: AppConstants.appName,
+                theme: ThemeData(
+                  colorScheme: colorScheme,
+                  useMaterial3: true,
+                ),
+                darkTheme: ThemeData(
+                  colorScheme: darkColorScheme,
+                  useMaterial3: true,
+                ),
+                themeMode: state.themeMode,
+                home: const HomeScreen(),
+              );
+            },
           );
         },
       ),
     );
+  }
+
+  ColorScheme _createColorScheme(
+      ColorScheme? lightDynamic, ColorScheme? darkDynamic,
+      {bool isDark = false}) {
+    if (lightDynamic != null && darkDynamic != null) {
+      return isDark ? darkDynamic : lightDynamic;
+    } else {
+      return ColorScheme.fromSeed(
+        seedColor: Colors.deepPurple,
+        brightness: isDark ? Brightness.dark : Brightness.light,
+      );
+    }
   }
 }

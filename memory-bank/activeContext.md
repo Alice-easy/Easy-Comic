@@ -26,3 +26,17 @@
 1.  Analyze the error log in detail.
 2.  Delegate the fixing of these errors to the `code` mode.
 * [2025-08-01 06:41:56Z] - 解决了与 BLoC/存储库重构相关的所有 Dart 编译错误。项目现在可以成功编译，但 Firebase Crashlytics 的网络问题阻止了最终的 APK 组装。
+
+---
+**当前焦点:** 基于新的全面功能规格文档进行开发。
+
+**任务:**
+1.  **实现书架模块 (MOD-04):** 根据 `specs/flutter_comic_reader_comprehensive_spec.md` 开始实现书架的文件导入、数据库集成和 UI。
+2.  **实现数据持久化 (MOD-02):** 扩展 Drift 数据库，加入 `Bookshelf` 和 `Favorites` 相关的数据表。
+3.  **实现 WebDAV 同步服务 (MOD-07):** 搭建 `SyncService` 的基础结构，并实现与 WebDAV 服务器的基本连接。
+
+**后续步骤:**
+- 按照新规格文档，逐一实现收藏夹、同步逻辑等其余核心功能。
+* [2025-08-01T16:02:03Z] - Startup process refactoring complete. The application now has a clean entry point based on Clean Architecture. The next logical step is to implement the core features like Bookshelf and Reader functionality on top of this stable base.
+---
+* [2025-08-01T16:04:07Z] - **Next Focus:** With the startup process stabilized, the immediate next priority is to implement the data persistence layer as defined in the architecture. This involves setting up the Drift (SQLite) database with the necessary tables for Comics, Bookshelves, and Favorites, and configuring the SharedPreferences service for user settings. This is a prerequisite for any feature development.

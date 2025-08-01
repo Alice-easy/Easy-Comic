@@ -81,3 +81,35 @@ It is optional, but recommended to be updated as the project evolves.
     *   **Directory Structure**: The `lib` directory is organized into `presentation`, `domain`, `data`, and `core` folders, directly reflecting the architectural layers.
     *   **Dependency Injection**: `GetIt` is used as a service locator to decouple classes and manage dependencies across layers, configured in a central `injection_container.dart`.
     *   **State Management**: The `flutter_bloc` library is used within the Presentation layer to manage state, responding to user events and interacting with the Domain layer (typically via UseCases or Repositories).
+
+---
+### Architectural Patterns
+[2025-08-01T15:41:06Z] - **Clean Architecture with BLoC and UseCases**
+*   **Description**: The application architecture is formally defined as a Clean Architecture variant. It promotes a clear separation of concerns into three primary layers: Presentation, Domain, and Data. The Presentation layer uses the BLoC pattern for state management. The Domain layer introduces UseCases (Interactors) to encapsulate specific business logic, which are called by the BLoCs. The Data layer implements repository interfaces defined in the Domain layer.
+*   **Rationale**: This structured approach enhances modularity, testability, and maintainability. UseCases provide a finer-grained control over business logic, preventing BLoCs from becoming bloated and ensuring that each component has a single, well-defined responsibility. This pattern is ideal for the complexity outlined in `specs/flutter_comic_reader_comprehensive_spec.md`.
+*   **Implementation**:
+    *   **Data Flow**: UI (Widget) -> BLoC -> UseCase -> Repository -> DataSource.
+    *   **Directory Structure**: The `lib` directory is physically separated into `presentation`, `domain`, and `data` folders.
+    *   **Dependencies**: All dependencies point inwards, towards the `domain` layer.
+
+---
+### Dependency Injection Patterns
+[2025-08-01T15:41:06Z] - **Service Locator with GetIt**
+*   **Description**: Dependency Injection is managed using the `get_it` package, which acts as a Service Locator. All dependencies (Repositories, UseCases, BLoCs, DataSources, external services like `SharedPreferences`) are registered in a centralized `injection_container.dart` file at application startup.
+*   **Rationale**: Using `get_it` provides a fast, simple, and flexible way to decouple classes across all layers of the application. It simplifies testing by allowing mock dependencies to be easily injected in test environments.
+*   **Implementation**:
+    *   **Registration**: Dependencies are registered with different lifecycles: `registerLazySingleton` for single instances (Repositories, UseCases), and `registerFactory` for new instances each time (BLoCs).
+    *   **Access**: Dependencies are retrieved in code by calling `sl<MyType>()`.
+    *   **Initialization**: All dependencies are registered by calling a single `init()` function from `main.dart` before the app runs.
+---
+### Architectural Patterns
+[2025-08-01T16:15:03Z] - **最终确定的整洁架构 (Finalized Clean Architecture)**
+*   **描述**: 正式确立应用的核心架构为整洁架构（Clean Architecture），严格划分表示层（Presentation）、领域层（Domain）和数据层（Data）。
+    *   **表示层**: 使用 BLoC 进行状态管理，负责 UI 渲染和用户交互。
+    *   **领域层**: 包含业务实体（Entities）、用例（UseCases）和仓库接口（Repository Interfaces），是应用的核心，独立于任何框架。
+    *   **数据层**: 通过实现仓库接口来提供数据，管理数据源（Drift 数据库、WebDAV、SharedPreferences）。
+*   **理由**: 此架构提供了极致的关注点分离，最大化了代码的可测试性、可维护性和长期可扩展性。它将核心业务逻辑与外部依赖完全隔离，能够灵活应对未来的技术和需求变化。该设计是对 `specs/comprehensive_feature_spec.pseudo` 中所有功能需求的直接响应。
+*   **实现**:
+    *   **权威文档**: 完整的架构定义、组件职责和数据流图见 [`architecture/FINAL_ARCHITECTURE_BLUEPRINT.md`](../architecture/FINAL_ARCHITECTURE_BLUEPRINT.md)。
+    *   **依赖注入**: 使用 `GetIt` 作为服务定位器，在 `injection_container.dart` 中统一管理所有依赖。
+    *   **数据流**: 严格遵循 UI -> BLoC -> UseCase -> Repository 的单向数据流。

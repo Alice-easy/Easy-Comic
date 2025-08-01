@@ -1,2 +1,399 @@
 import 'dart:async';
-import 'dart:io';\nimport 'package:flutter/foundation.dart';\nimport '../services/cache_service.dart';\nimport '../error/retry_mechanism.dart';\n\n/// Memory pressure levels with thresholds\nenum MemoryPressureLevel {\n  normal,    // < 60MB\n  warning,   // 60-80MB\n  critical,  // 80-100MB\n  emergency, // > 100MB\n}\n\n/// Recovery strategies for different pressure levels\nenum RecoveryStrategy {\n  none,\n  lightCleanup,\n  aggressiveCleanup,\n  qualityDegradation,\n  emergencyCleanup,\n}\n\n/// Memory usage statistics\nclass MemoryStats {\n  final int totalMemoryMB;\n  final int usedMemoryMB;\n  final int cacheMemoryMB;\n  final double usagePercentage;\n  final MemoryPressureLevel pressureLevel;\n  final DateTime timestamp;\n  \n  const MemoryStats({\n    required this.totalMemoryMB,\n    required this.usedMemoryMB,\n    required this.cacheMemoryMB,\n    required this.usagePercentage,\n    required this.pressureLevel,\n    required this.timestamp,\n  });\n  \n  @override\n  String toString() {\n    return 'MemoryStats(used: ${usedMemoryMB}MB, cache: ${cacheMemoryMB}MB, '\n        'pressure: $pressureLevel, usage: ${usagePercentage.toStringAsFixed(1)}%)';\n  }\n}\n\n/// Recovery action result\nclass RecoveryResult {\n  final int memoryFreedMB;\n  final RecoveryStrategy strategy;\n  final Duration duration;\n  final bool succeeded;\n  final String? error;\n  \n  const RecoveryResult({\n    required this.memoryFreedMB,\n    required this.strategy,\n    required this.duration,\n    required this.succeeded,\n    this.error,\n  });\n}\n\n/// Memory pressure recovery service with automatic cleanup and quality degradation\nclass MemoryPressureRecovery {\n  final ICacheService _cacheService;\n  final ExponentialBackoffRetry _retry = ExponentialBackoffRetry();\n  \n  // Monitoring configuration\n  final Duration monitoringInterval;\n  final int maxMemoryMB;\n  final int warningThresholdMB;\n  final int criticalThresholdMB;\n  \n  // State tracking\n  Timer? _monitoringTimer;\n  final StreamController<MemoryStats> _memoryStatsController = \n      StreamController<MemoryStats>.broadcast();\n  final StreamController<RecoveryResult> _recoveryResultController = \n      StreamController<RecoveryResult>.broadcast();\n  \n  MemoryStats? _lastStats;\n  bool _isRecovering = false;\n  ImageQuality _currentQuality = ImageQuality.high;\n  \n  // Recovery statistics\n  int _totalRecoveries = 0;\n  int _totalMemoryFreed = 0;\n  DateTime? _lastRecoveryTime;\n  \n  MemoryPressureRecovery({\n    required ICacheService cacheService,\n    this.monitoringInterval = const Duration(seconds: 5),\n    this.maxMemoryMB = 100,\n    this.warningThresholdMB = 60,\n    this.criticalThresholdMB = 80,\n  }) : _cacheService = cacheService {\n    _startMonitoring();\n  }\n  \n  /// Stream of memory statistics\n  Stream<MemoryStats> get memoryStatsStream => _memoryStatsController.stream;\n  \n  /// Stream of recovery results\n  Stream<RecoveryResult> get recoveryResultStream => _recoveryResultController.stream;\n  \n  /// Current memory statistics\n  MemoryStats? get currentStats => _lastStats;\n  \n  /// Current image quality level\n  ImageQuality get currentQuality => _currentQuality;\n  \n  /// Recovery statistics\n  Map<String, dynamic> get recoveryStats => {\n    'totalRecoveries': _totalRecoveries,\n    'totalMemoryFreed': _totalMemoryFreed,\n    'lastRecoveryTime': _lastRecoveryTime?.toIso8601String(),\n    'currentQuality': _currentQuality.name,\n  };\n  \n  void _startMonitoring() {\n    _monitoringTimer = Timer.periodic(monitoringInterval, (_) {\n      _checkMemoryPressure();\n    });\n  }\n  \n  Future<void> _checkMemoryPressure() async {\n    try {\n      final stats = await _getCurrentMemoryStats();\n      _lastStats = stats;\n      _memoryStatsController.add(stats);\n      \n      // Trigger recovery if needed\n      if (stats.pressureLevel != MemoryPressureLevel.normal && !_isRecovering) {\n        await _triggerRecovery(stats);\n      }\n      \n    } catch (e) {\n      debugPrint('Error checking memory pressure: $e');\n    }\n  }\n  \n  Future<MemoryStats> _getCurrentMemoryStats() async {\n    // Get cache statistics\n    final cacheStats = await _cacheService.getStats();\n    final cacheMemoryMB = cacheStats.memoryUsage.round();\n    \n    // Estimate total memory usage (cache + overhead)\n    final estimatedTotalMB = (cacheMemoryMB * 1.5).round(); // 50% overhead estimate\n    \n    // Determine pressure level\n    MemoryPressureLevel pressureLevel;\n    if (estimatedTotalMB < warningThresholdMB) {\n      pressureLevel = MemoryPressureLevel.normal;\n    } else if (estimatedTotalMB < criticalThresholdMB) {\n      pressureLevel = MemoryPressureLevel.warning;\n    } else if (estimatedTotalMB < maxMemoryMB) {\n      pressureLevel = MemoryPressureLevel.critical;\n    } else {\n      pressureLevel = MemoryPressureLevel.emergency;\n    }\n    \n    return MemoryStats(\n      totalMemoryMB: maxMemoryMB,\n      usedMemoryMB: estimatedTotalMB,\n      cacheMemoryMB: cacheMemoryMB,\n      usagePercentage: (estimatedTotalMB / maxMemoryMB) * 100,\n      pressureLevel: pressureLevel,\n      timestamp: DateTime.now(),\n    );\n  }\n  \n  Future<void> _triggerRecovery(MemoryStats stats) async {\n    if (_isRecovering) return;\n    \n    _isRecovering = true;\n    final stopwatch = Stopwatch()..start();\n    \n    try {\n      final strategy = _selectRecoveryStrategy(stats.pressureLevel);\n      final initialMemory = stats.usedMemoryMB;\n      \n      await _executeRecoveryStrategy(strategy, stats);\n      \n      // Check results\n      final newStats = await _getCurrentMemoryStats();\n      final memoryFreed = initialMemory - newStats.usedMemoryMB;\n      \n      stopwatch.stop();\n      \n      final result = RecoveryResult(\n        memoryFreedMB: memoryFreed,\n        strategy: strategy,\n        duration: stopwatch.elapsed,\n        succeeded: memoryFreed > 0,\n      );\n      \n      _recoveryResultController.add(result);\n      _updateRecoveryStats(result);\n      \n      debugPrint('Memory recovery completed: freed ${memoryFreed}MB using $strategy');\n      \n    } catch (e) {\n      stopwatch.stop();\n      \n      final result = RecoveryResult(\n        memoryFreedMB: 0,\n        strategy: RecoveryStrategy.none,\n        duration: stopwatch.elapsed,\n        succeeded: false,\n        error: e.toString(),\n      );\n      \n      _recoveryResultController.add(result);\n      debugPrint('Memory recovery failed: $e');\n      \n    } finally {\n      _isRecovering = false;\n    }\n  }\n  \n  RecoveryStrategy _selectRecoveryStrategy(MemoryPressureLevel level) {\n    switch (level) {\n      case MemoryPressureLevel.normal:\n        return RecoveryStrategy.none;\n      case MemoryPressureLevel.warning:\n        return RecoveryStrategy.lightCleanup;\n      case MemoryPressureLevel.critical:\n        return RecoveryStrategy.aggressiveCleanup;\n      case MemoryPressureLevel.emergency:\n        return RecoveryStrategy.emergencyCleanup;\n    }\n  }\n  \n  Future<void> _executeRecoveryStrategy(RecoveryStrategy strategy, MemoryStats stats) async {\n    switch (strategy) {\n      case RecoveryStrategy.none:\n        break;\n        \n      case RecoveryStrategy.lightCleanup:\n        await _performLightCleanup();\n        break;\n        \n      case RecoveryStrategy.aggressiveCleanup:\n        await _performAggressiveCleanup();\n        break;\n        \n      case RecoveryStrategy.qualityDegradation:\n        await _degradeImageQuality();\n        await _performAggressiveCleanup();\n        break;\n        \n      case RecoveryStrategy.emergencyCleanup:\n        await _performEmergencyCleanup();\n        break;\n    }\n  }\n  \n  Future<void> _performLightCleanup() async {\n    await _retry.execute(\n      () async {\n        // Clean up expired cache entries\n        await _cacheService.cleanupCacheAsync();\n        \n        // Trigger garbage collection\n        if (!kReleaseMode) {\n          await Future.delayed(const Duration(milliseconds: 100));\n        }\n      },\n      config: RetryConfig.database,\n    );\n  }\n  \n  Future<void> _performAggressiveCleanup() async {\n    await _retry.execute(\n      () async {\n        // Clear low priority cache entries\n        await _cacheService.cleanupCacheAsync();\n        \n        // Force garbage collection\n        await _forceGarbageCollection();\n      },\n      config: RetryConfig.database,\n    );\n  }\n  \n  Future<void> _performEmergencyCleanup() async {\n    await _retry.execute(\n      () async {\n        // Clear all cache\n        await _cacheService.clearCache();\n        \n        // Degrade quality to minimum\n        _currentQuality = ImageQuality.thumbnail;\n        \n        // Force garbage collection\n        await _forceGarbageCollection();\n      },\n      config: RetryConfig.database,\n    );\n  }\n  \n  Future<void> _degradeImageQuality() async {\n    // Step down quality level\n    switch (_currentQuality) {\n      case ImageQuality.original:\n        _currentQuality = ImageQuality.high;\n        break;\n      case ImageQuality.high:\n        _currentQuality = ImageQuality.medium;\n        break;\n      case ImageQuality.medium:\n        _currentQuality = ImageQuality.thumbnail;\n        break;\n      case ImageQuality.thumbnail:\n        // Already at minimum quality\n        break;\n    }\n    \n    debugPrint('Degraded image quality to: $_currentQuality');\n  }\n  \n  Future<void> _forceGarbageCollection() async {\n    // Platform-specific garbage collection hints\n    if (Platform.isAndroid || Platform.isIOS) {\n      // On mobile platforms, suggest garbage collection\n      await Future.delayed(const Duration(milliseconds: 50));\n    }\n  }\n  \n  void _updateRecoveryStats(RecoveryResult result) {\n    if (result.succeeded) {\n      _totalRecoveries++;\n      _totalMemoryFreed += result.memoryFreedMB;\n      _lastRecoveryTime = DateTime.now();\n    }\n  }\n  \n  /// Manually trigger memory recovery\n  Future<RecoveryResult> triggerManualRecovery({RecoveryStrategy? strategy}) async {\n    final stats = await _getCurrentMemoryStats();\n    final selectedStrategy = strategy ?? _selectRecoveryStrategy(stats.pressureLevel);\n    \n    final stopwatch = Stopwatch()..start();\n    final initialMemory = stats.usedMemoryMB;\n    \n    try {\n      await _executeRecoveryStrategy(selectedStrategy, stats);\n      \n      final newStats = await _getCurrentMemoryStats();\n      final memoryFreed = initialMemory - newStats.usedMemoryMB;\n      \n      stopwatch.stop();\n      \n      final result = RecoveryResult(\n        memoryFreedMB: memoryFreed,\n        strategy: selectedStrategy,\n        duration: stopwatch.elapsed,\n        succeeded: memoryFreed > 0,\n      );\n      \n      _updateRecoveryStats(result);\n      return result;\n      \n    } catch (e) {\n      stopwatch.stop();\n      \n      return RecoveryResult(\n        memoryFreedMB: 0,\n        strategy: selectedStrategy,\n        duration: stopwatch.elapsed,\n        succeeded: false,\n        error: e.toString(),\n      );\n    }\n  }\n  \n  /// Reset image quality to default\n  void resetImageQuality() {\n    _currentQuality = ImageQuality.high;\n  }\n  \n  /// Stop monitoring and cleanup\n  void dispose() {\n    _monitoringTimer?.cancel();\n    _memoryStatsController.close();\n    _recoveryResultController.close();\n  }\n}
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import '../services/cache_service.dart';
+import '../error/retry_mechanism.dart';
+
+/// Memory pressure levels with thresholds
+enum MemoryPressureLevel {
+  normal,    // < 60MB
+  warning,   // 60-80MB
+  critical,  // 80-100MB
+  emergency, // > 100MB
+}
+
+/// Recovery strategies for different pressure levels
+enum RecoveryStrategy {
+  none,
+  lightCleanup,
+  aggressiveCleanup,
+  qualityDegradation,
+  emergencyCleanup,
+}
+
+/// Image quality levels for degradation
+enum ImageQuality {
+  original,
+  high,
+  medium,
+  thumbnail,
+}
+
+/// Memory usage statistics
+class MemoryStats {
+  final int totalMemoryMB;
+  final int usedMemoryMB;
+  final int cacheMemoryMB;
+  final double usagePercentage;
+  final MemoryPressureLevel pressureLevel;
+  final DateTime timestamp;
+  
+  const MemoryStats({
+    required this.totalMemoryMB,
+    required this.usedMemoryMB,
+    required this.cacheMemoryMB,
+    required this.usagePercentage,
+    required this.pressureLevel,
+    required this.timestamp,
+  });
+  
+  @override
+  String toString() {
+    return 'MemoryStats(used: ${usedMemoryMB}MB, cache: ${cacheMemoryMB}MB, '
+        'pressure: $pressureLevel, usage: ${usagePercentage.toStringAsFixed(1)}%)';
+  }
+}
+
+/// Recovery action result
+class RecoveryResult {
+  final int memoryFreedMB;
+  final RecoveryStrategy strategy;
+  final Duration duration;
+  final bool succeeded;
+  final String? error;
+  
+  const RecoveryResult({
+    required this.memoryFreedMB,
+    required this.strategy,
+    required this.duration,
+    required this.succeeded,
+    this.error,
+  });
+}
+
+/// Memory pressure recovery service with automatic cleanup and quality degradation
+class MemoryPressureRecovery {
+  final ICacheService _cacheService;
+  final ExponentialBackoffRetry _retry = ExponentialBackoffRetry();
+  
+  // Monitoring configuration
+  final Duration monitoringInterval;
+  final int maxMemoryMB;
+  final int warningThresholdMB;
+  final int criticalThresholdMB;
+  
+  // State tracking
+  Timer? _monitoringTimer;
+  final StreamController<MemoryStats> _memoryStatsController = 
+      StreamController<MemoryStats>.broadcast();
+  final StreamController<RecoveryResult> _recoveryResultController = 
+      StreamController<RecoveryResult>.broadcast();
+  
+  MemoryStats? _lastStats;
+  bool _isRecovering = false;
+  ImageQuality _currentQuality = ImageQuality.high;
+  
+  // Recovery statistics
+  int _totalRecoveries = 0;
+  int _totalMemoryFreed = 0;
+  DateTime? _lastRecoveryTime;
+  
+  MemoryPressureRecovery({
+    required ICacheService cacheService,
+    this.monitoringInterval = const Duration(seconds: 5),
+    this.maxMemoryMB = 100,
+    this.warningThresholdMB = 60,
+    this.criticalThresholdMB = 80,
+  }) : _cacheService = cacheService {
+    _startMonitoring();
+  }
+  
+  /// Stream of memory statistics
+  Stream<MemoryStats> get memoryStatsStream => _memoryStatsController.stream;
+  
+  /// Stream of recovery results
+  Stream<RecoveryResult> get recoveryResultStream => _recoveryResultController.stream;
+  
+  /// Current memory statistics
+  MemoryStats? get currentStats => _lastStats;
+  
+  /// Current image quality level
+  ImageQuality get currentQuality => _currentQuality;
+  
+  /// Recovery statistics
+  Map<String, dynamic> get recoveryStats => {
+    'totalRecoveries': _totalRecoveries,
+    'totalMemoryFreed': _totalMemoryFreed,
+    'lastRecoveryTime': _lastRecoveryTime?.toIso8601String(),
+    'currentQuality': _currentQuality.name,
+  };
+  
+  void _startMonitoring() {
+    _monitoringTimer = Timer.periodic(monitoringInterval, (_) {
+      _checkMemoryPressure();
+    });
+  }
+  
+  Future<void> _checkMemoryPressure() async {
+    try {
+      final stats = await _getCurrentMemoryStats();
+      _lastStats = stats;
+      _memoryStatsController.add(stats);
+      
+      // Trigger recovery if needed
+      if (stats.pressureLevel != MemoryPressureLevel.normal && !_isRecovering) {
+        await _triggerRecovery(stats);
+      }
+      
+    } catch (e) {
+      debugPrint('Error checking memory pressure: $e');
+    }
+  }
+  
+  Future<MemoryStats> _getCurrentMemoryStats() async {
+    // Get cache statistics
+    final cacheStats = await _cacheService.getStats();
+    final cacheMemoryMB = cacheStats.memoryUsage.round();
+    
+    // Estimate total memory usage (cache + overhead)
+    final estimatedTotalMB = (cacheMemoryMB * 1.5).round(); // 50% overhead estimate
+    
+    // Determine pressure level
+    MemoryPressureLevel pressureLevel;
+    if (estimatedTotalMB < warningThresholdMB) {
+      pressureLevel = MemoryPressureLevel.normal;
+    } else if (estimatedTotalMB < criticalThresholdMB) {
+      pressureLevel = MemoryPressureLevel.warning;
+    } else if (estimatedTotalMB < maxMemoryMB) {
+      pressureLevel = MemoryPressureLevel.critical;
+    } else {
+      pressureLevel = MemoryPressureLevel.emergency;
+    }
+    
+    return MemoryStats(
+      totalMemoryMB: maxMemoryMB,
+      usedMemoryMB: estimatedTotalMB,
+      cacheMemoryMB: cacheMemoryMB,
+      usagePercentage: (estimatedTotalMB / maxMemoryMB) * 100,
+      pressureLevel: pressureLevel,
+      timestamp: DateTime.now(),
+    );
+  }
+  
+  Future<void> _triggerRecovery(MemoryStats stats) async {
+    if (_isRecovering) return;
+    
+    _isRecovering = true;
+    final stopwatch = Stopwatch()..start();
+    
+    try {
+      final strategy = _selectRecoveryStrategy(stats.pressureLevel);
+      final initialMemory = stats.usedMemoryMB;
+      
+      await _executeRecoveryStrategy(strategy, stats);
+      
+      // Check results
+      final newStats = await _getCurrentMemoryStats();
+      final memoryFreed = initialMemory - newStats.usedMemoryMB;
+      
+      stopwatch.stop();
+      
+      final result = RecoveryResult(
+        memoryFreedMB: memoryFreed,
+        strategy: strategy,
+        duration: stopwatch.elapsed,
+        succeeded: memoryFreed > 0,
+      );
+      
+      _recoveryResultController.add(result);
+      _updateRecoveryStats(result);
+      
+      debugPrint('Memory recovery completed: freed ${memoryFreed}MB using $strategy');
+      
+    } catch (e) {
+      stopwatch.stop();
+      
+      final result = RecoveryResult(
+        memoryFreedMB: 0,
+        strategy: RecoveryStrategy.none,
+        duration: stopwatch.elapsed,
+        succeeded: false,
+        error: e.toString(),
+      );
+      
+      _recoveryResultController.add(result);
+      debugPrint('Memory recovery failed: $e');
+      
+    } finally {
+      _isRecovering = false;
+    }
+  }
+  
+  RecoveryStrategy _selectRecoveryStrategy(MemoryPressureLevel level) {
+    switch (level) {
+      case MemoryPressureLevel.normal:
+        return RecoveryStrategy.none;
+      case MemoryPressureLevel.warning:
+        return RecoveryStrategy.lightCleanup;
+      case MemoryPressureLevel.critical:
+        return RecoveryStrategy.aggressiveCleanup;
+      case MemoryPressureLevel.emergency:
+        return RecoveryStrategy.emergencyCleanup;
+    }
+  }
+  
+  Future<void> _executeRecoveryStrategy(RecoveryStrategy strategy, MemoryStats stats) async {
+    switch (strategy) {
+      case RecoveryStrategy.none:
+        break;
+        
+      case RecoveryStrategy.lightCleanup:
+        await _performLightCleanup();
+        break;
+        
+      case RecoveryStrategy.aggressiveCleanup:
+        await _performAggressiveCleanup();
+        break;
+        
+      case RecoveryStrategy.qualityDegradation:
+        await _degradeImageQuality();
+        await _performAggressiveCleanup();
+        break;
+        
+      case RecoveryStrategy.emergencyCleanup:
+        await _performEmergencyCleanup();
+        break;
+    }
+  }
+  
+  Future<void> _performLightCleanup() async {
+    await _retry.execute(
+      () async {
+        // Clean up expired cache entries
+        await _cacheService.cleanupCacheAsync();
+        
+        // Trigger garbage collection
+        if (!kReleaseMode) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+      },
+      config: RetryConfig.database,
+    );
+  }
+  
+  Future<void> _performAggressiveCleanup() async {
+    await _retry.execute(
+      () async {
+        // Clear low priority cache entries
+        await _cacheService.cleanupCacheAsync();
+        
+        // Force garbage collection
+        await _forceGarbageCollection();
+      },
+      config: RetryConfig.database,
+    );
+  }
+  
+  Future<void> _performEmergencyCleanup() async {
+    await _retry.execute(
+      () async {
+        // Clear all cache
+        await _cacheService.clearCache();
+        
+        // Degrade quality to minimum
+        _currentQuality = ImageQuality.thumbnail;
+        
+        // Force garbage collection
+        await _forceGarbageCollection();
+      },
+      config: RetryConfig.database,
+    );
+  }
+  
+  Future<void> _degradeImageQuality() async {
+    // Step down quality level
+    switch (_currentQuality) {
+      case ImageQuality.original:
+        _currentQuality = ImageQuality.high;
+        break;
+      case ImageQuality.high:
+        _currentQuality = ImageQuality.medium;
+        break;
+      case ImageQuality.medium:
+        _currentQuality = ImageQuality.thumbnail;
+        break;
+      case ImageQuality.thumbnail:
+        // Already at minimum quality
+        break;
+    }
+    
+    debugPrint('Degraded image quality to: $_currentQuality');
+  }
+  
+  Future<void> _forceGarbageCollection() async {
+    // Platform-specific garbage collection hints
+    if (Platform.isAndroid || Platform.isIOS) {
+      // On mobile platforms, suggest garbage collection
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+  }
+  
+  void _updateRecoveryStats(RecoveryResult result) {
+    if (result.succeeded) {
+      _totalRecoveries++;
+      _totalMemoryFreed += result.memoryFreedMB;
+      _lastRecoveryTime = DateTime.now();
+    }
+  }
+  
+  /// Manually trigger memory recovery
+  Future<RecoveryResult> triggerManualRecovery({RecoveryStrategy? strategy}) async {
+    final stats = await _getCurrentMemoryStats();
+    final selectedStrategy = strategy ?? _selectRecoveryStrategy(stats.pressureLevel);
+    
+    final stopwatch = Stopwatch()..start();
+    final initialMemory = stats.usedMemoryMB;
+    
+    try {
+      await _executeRecoveryStrategy(selectedStrategy, stats);
+      
+      final newStats = await _getCurrentMemoryStats();
+      final memoryFreed = initialMemory - newStats.usedMemoryMB;
+      
+      stopwatch.stop();
+      
+      final result = RecoveryResult(
+        memoryFreedMB: memoryFreed,
+        strategy: selectedStrategy,
+        duration: stopwatch.elapsed,
+        succeeded: memoryFreed > 0,
+      );
+      
+      _updateRecoveryStats(result);
+      return result;
+      
+    } catch (e) {
+      stopwatch.stop();
+      
+      return RecoveryResult(
+        memoryFreedMB: 0,
+        strategy: selectedStrategy,
+        duration: stopwatch.elapsed,
+        succeeded: false,
+        error: e.toString(),
+      );
+    }
+  }
+  
+  /// Reset image quality to default
+  void resetImageQuality() {
+    _currentQuality = ImageQuality.high;
+  }
+  
+  /// Stop monitoring and cleanup
+  void dispose() {
+    _monitoringTimer?.cancel();
+    _memoryStatsController.close();
+    _recoveryResultController.close();
+  }
+}
