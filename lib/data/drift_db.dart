@@ -96,6 +96,91 @@ class ReadingHistory extends Table {
   DateTimeColumn get timestamp => dateTime()();
 }
 
+/// 漫画阅读进度表 - 用于详细的进度跟踪和同步
+@DataClassName('ComicProgressModel')
+@TableIndex(name: 'comic_progress_comic_id_idx', columns: {#comicId})
+@TableIndex(name: 'comic_progress_last_updated_idx', columns: {#lastUpdated})
+class ComicProgress extends Table {
+  /// 主键，使用 UUID
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
+  /// 漫画ID (外键)
+  TextColumn get comicId => text().references(Comics, #id)();
+  /// 当前页码
+  IntColumn get currentPage => integer()();
+  /// 总页数
+  IntColumn get totalPages => integer()();
+  /// 最后更新时间
+  DateTimeColumn get lastUpdated => dateTime()();
+  /// 是否已完成
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  
+  /// 同步管理
+  /// 同步状态: 'pending', 'synced', 'conflict'
+  TextColumn get syncStatus => text().withDefault(const Constant('pending'))();
+  /// WebDAV 同步的 ETag
+  TextColumn get syncETag => text().nullable()();
+  /// 最后同步时间
+  DateTimeColumn get lastSyncTime => dateTime().nullable()();
+  
+  /// 性能跟踪
+  /// 阅读时长（秒）
+  IntColumn get readingTimeSeconds => integer().withDefault(const Constant(0))();
+  /// 元数据 JSON
+  TextColumn get metadata => text().withDefault(const Constant('{}'))();
+  
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// 缓存元数据表 - 用于缓存管理和性能优化
+@DataClassName('CacheMetadataModel')
+@TableIndex(name: 'cache_metadata_comic_id_idx', columns: {#comicId})
+@TableIndex(name: 'cache_metadata_last_accessed_idx', columns: {#lastAccessed})
+class CacheMetadata extends Table {
+  /// 缓存键
+  TextColumn get cacheKey => text()();
+  /// 漫画ID
+  TextColumn get comicId => text().references(Comics, #id)();
+  /// 页面索引
+  IntColumn get pageIndex => integer()();
+  /// 文件大小（字节）
+  IntColumn get sizeBytes => integer()();
+  /// 最后访问时间
+  DateTimeColumn get lastAccessed => dateTime()();
+  /// 创建时间
+  DateTimeColumn get createdAt => dateTime()();
+  /// 访问次数
+  IntColumn get accessCount => integer().withDefault(const Constant(0))();
+  /// 优先级: 'critical', 'high', 'medium', 'low'
+  TextColumn get priority => text().withDefault(const Constant('low'))();
+  
+  @override
+  Set<Column> get primaryKey => {cacheKey};
+}
+
+/// 性能指标表 - 用于监控和优化
+@DataClassName('PerformanceMetricsModel')
+@TableIndex(name: 'performance_metrics_timestamp_idx', columns: {#timestamp})
+class PerformanceMetrics extends Table {
+  /// 主键，使用 UUID
+  TextColumn get id => text().clientDefault(() => const Uuid().v4())();
+  /// 时间戳
+  DateTimeColumn get timestamp => dateTime()();
+  /// 指标类型: 'memory', 'performance', 'error', 'cache'
+  TextColumn get metricType => text()();
+  /// 相关漫画ID（可选）
+  TextColumn get comicId => text().nullable().references(Comics, #id)();
+  /// 指标值
+  RealColumn get value => real()();
+  /// 单位: 'MB', 'ms', 'count', 'percentage'
+  TextColumn get unit => text()();
+  /// 上下文信息 JSON
+  TextColumn get context => text().withDefault(const Constant('{}'))();
+  
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 
 // --- 数据库访问对象 (DAO) ---
 
@@ -228,12 +313,178 @@ class FavoritesDao extends DatabaseAccessor<AppDatabase> with _$FavoritesDaoMixi
   }
 }
 
+/// 漫画进度数据访问对象
+@DriftAccessor(tables: [ComicProgress])
+class ComicProgressDao extends DatabaseAccessor<AppDatabase> with _$ComicProgressDaoMixin {
+  ComicProgressDao(AppDatabase db) : super(db);
+
+  /// 获取指定漫画的进度
+  Future<ComicProgressModel?> getProgress(String comicId) =>
+      (select(comicProgress)..where((tbl) => tbl.comicId.equals(comicId))).getSingleOrNull();
+
+  /// 监听指定漫画的进度变化
+  Stream<ComicProgressModel?> watchProgress(String comicId) =>
+      (select(comicProgress)..where((tbl) => tbl.comicId.equals(comicId))).watchSingleOrNull();
+
+  /// 保存或更新进度
+  Future<void> saveProgress(ComicProgressCompanion entry) async {
+    await into(comicProgress).insert(entry, mode: InsertMode.insertOrReplace);
+  }
+
+  /// 批量保存进度
+  Future<void> batchSaveProgress(List<ComicProgressCompanion> entries) async {
+    await batch((batch) {
+      for (final entry in entries) {
+        batch.insert(comicProgress, entry, mode: InsertMode.insertOrReplace);
+      }
+    });
+  }
+
+  /// 获取需要同步的进度记录
+  Future<List<ComicProgressModel>> getPendingSyncProgress() =>
+      (select(comicProgress)..where((tbl) => tbl.syncStatus.equals('pending'))).get();
+
+  /// 标记进度为已同步
+  Future<void> markAsSynced(String comicId, String etag) async {
+    await (update(comicProgress)..where((tbl) => tbl.comicId.equals(comicId)))
+        .write(ComicProgressCompanion(
+      syncStatus: const Value('synced'),
+      syncETag: Value(etag),
+      lastSyncTime: Value(DateTime.now()),
+    ));
+  }
+
+  /// 获取所有完成的漫画
+  Future<List<ComicProgressModel>> getCompletedComics() =>
+      (select(comicProgress)..where((tbl) => tbl.isCompleted.equals(true))).get();
+
+  /// 删除指定漫画的进度
+  Future<void> deleteProgress(String comicId) =>
+      (delete(comicProgress)..where((tbl) => tbl.comicId.equals(comicId))).go();
+
+  /// 更新阅读时长
+  Future<void> updateReadingTime(String comicId, int additionalSeconds) async {
+    final existing = await getProgress(comicId);
+    if (existing != null) {
+      await (update(comicProgress)..where((tbl) => tbl.comicId.equals(comicId)))
+          .write(ComicProgressCompanion(
+        readingTimeSeconds: Value(existing.readingTimeSeconds + additionalSeconds),
+        lastUpdated: Value(DateTime.now()),
+      ));
+    }
+  }
+}
+
+/// 缓存元数据数据访问对象
+@DriftAccessor(tables: [CacheMetadata])
+class CacheMetadataDao extends DatabaseAccessor<AppDatabase> with _$CacheMetadataDaoMixin {
+  CacheMetadataDao(AppDatabase db) : super(db);
+
+  /// 添加缓存元数据
+  Future<void> addCacheMetadata(CacheMetadataCompanion entry) =>
+      into(cacheMetadata).insert(entry, mode: InsertMode.insertOrReplace);
+
+  /// 获取缓存元数据
+  Future<CacheMetadataModel?> getCacheMetadata(String cacheKey) =>
+      (select(cacheMetadata)..where((tbl) => tbl.cacheKey.equals(cacheKey))).getSingleOrNull();
+
+  /// 更新访问信息
+  Future<void> updateAccess(String cacheKey) async {
+    final existing = await getCacheMetadata(cacheKey);
+    if (existing != null) {
+      await (update(cacheMetadata)..where((tbl) => tbl.cacheKey.equals(cacheKey)))
+          .write(CacheMetadataCompanion(
+        lastAccessed: Value(DateTime.now()),
+        accessCount: Value(existing.accessCount + 1),
+      ));
+    }
+  }
+
+  /// 获取低优先级的缓存项用于清理
+  Future<List<CacheMetadataModel>> getLowPriorityCache(int limit) =>
+      (select(cacheMetadata)
+        ..where((tbl) => tbl.priority.isNotIn(['critical', 'high']))
+        ..orderBy([(t) => OrderingTerm(expression: t.lastAccessed, mode: OrderingMode.asc)])
+        ..limit(limit))
+          .get();
+
+  /// 删除缓存元数据
+  Future<void> deleteCacheMetadata(String cacheKey) =>
+      (delete(cacheMetadata)..where((tbl) => tbl.cacheKey.equals(cacheKey))).go();
+
+  /// 获取指定漫画的所有缓存
+  Future<List<CacheMetadataModel>> getComicCacheMetadata(String comicId) =>
+      (select(cacheMetadata)..where((tbl) => tbl.comicId.equals(comicId))).get();
+
+  /// 清理过期缓存元数据
+  Future<void> cleanupOldCache(DateTime cutoffTime) =>
+      (delete(cacheMetadata)..where((tbl) => tbl.lastAccessed.isSmallerThanValue(cutoffTime))).go();
+}
+
+/// 性能指标数据访问对象
+@DriftAccessor(tables: [PerformanceMetrics])
+class PerformanceMetricsDao extends DatabaseAccessor<AppDatabase> with _$PerformanceMetricsDaoMixin {
+  PerformanceMetricsDao(AppDatabase db) : super(db);
+
+  /// 添加性能指标
+  Future<void> addMetric(PerformanceMetricsCompanion entry) =>
+      into(performanceMetrics).insert(entry);
+
+  /// 获取指定类型的最新指标
+  Future<List<PerformanceMetricsModel>> getRecentMetrics(String metricType, int limit) =>
+      (select(performanceMetrics)
+        ..where((tbl) => tbl.metricType.equals(metricType))
+        ..orderBy([(t) => OrderingTerm(expression: t.timestamp, mode: OrderingMode.desc)])
+        ..limit(limit))
+          .get();
+
+  /// 获取指定时间范围内的指标
+  Future<List<PerformanceMetricsModel>> getMetricsInRange(
+      String metricType, DateTime startTime, DateTime endTime) =>
+      (select(performanceMetrics)
+        ..where((tbl) => tbl.metricType.equals(metricType) &
+            tbl.timestamp.isBetweenValues(startTime, endTime))
+        ..orderBy([(t) => OrderingTerm(expression: t.timestamp, mode: OrderingMode.desc)]))
+          .get();
+
+  /// 清理旧的性能指标
+  Future<void> cleanupOldMetrics(DateTime cutoffTime) =>
+      (delete(performanceMetrics)..where((tbl) => tbl.timestamp.isSmallerThanValue(cutoffTime))).go();
+
+  /// 获取平均性能指标
+  Future<double?> getAverageMetric(String metricType, DateTime since) async {
+    final query = selectOnly(performanceMetrics)
+      ..addColumns([performanceMetrics.value.avg()])
+      ..where(performanceMetrics.metricType.equals(metricType) &
+          performanceMetrics.timestamp.isBiggerThanValue(since));
+    
+    final result = await query.getSingleOrNull();
+    return result?.read(performanceMetrics.value.avg());
+  }
+}
+
 
 // --- 数据库主类 ---
 
 @DriftDatabase(
-  tables: [Comics, Bookshelves, Favorites, ComicFavoriteLinks, ReadingHistory],
-  daos: [ComicsDao, BookshelvesDao, FavoritesDao],
+  tables: [
+    Comics, 
+    Bookshelves, 
+    Favorites, 
+    ComicFavoriteLinks, 
+    ReadingHistory,
+    ComicProgress,
+    CacheMetadata,
+    PerformanceMetrics,
+  ],
+  daos: [
+    ComicsDao, 
+    BookshelvesDao, 
+    FavoritesDao, 
+    ComicProgressDao,
+    CacheMetadataDao,
+    PerformanceMetricsDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -241,7 +492,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(DatabaseConnection connection) : super(connection);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -254,6 +505,14 @@ class AppDatabase extends _$AppDatabase {
           createTime: Value(DateTime.now()),
         ),
       );
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        // 添加新的表格
+        await m.createTable(comicProgress);
+        await m.createTable(cacheMetadata);
+        await m.createTable(performanceMetrics);
+      }
     },
   );
 }

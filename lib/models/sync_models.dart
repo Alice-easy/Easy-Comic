@@ -1,3 +1,27 @@
+import 'package:easy_comic/domain/entities/bookmark.dart';
+import 'package:easy_comic/domain/entities/comic_progress.dart';
+import 'package:easy_comic/domain/entities/favorite.dart';
+import 'package:easy_comic/domain/entities/reader_settings.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'sync_models.freezed.dart';
+part 'sync_models.g.dart';
+
+@freezed
+class SyncPackage with _$SyncPackage {
+  const factory SyncPackage({
+    required DateTime lastModified,
+    required ReaderSettings settings,
+    required List<ComicProgress> progress,
+    required List<Favorite> favorites,
+    required List<Bookmark> bookmarks,
+  }) = _SyncPackage;
+
+  factory SyncPackage.fromJson(Map<String, dynamic> json) =>
+      _$SyncPackageFromJson(json);
+}
+
+
 class SyncResult {
   SyncResult({
     required this.uploaded,

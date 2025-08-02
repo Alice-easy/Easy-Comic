@@ -1,337 +1,133 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:path/path.dart' as p;
-import '../data/drift_db.dart';
-import '../models/sync_models.dart';
-import 'constants.dart';
-import 'error_handler.dart';
-import 'webdav_service.dart';
+import 'dart:typed_data';
 
-/// 同步冲突解决策略
-enum ConflictResolution {
-  localFirst, // 本地优先
-  remoteFirst, // 远程优先
-  manual, // 手动解决
-}
+import 'package:dartz/dartz.dart';
+import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/domain/entities/bookmark.dart';
+import 'package:easy_comic/domain/entities/comic.dart';
+import 'package:easy_comic/domain/entities/comic_progress.dart';
+import 'package:easy_comic/domain/entities/favorite.dart';
+import 'package:easy_comic/domain/entities/webdav_config.dart';
+import 'package:easy_comic/domain/entities/reader_settings.dart';
+import 'package:easy_comic/domain/repositories/bookmark_repository.dart';
+import 'package:easy_comic/domain/repositories/comic_repository.dart';
+import 'package:easy_comic/domain/repositories/favorite_repository.dart';
+import 'package:easy_comic/domain/repositories/settings_repository.dart';
+import 'package:easy_comic/domain/services/webdav_service.dart';
+import 'package:easy_comic/models/sync_models.dart';
 
-/// 同步状态
-enum SyncStatus { idle, syncing, error }
+const _syncFileName = 'easy_comic_sync.json';
 
-/// 同步引擎
 class SyncEngine {
+  final WebDAVService _webDAVService;
+  final SettingsRepository _settingsRepository;
+  final ComicRepository _comicRepository;
+  final FavoriteRepository _favoriteRepository;
+  final BookmarkRepository _bookmarkRepository;
+
   SyncEngine({
-    required this.db,
-    required this.webdavService,
-    this.conflictResolution = ConflictResolution.localFirst,
-  });
+    required WebDAVService webDAVService,
+    required SettingsRepository settingsRepository,
+    required ComicRepository comicRepository,
+    required FavoriteRepository favoriteRepository,
+    required BookmarkRepository bookmarkRepository,
+  })  : _webDAVService = webDAVService,
+        _settingsRepository = settingsRepository,
+        _comicRepository = comicRepository,
+        _favoriteRepository = favoriteRepository,
+        _bookmarkRepository = bookmarkRepository;
 
-  final DriftDb db;
-  final WebDAVService webdavService;
-
-  // 同步配置
-  final ConflictResolution conflictResolution;
-
-  // 同步状态
-  SyncStatus _status = SyncStatus.idle;
-  final StreamController<SyncStatus> _statusController =
-      StreamController<SyncStatus>.broadcast();
-
-  // 进度报告
-  final StreamController<double> _progressController =
-      StreamController<double>.broadcast();
-
-  // Getters
-  SyncStatus get status => _status;
-  Stream<SyncStatus> get statusStream => _statusController.stream;
-  Stream<double> get progressStream => _progressController.stream;
-
-  /// 设置同步状态
-  void _setStatus(SyncStatus status) {
-    _status = status;
-    _statusController.add(status);
-  }
-
-  /// 设置进度
-  void _setProgress(double progress) {
-    _progressController.add(progress);
-  }
-
-  /// 执行双向同步
-  Future<SyncResult> sync() async {
-    if (_status == SyncStatus.syncing) {
-      throw StateError('Sync already in progress');
-    }
-
-    _setStatus(SyncStatus.syncing);
-    _setProgress(0);
-
+  Future<Either<Failure, Unit>> performSync() async {
     try {
-      final result = await _performSync();
-      _setStatus(SyncStatus.idle);
-      _setProgress(1);
-      return result;
-    } catch (e) {
-      _setStatus(SyncStatus.error);
-      rethrow;
-    }
-  }
-
-  /// 执行单次同步 (sync 方法的别名)
-  Future<SyncResult> runOnce() => sync();
-
-  /// 执行实际同步逻辑
-  Future<SyncResult> _performSync() async {
-    final errors = <String>[];
-    var uploaded = 0;
-    var downloaded = 0;
-    var conflicts = 0;
-
-    try {
-      // 1. 获取本地数据
-      _setProgress(0.1);
-      final localData = await _getLocalData();
-
-      // 2. 获取远程数据
-      _setProgress(0.2);
-      final remoteData = await _getRemoteData();
-
-      // 3. 比较并生成操作列表
-      _setProgress(0.3);
-      final operations = _compareData(localData, remoteData);
-
-      // 4. 并发执行同步操作
-      _setProgress(0.4);
-      final futures = <Future<void>>[];
-
-      var completedOperations = 0;
-      final totalOperations = operations.length;
-
-      for (final operation in operations) {
-        final future = Future(() async {
-          try {
-            switch (operation.type) {
-              case SyncOperationType.upload:
-                await _uploadData(operation.item);
-                uploaded++;
-                break;
-              case SyncOperationType.download:
-                await _downloadData(operation.item);
-                downloaded++;
-                break;
-              case SyncOperationType.conflict:
-                await _resolveConflict(operation.item, operation.remoteItem!);
-                conflicts++;
-                break;
-            }
-          } catch (e) {
-            final appError = ErrorHandler.convertToAppError(e);
-            errors.add('Failed to sync ${operation.item.fileHash}: ${appError.userMessage}');
-            await ErrorHandler.handleError(
-              e,
-              stackTrace: StackTrace.current,
-              context: 'SyncEngine._performSync',
-            );
-          } finally {
-            completedOperations++;
-            _setProgress(0.4 + (completedOperations / totalOperations) * 0.6);
-          }
-        });
-        futures.add(future);
+      // 1. Get WebDAV config
+      final config = await _settingsRepository.getWebDAVConfig();
+      if (config.uri.isEmpty) {
+        return Left(ConfigurationFailure('WebDAV is not configured.'));
       }
 
-      await Future.wait(futures);
-    } catch (e) {
-      errors.add('Sync failed: $e');
-    }
-
-    return SyncResult(
-      uploaded: uploaded,
-      downloaded: downloaded,
-      conflicts: conflicts,
-      errors: errors,
-    );
-  }
-
-  /// 获取本地数据
-  Future<Map<String, SyncDataItem>> _getLocalData() async {
-    final progressList = await db.select(db.comicProgress).get();
-    final result = <String, SyncDataItem>{};
-
-    for (final progress in progressList) {
-      result[progress.fileHash] = SyncDataItem(
-        fileHash: progress.fileHash,
-        currentPage: progress.currentPage,
-        totalPages: progress.totalPages,
-        updatedAt: progress.updatedAt,
-        localEtag: progress.etag,
+      // 2. Fetch remote package
+      final remotePackageResult = await _webDAVService.restore(
+        config: config,
+        fileName: _syncFileName,
       );
-    }
 
-    return result;
-  }
-
-  /// 获取远程数据
-  Future<Map<String, SyncDataItem>> _getRemoteData() async {
-    try {
-      // 确保远程目录存在
-      await webdavService.mkdir(AppConstants.syncProgressPath);
-    } catch (e) {
-      // 目录可能已存在，忽略错误
-    }
-
-    try {
-      final files = await webdavService.listDir(AppConstants.syncProgressPath);
-      final result = <String, SyncDataItem>{};
-
-      for (final file in files) {
-        if (!file.isDirectory && file.name.endsWith(AppConstants.jsonExtension)) {
-          try {
-            // 使用临时文件下载
-            final tempFile = File(p.join(Directory.systemTemp.path, file.name));
-            await webdavService.download(
-              '${AppConstants.syncProgressPath}${file.name}',
-              tempFile.path,
-            );
-            final content = await tempFile.readAsString();
-            await tempFile.delete(); // 清理临时文件
-
-            final jsonData = json.decode(content) as Map<String, dynamic>;
-            final item = SyncDataItem.fromJson(jsonData);
-            result[item.fileHash] = SyncDataItem(
-              fileHash: item.fileHash,
-              currentPage: item.currentPage,
-              totalPages: item.totalPages,
-              updatedAt: item.updatedAt,
-              remoteEtag: file.etag,
-            );
-          } catch (e) {
-            // 忽略无法解析的文件
+      SyncPackage? remotePackage;
+      remotePackageResult.fold(
+        (failure) {
+          if (failure is! NotFoundFailure) {
+            // It's a real error, propagate it
+            throw failure;
           }
-        }
-      }
+          // If it's NotFoundFailure, it's okay, we'll just upload a new file.
+        },
+        (data) {
+          remotePackage = SyncPackage.fromJson(jsonDecode(utf8.decode(data)));
+        },
+      );
 
-      return result;
+      // 3. Build local package
+      final localPackage = await buildLocalSyncPackage();
+
+      // 4. Merge packages
+      final mergedPackage = _mergePackages(localPackage, remotePackage);
+
+      // 5. Upload merged package
+      final uploadData = Uint8List.fromList(utf8.encode(jsonEncode(mergedPackage.toJson())));
+      final uploadResult = await _webDAVService.backup(
+        config: config,
+        fileName: _syncFileName,
+        data: uploadData,
+      );
+
+      return await uploadResult.fold(
+        (failure) => Left(failure),
+        (_) async {
+          // 6. Apply merged data locally
+          await _applyMergedPackage(mergedPackage);
+          return const Right(unit);
+        },
+      );
+    } on Failure catch (e) {
+      return Left(e);
     } catch (e) {
-      // 远程目录不存在或无法访问
-      return {};
+      return Left(UnknownFailure(e.toString()));
     }
   }
 
-  /// 比较本地和远程数据，生成操作列表
-  List<SyncOperation> _compareData(
-    Map<String, SyncDataItem> localData,
-    Map<String, SyncDataItem> remoteData,
-  ) {
-    final operations = <SyncOperation>[];
-    final allKeys = {...localData.keys, ...remoteData.keys};
-
-    for (final key in allKeys) {
-      final local = localData[key];
-      final remote = remoteData[key];
-
-      if (local == null) {
-        // 只有远程有，下载
-        operations.add(SyncOperation(SyncOperationType.download, remote!));
-      } else if (remote == null) {
-        // 只有本地有，上传
-        operations.add(SyncOperation(SyncOperationType.upload, local));
-      } else {
-        // 本地和远程都有，检查是否需要同步
-        if (local.localEtag != remote.remoteEtag) {
-          // ETag不同，可能存在冲突
-          if (local.updatedAt.isAfter(remote.updatedAt)) {
-            operations.add(SyncOperation(SyncOperationType.upload, local));
-          } else if (remote.updatedAt.isAfter(local.updatedAt)) {
-            operations.add(SyncOperation(SyncOperationType.download, remote));
-          } else {
-            // 时间相同但ETag不同，存在冲突
-            operations.add(
-              SyncOperation(SyncOperationType.conflict, local, remote),
-            );
-          }
-        }
-      }
+  SyncPackage _mergePackages(SyncPackage local, SyncPackage? remote) {
+    if (remote == null) {
+      return local;
     }
 
-    return operations;
-  }
-
-  /// 上传数据到远程
-  Future<void> _uploadData(SyncDataItem item) async {
-    final fileName = '${item.fileHash}${AppConstants.jsonExtension}';
-    final remotePath = '${AppConstants.syncProgressPath}$fileName';
-
-    // 创建临时文件
-    final tempFile = File(p.join(Directory.systemTemp.path, fileName));
-    await tempFile.writeAsString(json.encode(item.toJson()));
-
-    try {
-      await webdavService.upload(tempFile.path, remotePath);
-
-      // 获取新的ETag并更新本地数据库
-      final fileInfo = await webdavService.getFileInfo(remotePath);
-      if (fileInfo != null) {
-        await db.upsertProgress(
-          item.fileHash,
-          item.currentPage,
-          item.totalPages,
-          etag: fileInfo.etag,
-        );
-      }
-    } finally {
-      // 清理临时文件
-      if (await tempFile.exists()) {
-        await tempFile.delete();
-      }
+    // "Last write wins" based on timestamp
+    if (local.lastModified.isAfter(remote.lastModified)) {
+      return local.copyWith(lastModified: DateTime.now());
+    } else {
+      return remote.copyWith(lastModified: DateTime.now());
     }
   }
 
-  /// 从远程下载数据
-  Future<void> _downloadData(SyncDataItem item) async {
-    await db.upsertProgress(
-      item.fileHash,
-      item.currentPage,
-      item.totalPages,
-      etag: item.remoteEtag,
+  Future<void> _applyMergedPackage(SyncPackage package) async {
+    await _settingsRepository.saveReaderSettings(package.settings);
+    await _comicRepository.applySyncChanges(package.progress);
+    await _favoriteRepository.clearAndInsertFavorites(package.favorites);
+    await _bookmarkRepository.clearAndInsertBookmarks(package.bookmarks);
+  }
+
+  Future<SyncPackage> buildLocalSyncPackage() async {
+    final settingsResult = await _settingsRepository.getReaderSettings();
+    final settings = settingsResult.getOrElse(() => const ReaderSettings());
+
+    final progress = await _comicRepository.getAllProgress();
+    final favorites = await _favoriteRepository.getFavorites();
+    final bookmarks = await _bookmarkRepository.getAllBookmarks();
+
+    return SyncPackage(
+      lastModified: DateTime.now(),
+      settings: settings,
+      progress: progress,
+      favorites: favorites,
+      bookmarks: bookmarks,
     );
   }
-
-  /// 解决冲突
-  Future<void> _resolveConflict(
-    SyncDataItem localItem,
-    SyncDataItem remoteItem,
-  ) async {
-    switch (conflictResolution) {
-      case ConflictResolution.localFirst:
-        await _uploadData(localItem);
-        break;
-      case ConflictResolution.remoteFirst:
-        await _downloadData(remoteItem);
-        break;
-      case ConflictResolution.manual:
-        // 在实际应用中，这里应该触发用户界面让用户手动选择
-        // 目前默认使用本地优先
-        await _uploadData(localItem);
-        break;
-    }
-  }
-
-  /// 清理资源
-  void dispose() {
-    _statusController.close();
-    _progressController.close();
-  }
-}
-
-/// 同步操作类型
-enum SyncOperationType { upload, download, conflict }
-
-/// 同步操作
-class SyncOperation {
-  SyncOperation(this.type, this.item, [this.remoteItem]);
-
-  final SyncOperationType type;
-  final SyncDataItem item;
-  final SyncDataItem? remoteItem;
 }

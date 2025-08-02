@@ -125,4 +125,50 @@ class Comic extends Equatable {
       'pages': jsonEncode(pages.map((p) => p.toJson()).toList()),
     };
   }
+
+  Comic copyWith({
+    String? id,
+    String? title,
+    String? path,
+    String? filePath,
+    String? fileName,
+    String? coverPath,
+    int? pageCount,
+    DateTime? addTime,
+    DateTime? lastReadTime,
+    int? progress,
+    int? bookshelfId,
+    bool? isFavorite,
+    List<String>? tags,
+    Map<String, dynamic>? metadata,
+    String? author,
+    DateTime? addedAt,
+    DateTime? lastReadAt,
+    int? currentPage,
+    int? totalPages,
+    List<ComicPage>? pages,
+  }) {
+    return Comic(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      path: path ?? this.path,
+      filePath: filePath ?? this.filePath,
+      fileName: fileName ?? this.fileName,
+      coverPath: coverPath ?? this.coverPath,
+      pageCount: pageCount ?? this.pageCount,
+      addTime: addTime ?? this.addTime,
+      lastReadTime: lastReadTime ?? this.lastReadTime,
+      progress: progress ?? this.progress,
+      bookshelfId: bookshelfId ?? this.bookshelfId,
+      isFavorite: isFavorite ?? this.isFavorite,
+      tags: tags ?? this.tags,
+      metadata: metadata ?? this.metadata,
+      author: author ?? this.author,
+      addedAt: addedAt ?? this.addedAt,
+      lastReadAt: lastReadAt ?? this.lastReadAt,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      pages: pages ?? this.pages,
+    );
+  }
 }

@@ -1,0 +1,33 @@
+# Test Coverage Configuration
+include: lib/**
+exclude:
+  - lib/**/*.g.dart
+  - lib/**/*.freezed.dart
+  - lib/generated/**
+  - lib/l10n/**
+
+# Performance test configuration
+performance:
+  memory:
+    max_usage_mb: 100
+    warning_threshold_mb: 80
+  timing:
+    page_load_max_ms: 100
+    cache_hit_max_us: 1000
+    progress_save_max_ms: 50
+  batch_processing:
+    min_efficiency_ratio: 0.7  # Batch should be 30% faster than individual ops
+
+# Integration test configuration
+integration:
+  database:
+    connection_timeout_ms: 5000
+    query_timeout_ms: 1000
+  services:
+    startup_timeout_ms: 3000
+    shutdown_timeout_ms: 1000
+
+# Widget test configuration
+widget:
+  pump_duration_ms: 16  # Standard frame duration
+  settle_timeout_ms: 10000

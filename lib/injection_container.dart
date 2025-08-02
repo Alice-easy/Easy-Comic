@@ -24,6 +24,8 @@ import 'package:easy_comic/data/services/archive_service_impl.dart';
 import 'package:easy_comic/domain/services/archive_service.dart';
 import 'package:easy_comic/data/services/auto_page_service_impl.dart';
 import 'package:easy_comic/domain/services/auto_page_service.dart';
+import 'package:easy_comic/core/services/progress_persistence_manager_impl.dart';
+import 'package:easy_comic/domain/services/progress_persistence_manager.dart';
 import 'package:easy_comic/presentation/features/reader/bloc/reader_bloc.dart';
 import 'package:easy_comic/core/comic_archive.dart';
 import 'package:easy_comic/data/drift_db.dart';
@@ -56,6 +58,10 @@ import 'package:easy_comic/presentation/features/settings/theme/bloc/theme_bloc.
 import 'package:easy_comic/presentation/features/settings/general/bloc/settings_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/services/unified_manga_importer_service.dart';
+import 'core/services/avatar_manager.dart';
+import 'core/services/file_system_manager.dart';
+import 'package:easy_comic/core/sync_engine.dart';
 
 final sl = GetIt.instance;
 
@@ -88,6 +94,8 @@ Future<void> init() async {
         restoreDataFromWebdavUseCase: sl(),
         settingsRepository: sl(),
         loggingService: sl(),
+        avatarManager: sl(),
+        syncEngine: sl(),
       ));
   sl.registerFactory(() => ThemeBloc(themeService: sl()));
   sl.registerFactory(() => SettingsBloc(
@@ -103,7 +111,8 @@ Future<void> init() async {
         bookmarkRepository: sl(),
         autoPageService: sl(),
         cacheService: sl(),
-        comicArchive: sl(),
+        mangaImporter: sl(),
+        progressPersistenceManager: sl(),
       ));
   // #endregion
 
@@ -149,7 +158,16 @@ Future<void> init() async {
   sl.registerLazySingleton<CacheService>(() => CacheService());
   sl.registerLazySingleton<ArchiveService>(() => ArchiveServiceImpl());
   sl.registerLazySingleton<AutoPageService>(() => AutoPageServiceImpl());
+  sl.registerLazySingleton<IProgressPersistenceManager>(() => ProgressPersistenceManager(sl()));
   sl.registerFactory(() => ComicArchive());
+  sl.registerLazySingleton(() => AvatarManager());
+  sl.registerLazySingleton(() => SyncEngine(
+        webDAVService: sl(),
+        settingsRepository: sl(),
+        comicRepository: sl(),
+        favoriteRepository: sl(),
+        bookmarkRepository: sl(),
+      ));
   // #endregion
 
   // #region Data
@@ -187,10 +205,19 @@ Future<void> init() async {
 sl.registerLazySingleton(() => OfflineQueueManager.instance);
 sl.registerLazySingleton(() => DataFlowOptimizer.instance);
   sl.registerLazySingleton(() => GlobalErrorHandler.instance);
-  // #endregion
-
-  // #region External
-  final sharedPreferences = await SharedPreferences.getInstance();
+  
+    // Manga Importer
+    sl.registerLazySingleton<FileSystemManager>(() => FileSystemManagerImpl());
+    sl.registerLazySingleton<UnifiedMangaImporterService>(() => UnifiedMangaImporterService(
+          archiveService: sl(),
+          fileSystemManager: sl(),
+          comicRepository: sl(),
+          logger: sl(),
+        ));
+    // #endregion
+  
+    // #region External
+    final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
   // #endregion
 }

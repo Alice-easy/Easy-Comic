@@ -4,17 +4,49 @@ import 'package:easy_comic/domain/entities/comic.dart';
 import 'package:easy_comic/domain/entities/reader_settings.dart';
 import 'package:easy_comic/domain/entities/bookmark.dart';
 
+/// Enhanced error types for better error handling
+enum ReaderErrorType {
+  unknown,
+  fileError,
+  databaseError,
+  networkError,
+  memoryError,
+  unsupportedFormat,
+  corruptedFile,
+  noValidImages,
+  fileTooLarge,
+  permissionDenied,
+  invalidRequest,
+}
+
 abstract class ReaderState extends Equatable {
   const ReaderState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class ReaderInitial extends ReaderState {}
 
-class ReaderLoading extends ReaderState {}
+/// Enhanced loading state with progress information
+class ReaderLoading extends ReaderState {
+  final double? progress;
+  final String? message;
+  final String? operation;
+  final Map<String, dynamic>? diagnostics;
+  
+  const ReaderLoading({
+    this.progress,
+    this.message,
+    this.operation,
+    this.diagnostics,
+  });
+  
+  @override
+  List<Object?> get props => [progress, message, operation, diagnostics];
+}
 
+/// Enhanced loaded state with diagnostic information
 class ReaderLoaded extends ReaderState {
   final Comic comic;
   final int currentPageIndex;
@@ -28,6 +60,15 @@ class ReaderLoaded extends ReaderState {
   final ReaderSettings settings;
   final List<Bookmark> bookmarks;
   final bool isCurrentPageBookmarked;
+  final Duration? loadDuration;
+  final Map<String, dynamic>? diagnostics;
+  final Map<String, dynamic>? performanceMetrics;
+  
+  // 新增缺失的属性
+  final ReadingMode readingMode;
+  final double zoomScale;
+  final int? lastSavedProgress;
+  final DateTime? progressSaveTime;
 
   const ReaderLoaded({
     required this.comic,
@@ -42,6 +83,13 @@ class ReaderLoaded extends ReaderState {
     this.brightness = 1.0,
     this.zoomLevel = 1.0,
     this.isCurrentPageBookmarked = false,
+    this.loadDuration,
+    this.diagnostics,
+    this.performanceMetrics,
+    this.readingMode = ReadingMode.SinglePage,
+    this.zoomScale = 1.0,
+    this.lastSavedProgress,
+    this.progressSaveTime,
   });
 
   ReaderLoaded copyWith({
@@ -57,6 +105,13 @@ class ReaderLoaded extends ReaderState {
     ReaderSettings? settings,
     List<Bookmark>? bookmarks,
     bool? isCurrentPageBookmarked,
+    Duration? loadDuration,
+    Map<String, dynamic>? diagnostics,
+    Map<String, dynamic>? performanceMetrics,
+    ReadingMode? readingMode,
+    double? zoomScale,
+    int? lastSavedProgress,
+    DateTime? progressSaveTime,
   }) {
     return ReaderLoaded(
       comic: comic ?? this.comic,
@@ -71,11 +126,18 @@ class ReaderLoaded extends ReaderState {
       settings: settings ?? this.settings,
       bookmarks: bookmarks ?? this.bookmarks,
       isCurrentPageBookmarked: isCurrentPageBookmarked ?? this.isCurrentPageBookmarked,
+      loadDuration: loadDuration ?? this.loadDuration,
+      diagnostics: diagnostics ?? this.diagnostics,
+      performanceMetrics: performanceMetrics ?? this.performanceMetrics,
+      readingMode: readingMode ?? this.readingMode,
+      zoomScale: zoomScale ?? this.zoomScale,
+      lastSavedProgress: lastSavedProgress ?? this.lastSavedProgress,
+      progressSaveTime: progressSaveTime ?? this.progressSaveTime,
     );
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         comic,
         currentPageIndex,
         isUIVisible,
@@ -88,14 +150,47 @@ class ReaderLoaded extends ReaderState {
         settings,
         bookmarks,
         isCurrentPageBookmarked,
+        loadDuration,
+        diagnostics,
+        performanceMetrics,
+        readingMode,
+        zoomScale,
+        lastSavedProgress,
+        progressSaveTime,
       ];
 }
 
+/// Enhanced error state with detailed error information
 class ReaderError extends ReaderState {
   final String message;
+  final ReaderErrorType errorType;
+  final bool canRetry;
+  final String? details;
+  final dynamic originalError;
+  final Map<String, dynamic>? diagnostics;
+  final List<String>? suggestedActions;
 
-  const ReaderError({required this.message});
+  const ReaderError({
+    required this.message,
+    this.errorType = ReaderErrorType.unknown,
+    this.canRetry = false,
+    this.details,
+    this.originalError,
+    this.diagnostics,
+    this.suggestedActions,
+  });
+  
+  /// Create error with recovery suggestions
+  ReaderError.withSuggestions({
+    required this.message,
+    required this.errorType,
+    required List<String> suggestions,
+    this.canRetry = true,
+    this.details,
+    this.originalError,
+    this.diagnostics,
+  }) : suggestedActions = suggestions;
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message, errorType, canRetry, details, originalError, diagnostics, suggestedActions];
 }

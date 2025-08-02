@@ -76,6 +76,7 @@ class ArchiveServiceImpl implements ArchiveService {
   }
 
   /// Get the first image as cover
+  @override
   Future<Uint8List?> extractCoverImage(String filePath) async {
     try {
       final images = await extractImages(filePath);
@@ -86,6 +87,7 @@ class ArchiveServiceImpl implements ArchiveService {
   }
 
   /// Get page count without extracting all images
+  @override
   Future<int> getPageCount(String filePath) async {
     final file = File(filePath);
     
@@ -115,6 +117,30 @@ class ArchiveServiceImpl implements ArchiveService {
     } catch (e) {
       throw Exception('Failed to get page count: ${e.toString()}');
     }
+  }
+
+  @override
+  Future<List<String>> extractArchive(String filePath, String destinationPath) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      throw ArchiveFileNotFoundException(filePath);
+    }
+
+    final bytes = await file.readAsBytes();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final extractedFilePaths = <String>[];
+
+    for (final file in archive) {
+      final filename = file.name;
+      if (file.isFile) {
+        final data = file.content as List<int>;
+        final extractedFile = File('$destinationPath/$filename');
+        await extractedFile.create(recursive: true);
+        await extractedFile.writeAsBytes(data);
+        extractedFilePaths.add(extractedFile.path);
+      }
+    }
+    return extractedFilePaths;
   }
 
   /// Natural string comparison for proper filename sorting

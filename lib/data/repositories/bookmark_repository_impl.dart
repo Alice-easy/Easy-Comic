@@ -50,9 +50,7 @@ class BookmarkRepositoryImpl implements BookmarkRepository {
 
   @override
   Future<List<Bookmark>> getAllBookmarks() async {
-    // For now, return empty list
-    // In a full implementation, this would get all bookmarks across all comics
-    return [];
+    return await localDataSource.getAllBookmarks();
   }
 
   @override
@@ -86,8 +84,22 @@ class BookmarkRepositoryImpl implements BookmarkRepository {
   }
 
   @override
-  Future<void> updateBookmark(Bookmark bookmark) {
-    // TODO: implement updateBookmark
-    throw UnimplementedError();
+  Future<void> updateBookmark(Bookmark bookmark) async {
+    await localDataSource.updateBookmark(bookmark);
+  }
+
+  @override
+  Future<Either<Failure, void>> removeBookmarksForComic(String comicId) async {
+    try {
+      await localDataSource.deleteBookmarksForComic(comicId);
+      return const Right(null);
+    } catch (e) {
+      return Left(const CacheFailure('Failed to remove bookmarks for comic'));
+    }
+  }
+
+  @override
+  Future<void> clearAndInsertBookmarks(List<Bookmark> bookmarks) async {
+    await localDataSource.clearAndInsertBookmarks(bookmarks);
   }
 }

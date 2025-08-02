@@ -46,4 +46,7 @@ abstract class ArchiveService {
   ///
   /// Throws [ArchiveFileNotFoundException] if the file does not exist.
   Future<int> getPageCount(String filePath);
+
+  /// Extracts an archive to a specified directory and returns a list of file paths.
+  Future<List<String>> extractArchive(String filePath, String destinationPath);
 }

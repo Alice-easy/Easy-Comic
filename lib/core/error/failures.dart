@@ -27,6 +27,14 @@ class NotFoundFailure extends Failure {
   const NotFoundFailure(String message) : super(message);
 }
 
+class ConfigurationFailure extends Failure {
+  const ConfigurationFailure(String message) : super(message);
+}
+
+class UnknownFailure extends Failure {
+  const UnknownFailure(String message) : super(message);
+}
+
 class DatabaseException implements Exception {
   final String message;
   DatabaseException(this.message);

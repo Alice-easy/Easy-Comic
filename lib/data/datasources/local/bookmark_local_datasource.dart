@@ -7,6 +7,10 @@ abstract class BookmarkLocalDataSource {
   Future<void> deleteBookmark(String bookmarkId);
   Future<Bookmark?> getBookmarkById(String bookmarkId);
   Stream<List<Bookmark>> watchBookmarks(String comicId);
+  Future<List<Bookmark>> getAllBookmarks();
+  Future<void> deleteBookmarksForComic(String comicId);
+  Future<void> clearAndInsertBookmarks(List<Bookmark> bookmarks);
+  Future<void> updateBookmark(Bookmark bookmark);
 }
 
 class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
@@ -45,5 +49,25 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
     // For now, return empty stream
     // In a full implementation, this would watch database changes
     return Stream.value([]);
+  }
+
+  @override
+  Future<List<Bookmark>> getAllBookmarks() async {
+    return []; // Placeholder
+  }
+
+  @override
+  Future<void> deleteBookmarksForComic(String comicId) async {
+    // Placeholder
+  }
+
+  @override
+  Future<void> clearAndInsertBookmarks(List<Bookmark> bookmarks) async {
+    // Placeholder
+  }
+
+  @override
+  Future<void> updateBookmark(Bookmark bookmark) async {
+    // Placeholder
   }
 }

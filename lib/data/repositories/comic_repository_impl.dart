@@ -4,6 +4,7 @@ import 'package:easy_comic/core/error/failures.dart';
 import 'package:dartz/dartz.dart';
 import 'package:easy_comic/data/datasources/local/comic_local_datasource.dart';
 import 'package:easy_comic/domain/entities/comic.dart';
+import 'package:easy_comic/domain/entities/comic_progress.dart';
 import 'package:easy_comic/domain/repositories/comic_repository.dart';
 import '../drift_db.dart' as db;
 
@@ -173,5 +174,43 @@ class ComicRepositoryImpl implements ComicRepository {
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
     }
+  }
+
+  @override
+  Future<List<ComicProgress>> getAllProgress() async {
+    final comics = await getAllComics();
+    return comics.map(_comicToComicProgress).toList();
+  }
+
+  @override
+  Future<void> applySyncChanges(List<ComicProgress> progressToUpdate) async {
+    for (final progress in progressToUpdate) {
+      final comicResult = await getComicById(progress.comicId);
+      comicResult.fold(
+        (l) => null, // Should log this error
+        (comic) async {
+          final updatedComic = comic.copyWith(
+            currentPage: progress.currentPage,
+            totalPages: progress.totalPages,
+            lastReadAt: progress.lastUpdated,
+          );
+          await updateComic(updatedComic);
+        },
+      );
+    }
+  }
+
+  ComicProgress _comicToComicProgress(Comic comic) {
+    return ComicProgress(
+      id: comic.id,
+      comicId: comic.id,
+      currentPage: comic.currentPage ?? 0,
+      totalPages: comic.totalPages ?? 0,
+      lastUpdated: comic.lastReadAt ?? DateTime.now(),
+      isCompleted: (comic.currentPage ?? 0) >= (comic.totalPages ?? 1) && (comic.totalPages ?? 0) > 0,
+      syncStatus: const SyncStatus.synced(), // Assuming local is always synced
+      readingTimeSeconds: 0, // This info is not available in Comic entity
+      metadata: {}, // This info is not available in Comic entity
+    );
   }
 }

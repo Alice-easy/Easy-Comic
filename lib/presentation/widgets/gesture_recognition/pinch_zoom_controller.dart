@@ -75,22 +75,9 @@ class PinchZoomController extends ChangeNotifier {
   
   Future<void> _animateToScale(double targetScale, Duration duration) async {
     final startScale = _currentScale;
-    final controller = AnimationController(duration: duration, vsync: TickerProvider.of(context));
-    
-    final animation = Tween<double>(
-      begin: startScale,
-      end: targetScale,
-    ).animate(CurvedAnimation(
-      parent: controller,
-      curve: Curves.easeInOut,
-    ));
-    
-    animation.addListener(() {
-      _photoViewController.scale = animation.value;
-    });
-    
-    await controller.forward();
-    controller.dispose();
+    // Animation temporarily disabled due to missing TickerProvider context
+    // Would need to be passed from widget that has access to TickerProvider
+    _photoViewController.scale = targetScale;
   }
   
   /// Reset zoom to fit container
@@ -140,7 +127,7 @@ extension PhotoViewScaleExtension on PhotoViewComputedScale {
 
 /// Mixin for providing TickerProvider (would need to be implemented in actual usage)
 mixin TickerProvider {
-  static TickerProvider of(BuildContext context) {
-    return context.findAncestorStateOfType<TickerProviderStateMixin>() as TickerProvider;
+  static TickerProvider? of(BuildContext context) {
+    return context.findAncestorStateOfType<TickerProviderStateMixin>();
   }
 }

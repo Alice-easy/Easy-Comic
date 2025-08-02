@@ -113,3 +113,20 @@ It is optional, but recommended to be updated as the project evolves.
     *   **权威文档**: 完整的架构定义、组件职责和数据流图见 [`architecture/FINAL_ARCHITECTURE_BLUEPRINT.md`](../architecture/FINAL_ARCHITECTURE_BLUEPRINT.md)。
     *   **依赖注入**: 使用 `GetIt` 作为服务定位器，在 `injection_container.dart` 中统一管理所有依赖。
     *   **数据流**: 严格遵循 UI -> BLoC -> UseCase -> Repository 的单向数据流。
+---
+### Architectural Patterns
+[2025-08-02T01:14:55Z] - **复合 BLoC 模式 (Composite BLoC Pattern)**
+*   **描述**: 在复杂的 UI 界面（如设置屏幕）中，使用一个主 Widget（`SettingsScreen`）通过 `MultiBlocProvider` 来提供和管理多个独立的、功能特定的子 BLoC（如 `SettingsBloc`, `WebDavBloc`）。每个子 BLoC 只负责其自己的功能领域，而 UI 则由多个独立的子 Widget 组成，每个子 Widget 只监听其所需的 BLoC。
+*   **理由**: 这种模式可以有效分解复杂性。它避免了创建一个巨大而臃肿的“上帝 BLoC”，而是将状态管理逻辑分散到多个更小、更易于维护的 BLoC 中。这提高了模块化程度、可测试性和代码的可读性。
+*   **实现**:
+    *   **UI**: 使用 `MultiBlocProvider` 在顶层提供所有需要的 BLoC。子 Widget 使用 `BlocBuilder` 或 `context.watch<MyBloc>()` 来监听特定 BLoC 的状态。
+    *   **BLoCs**: 每个 BLoC 都是独立的，并处理自己的一组事件和状态。
+
+---
+### Architectural Patterns
+[2025-08-02T01:14:55Z] - **协调器服务模式 (Coordinator Service Pattern)**
+*   **描述**: 定义一个高级服务（“协调器”），其主要职责不是执行底层的 I/O 或业务计算，而是编排和协调多个其他低级服务和仓库来完成一个复杂的、多步骤的业务流程。`SyncEngine` 就是这个模式的一个例子。
+*   **理由**: 对于像数据同步这样涉及多个数据源和多个操作步骤的复杂流程，将编排逻辑封装在一个专门的协调器服务中，可以使流程更清晰、更易于管理和测试。它将高层的“做什么”（同步）与低层的“怎么做”（API 调用、数据库读写）分离开来。
+*   **实现**:
+    *   **协调器 (`SyncEngine`)**: 依赖于多个低级服务/仓库的接口。其公共方法（如 `performSync()`）定义了业务流程的各个步骤。
+    *   **调用者 (`WebDavBloc`)**: 只需调用协调器的一个方法，而无需关心其内部复杂的实现细节。

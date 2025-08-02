@@ -12,6 +12,9 @@ abstract class BookmarkRepository {
   /// 删除书签
   Future<Either<Failure, void>> removeBookmark(String comicId, int pageIndex);
 
+  /// 删除指定漫画的所有书签
+  Future<Either<Failure, void>> removeBookmarksForComic(String comicId);
+
   /// 获取指定漫画的所有书签
   Future<List<Bookmark>> getBookmarks(String comicId);
 
@@ -38,4 +41,7 @@ abstract class BookmarkRepository {
 
   /// 导入书签
   Future<void> importBookmarks(String comicId, List<Map<String, dynamic>> bookmarks);
+
+  /// 清空并插入书签
+  Future<void> clearAndInsertBookmarks(List<Bookmark> bookmarks);
 }

@@ -16,7 +16,16 @@ class LoadComic extends ReaderEvent {
   const LoadComic({this.filePath, this.comicId});
 
   @override
-  List<Object> get props => [filePath ?? '', comicId ?? 0];
+  List<Object> get props => [filePath ?? '', comicId ?? ''];
+}
+
+class LoadMangaEvent extends ReaderEvent {
+  final String path;
+
+  const LoadMangaEvent(this.path);
+
+  @override
+  List<Object> get props => [path];
 }
 
 class PageChanged extends ReaderEvent {
@@ -85,11 +94,12 @@ class HandleGesture extends ReaderEvent {
 
 class SaveProgress extends ReaderEvent {
   final int pageIndex;
+  final bool forceImmediate;
 
-  const SaveProgress(this.pageIndex);
+  const SaveProgress(this.pageIndex, {this.forceImmediate = false});
 
   @override
-  List<Object> get props => [pageIndex];
+  List<Object> get props => [pageIndex, forceImmediate];
 }
 
 class AddBookmark extends ReaderEvent {
