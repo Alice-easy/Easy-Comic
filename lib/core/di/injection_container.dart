@@ -44,9 +44,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SyncDataUseCase(sl()));
 
   // Repository
-  sl.registerLazySingleton<SettingsRepository>(
+  sl.registerLazySingleton<ISettingsRepository>(
       () => SettingsRepositoryImpl(localDataSource: sl()));
-  sl.registerLazySingleton<WebdavRepository>(() => WebdavRepositoryImpl());
+  sl.registerLazySingleton<IWebdavRepository>(() => WebdavRepositoryImpl());
 
   // Data sources
   sl.registerLazySingleton<SettingsLocalDataSource>(
@@ -59,6 +59,8 @@ Future<void> init() async {
       getLibraryMangas: sl(),
       importManga: sl(),
       filePickerService: sl(),
+      deleteMangaUseCase: sl(),
+      toggleFavoriteUseCase: sl(),
     ),
   );
   sl.registerFactory(() => ReaderBloc(
@@ -70,9 +72,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetLibraryMangasUseCase(sl()));
   sl.registerLazySingleton(() => ImportMangaUseCase(sl()));
   sl.registerLazySingleton(() => GetMangaDetailsUseCase(sl()));
-  sl.registerLazySingleton(() => DeleteMangaUseCase(sl()));
-  sl.registerLazySingleton(() => ToggleFavoriteUseCase(sl()));
-  sl.registerLazySingleton(() => DeleteMangaUseCase(sl()));
+  // These are already registered above
+  // sl.registerLazySingleton(() => DeleteMangaUseCase(sl()));
+  // sl.registerLazySingleton(() => ToggleFavoriteUseCase(sl()));
 
   // Repository
   sl.registerLazySingleton<MangaRepository>(

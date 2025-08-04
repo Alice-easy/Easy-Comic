@@ -279,3 +279,20 @@
 **后续行动:**
 - 所有后续的开发工作都必须遵循此架构文档。
 - `systemPatterns.md` 已同步更新以反映此决策。
+- **[2025-08-04T01:57:23Z]** Decided to push the major refactoring (commit 3fbef34) to the main branch to integrate the new project structure. This was a necessary step to align the codebase with the new architecture.
+- **Decision @ 2025-08-04T07:55:17.694Z:** Android APK compilation failed with numerous errors. The root cause appears to be missing dependencies.
+- **Action:** Will attempt to resolve by running `flutter pub get` before re-initiating the build process.
+- **Decision @ 2025-08-04T08:28:17.372Z:** Android APK compilation failed due to a network error while resolving the `home_widget` dependency.
+- **Action:** Recommending the user to check their network settings, firewall, proxy, and SSL configuration.
+
+---
+### Decision (Debug)
+[2025-08-04T08:40:27.482Z] - [Bug Fix Strategy: Revert Gradle Changes and Advise Network Check]
+
+**Rationale:**
+Initial attempts to fix a Gradle dependency download failure for `home_widget` by centralizing repositories in `settings.gradle.kts` led to a series of more complex Gradle script compilation errors (scope and plugin conflicts). After multiple failed attempts to fix the script, it was determined that the initial problem was more likely a network issue rather than a configuration problem. Reverting the Gradle files to their original state and advising the user to check their network is the most logical and least intrusive solution.
+
+**Details:**
+- Reverted changes to `android/settings.gradle.kts`.
+- Reverted changes to `android/build.gradle.kts`.
+- The core issue remains the inability for Gradle to download `es.antonborri.home_widget:home_widget:0.1.8` from any of the configured repositories.

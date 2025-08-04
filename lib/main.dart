@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
   // Don't await this, let it run in the background
-  di.sl<SyncDataUseCase>().call(SyncDataParams());
+  // di.sl<SyncDataUseCase>().call(SyncDataParams());
   runApp(const MyApp());
 }
 

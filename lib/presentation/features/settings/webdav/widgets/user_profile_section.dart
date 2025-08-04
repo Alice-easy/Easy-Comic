@@ -36,11 +36,11 @@ class UserProfileSection extends StatelessWidget {
                 children: [
                   Text(
                     state.config?.username ?? 'Not logged in',
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   Text(
                     state.config != null ? 'Connected to WebDAV' : 'Not connected',
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),

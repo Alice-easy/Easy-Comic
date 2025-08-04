@@ -27,7 +27,7 @@ class LibraryLoaded extends LibraryState {
   });
 
   @override
-  List<Object?> get props => [allMangas, displayedMangas, sortType, searchQuery];
+  List<Object> get props => [allMangas, displayedMangas, sortType, searchQuery ?? ''];
 
   LibraryLoaded copyWith({
     List<Manga>? allMangas,

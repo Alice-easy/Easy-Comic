@@ -1,10 +1,11 @@
 import 'package:drift/drift.dart';
-import 'package:easy_comic/data/datasources/local/app_database.dart';
+import 'package:easy_comic/data/datasources/local/app_database.dart' as db;
 import 'package:easy_comic/data/datasources/local/manga_local_data_source.dart';
 import 'package:easy_comic/domain/entities/manga.dart';
+import 'package:easy_comic/domain/entities/collection.dart';
 
 class MangaLocalDataSourceImpl implements MangaLocalDataSource {
-  final AppDatabase database;
+  final db.AppDatabase database;
 
   MangaLocalDataSourceImpl({required this.database});
 
@@ -22,14 +23,14 @@ class MangaLocalDataSourceImpl implements MangaLocalDataSource {
   @override
   Future<List<Manga>> getAllMangas() async {
     final mangaDataList = await database.select(database.mangas).get();
-    return mangaDataList.map((mangaData) => Manga.fromDrift(mangaData)).toList();
+    return mangaDataList.map<Manga>((mangaData) => MangaFactory.fromDrift(mangaData)).toList();
   }
 
   @override
   Future<Manga?> getMangaById(String mangaId) async {
     final query = database.select(database.mangas)..where((tbl) => tbl.id.equals(mangaId));
     final mangaData = await query.getSingleOrNull();
-    return mangaData?.toEntity();
+    return mangaData != null ? MangaFactory.fromDrift(mangaData) : null;
   }
 
   @override
@@ -76,8 +77,8 @@ class MangaLocalDataSourceImpl implements MangaLocalDataSource {
 }
 
 extension on Manga {
-  MangasCompanion toCompanion() {
-    return MangasCompanion(
+  db.MangasCompanion toCompanion() {
+    return db.MangasCompanion(
       id: Value(id),
       title: Value(title),
       filePath: Value(filePath),
@@ -92,7 +93,7 @@ extension on Manga {
   }
 }
 
-extension on MangaData {
+extension on db.Manga {
   Manga toEntity() {
     return Manga(
       id: id,
@@ -111,7 +112,7 @@ extension on MangaData {
 
 // This factory will be used in the main fromDrift method
 extension MangaFactory on Manga {
-  static Manga fromDrift(MangaData data) {
+  static Manga fromDrift(db.Manga data) {
     return data.toEntity();
   }
 }

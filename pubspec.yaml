@@ -45,6 +45,7 @@ dependencies:
   # UI & UX
   dynamic_color: ^1.7.0
   wakelock_plus: ^1.2.1
+  home_widget: ^0.3.0
 
 dev_dependencies:
   # Build & Code Generation

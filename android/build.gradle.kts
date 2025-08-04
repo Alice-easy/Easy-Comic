@@ -9,6 +9,7 @@ allprojects {
         google()
         mavenCentral()
         maven("https://maven.aliyun.com/repository/public")
+        maven { url = uri("https://www.jitpack.io") }
     }
     afterEvaluate {
         if (project.name == "file_picker") {

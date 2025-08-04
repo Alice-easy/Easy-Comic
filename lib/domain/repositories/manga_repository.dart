@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/core/failures/failures.dart';
 import 'package:easy_comic/domain/entities/manga.dart';
 
 abstract class MangaRepository {

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:easy_comic/core/error/failures.dart';
+import 'package:easy_comic/core/failures/failures.dart';
 import 'package:easy_comic/core/services/file_processing_service.dart';
 import 'package:easy_comic/data/datasources/local/manga_local_data_source.dart';
 import 'package:easy_comic/domain/entities/manga.dart';
@@ -27,7 +27,7 @@ class MangaRepositoryImpl implements MangaRepository {
       final mangaModels = await localDataSource.getAllMangas();
       return Right(mangaModels);
     } catch (e) {
-      return Left(CacheFailure());
+      return Left(CacheFailure("Failed to get library mangas"));
     }
   }
 
@@ -57,7 +57,7 @@ class MangaRepositoryImpl implements MangaRepository {
 
       return Right(manga);
     } catch (e) {
-      return Left(FileProcessingFailure(e.toString()));
+      return Left(DatabaseFailure(e.toString()));
     }
   }
 
@@ -66,13 +66,13 @@ class MangaRepositoryImpl implements MangaRepository {
     try {
       final manga = await localDataSource.getMangaById(mangaId);
       if (manga == null) {
-        return Left(CacheFailure());
+        return Left(CacheFailure("Manga not found"));
       }
       final pagePaths = await fileProcessingService.getPageImagePaths(manga.filePath);
       final mangaWithPages = manga.copyWith(pagePaths: pagePaths);
       return Right(mangaWithPages);
     } catch (e) {
-      return Left(FileProcessingFailure(e.toString()));
+      return Left(DatabaseFailure(e.toString()));
     }
   }
 
@@ -84,7 +84,7 @@ class MangaRepositoryImpl implements MangaRepository {
       // That would require another service and more complex logic.
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure());
+      return Left(CacheFailure("Failed to delete manga"));
     }
   }
 
@@ -93,13 +93,13 @@ class MangaRepositoryImpl implements MangaRepository {
     try {
       final manga = await localDataSource.getMangaById(mangaId);
       if (manga == null) {
-        return Left(CacheFailure());
+        return Left(CacheFailure("Manga not found"));
       }
       final updatedManga = manga.copyWith(isFavorite: !manga.isFavorite);
       await localDataSource.updateManga(updatedManga);
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure());
+      return Left(CacheFailure("Failed to toggle favorite status"));
     }
   }
 }

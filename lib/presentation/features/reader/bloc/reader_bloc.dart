@@ -3,13 +3,14 @@ import 'package:easy_comic/domain/entities/manga.dart';
 import 'package:easy_comic/domain/repositories/settings_repository.dart';
 import 'package:easy_comic/domain/usecases/get_manga_details_usecase.dart';
 import 'package:equatable/equatable.dart';
+import 'package:easy_comic/domain/entities/app_settings.dart';
 
 part 'reader_event.dart';
 part 'reader_state.dart';
 
 class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
   final GetMangaDetailsUseCase getMangaDetailsUseCase;
-  final SettingsRepository settingsRepository;
+  final ISettingsRepository settingsRepository;
 
   ReaderBloc({
     required this.getMangaDetailsUseCase,
@@ -28,11 +29,16 @@ class ReaderBloc extends Bloc<ReaderEvent, ReaderState> {
     final failureOrManga = await getMangaDetailsUseCase(event.mangaId);
     failureOrManga.fold(
       (failure) => emit(ReaderError(failure.toString())),
-      (manga) => emit(ReaderLoaded(
-        manga: manga,
-        currentPage: manga.currentPage,
-        readingMode: settings.readingMode,
-      )),
+      (manga) {
+        settings.fold(
+          (failure) => emit(ReaderError(failure.toString())),
+          (settings) => emit(ReaderLoaded(
+            manga: manga,
+            currentPage: manga.currentPage,
+            readingMode: ReadingMode.values.firstWhere((e) => e.toString() == 'ReadingMode.${settings.readingMode.name}'),
+          )),
+        );
+      },
     );
   }
 

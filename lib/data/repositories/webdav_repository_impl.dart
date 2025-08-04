@@ -22,7 +22,7 @@ class WebdavRepositoryImpl implements IWebdavRepository {
       await client.ping();
       return const Right(unit);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -34,7 +34,7 @@ class WebdavRepositoryImpl implements IWebdavRepository {
       await client.read2File(remotePath, file.path);
       return Right(file);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -45,7 +45,7 @@ class WebdavRepositoryImpl implements IWebdavRepository {
       await client.writeFromFile(file.path, remotePath);
       return const Right(unit);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

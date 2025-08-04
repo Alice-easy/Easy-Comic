@@ -1,4 +1,4 @@
-import 'package.bloc/bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:easy_comic/domain/entities/app_settings.dart';
 import 'package:easy_comic/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';

@@ -62,7 +62,7 @@ class WebdavBloc extends Bloc<WebdavEvent, WebdavState> {
   ) async {
     if (state.config == null) return;
     emit(state.copyWith(status: WebdavStatus.syncing));
-    final result = await syncDataUseCase(SyncDataParams());
+    final result = await syncDataUseCase(state.config!);
     result.fold(
       (failure) => emit(state.copyWith(status: WebdavStatus.failure, failureMessage: failure.message)),
       (_) => emit(state.copyWith(status: WebdavStatus.success)),

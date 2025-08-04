@@ -229,3 +229,4 @@
 * [2025-08-03T19:29:40Z] - **当前焦点:** WebDAV 集成和用户资料管理。
 * **状态:** 实现了完整的 WebDAV 功能，包括服务、UI、状态管理和依赖注入。用户现在可以配置 WebDAV、登录、上传头像，并在设置页面看到连接状态。
 * **后续步骤:** 准备进行测试和验证。
+- **[2025-08-04T01:57:57Z]** Deployment of major refactoring (commit 3fbef34) to GitHub main branch is complete. The repository is now up-to-date with the latest restructured code.
