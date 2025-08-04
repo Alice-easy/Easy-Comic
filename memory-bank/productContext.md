@@ -134,3 +134,9 @@ A detailed functional specification has been created to translate user requireme
   * 提供双向数据合并以解决冲突。
 
 *   **[View Comprehensive Specification](specs/flutter_comic_reader_comprehensive_spec.md)**
+
+## Project Refactoring Initiative (2025-08-03)
+
+A new comprehensive specification and pseudocode document has been created to guide a full-scale refactoring of the application from the ground up, based on all accumulated requirements and architectural decisions. This document now serves as the primary blueprint for development.
+
+*   **[View Refactoring Specification](specs/refactor_spec.pseudo)**

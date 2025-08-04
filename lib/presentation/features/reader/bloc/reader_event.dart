@@ -1,6 +1,4 @@
-// lib/presentation/features/reader/bloc/reader_event.dart
-import 'package:equatable/equatable.dart';
-import 'package:easy_comic/domain/entities/reader_settings.dart';
+part of 'reader_bloc.dart';
 
 abstract class ReaderEvent extends Equatable {
   const ReaderEvent();
@@ -9,138 +7,40 @@ abstract class ReaderEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadComic extends ReaderEvent {
-  final String? filePath;
-  final String? comicId;
-
-  const LoadComic({this.filePath, this.comicId});
-
-  @override
-  List<Object> get props => [filePath ?? '', comicId ?? ''];
-}
-
 class LoadMangaEvent extends ReaderEvent {
-  final String path;
+  final String mangaId;
 
-  const LoadMangaEvent(this.path);
-
-  @override
-  List<Object> get props => [path];
-}
-
-class PageChanged extends ReaderEvent {
-  final int newIndex;
-
-  const PageChanged(this.newIndex);
+  const LoadMangaEvent(this.mangaId);
 
   @override
-  List<Object> get props => [newIndex];
+  List<Object> get props => [mangaId];
 }
 
-class PreviousPage extends ReaderEvent {}
-
-class NextPage extends ReaderEvent {}
-
-class ToggleUIVisibility extends ReaderEvent {}
-
-class ToggleAutoPageTurn extends ReaderEvent {}
-
-class UpdateAutoPageInterval extends ReaderEvent {
-  final Duration interval;
-
-  const UpdateAutoPageInterval(this.interval);
-
-  @override
-  List<Object> get props => [interval];
-}
-
-class ChangeReadingMode extends ReaderEvent {
-  final ReadingMode mode;
-
-  const ChangeReadingMode(this.mode);
-
-  @override
-  List<Object> get props => [mode];
-}
-
-class ToggleFullscreen extends ReaderEvent {}
-
-class UpdateBrightness extends ReaderEvent {
-  final double brightness;
-
-  const UpdateBrightness(this.brightness);
-
-  @override
-  List<Object> get props => [brightness];
-}
-
-class ZoomChanged extends ReaderEvent {
-  final double zoomLevel;
-
-  const ZoomChanged(this.zoomLevel);
-
-  @override
-  List<Object> get props => [zoomLevel];
-}
-
-class HandleGesture extends ReaderEvent {
-  final GestureType gestureType;
-
-  const HandleGesture(this.gestureType);
-
-  @override
-  List<Object> get props => [gestureType];
-}
-
-class SaveProgress extends ReaderEvent {
-  final int pageIndex;
-  final bool forceImmediate;
-
-  const SaveProgress(this.pageIndex, {this.forceImmediate = false});
-
-  @override
-  List<Object> get props => [pageIndex, forceImmediate];
-}
-
-class AddBookmark extends ReaderEvent {
+class PageChangedEvent extends ReaderEvent {
   final int pageIndex;
 
-  const AddBookmark(this.pageIndex);
+  const PageChangedEvent(this.pageIndex);
 
   @override
   List<Object> get props => [pageIndex];
 }
 
-class RemoveBookmark extends ReaderEvent {
-  final int pageIndex;
+class ToggleOverlayEvent extends ReaderEvent {}
 
-  const RemoveBookmark(this.pageIndex);
+class ZoomChangedEvent extends ReaderEvent {
+  final double scale;
 
-  @override
-  List<Object> get props => [pageIndex];
-}
-
-class LoadSettings extends ReaderEvent {}
-
-class UpdateSettings extends ReaderEvent {
-  final ReaderSettings settings;
-
-  const UpdateSettings(this.settings);
+  const ZoomChangedEvent(this.scale);
 
   @override
-  List<Object> get props => [settings];
+  List<Object> get props => [scale];
 }
 
-enum GestureType {
-  tapLeft,
-  tapRight,
-  tapCenter,
-  doubleTap,
-  longPress,
-  swipeLeft,
-  swipeRight,
-  swipeUp,
-  swipeDown,
-  pinchIn,
-  pinchOut,
+class ReadingModeChangedEvent extends ReaderEvent {
+  final ReadingMode readingMode;
+
+  const ReadingModeChangedEvent(this.readingMode);
+
+  @override
+  List<Object> get props => [readingMode];
 }

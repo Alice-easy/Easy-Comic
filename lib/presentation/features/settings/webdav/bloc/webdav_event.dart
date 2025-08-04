@@ -1,36 +1,38 @@
-import 'package:equatable/equatable.dart';
+part of 'webdav_bloc.dart';
 
-abstract class WebDAVEvent extends Equatable {
-  const WebDAVEvent();
+abstract class WebdavEvent extends Equatable {
+  const WebdavEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class BackupDataEvent extends WebDAVEvent {}
-
-class RestoreDataEvent extends WebDAVEvent {}
-
-class LoginEvent extends WebDAVEvent {
+class LoginButtonPressed extends WebdavEvent {
   final String serverUrl;
   final String username;
   final String password;
 
-  const LoginEvent({required this.serverUrl, required this.username, required this.password});
+  const LoginButtonPressed({
+    required this.serverUrl,
+    required this.username,
+    required this.password,
+  });
 
   @override
   List<Object> get props => [serverUrl, username, password];
 }
 
-class LogoutEvent extends WebDAVEvent {}
+class LogoutButtonPressed extends WebdavEvent {}
 
-class SyncDataEvent extends WebDAVEvent {}
+class SyncNow extends WebdavEvent {}
 
-class UpdateAvatarEvent extends WebDAVEvent {
-  final String newAvatarPath;
+class UploadAvatarButtonPressed extends WebdavEvent {
+  final File avatarFile;
 
-  const UpdateAvatarEvent(this.newAvatarPath);
+  const UploadAvatarButtonPressed({required this.avatarFile});
 
   @override
-  List<Object> get props => [newAvatarPath];
+  List<Object> get props => [avatarFile];
 }
+
+class DownloadAvatar extends WebdavEvent {}

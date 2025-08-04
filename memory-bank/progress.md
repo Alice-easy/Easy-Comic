@@ -7,6 +7,9 @@ This file tracks the project's progress using a task list format.
 
 ## Completed Tasks
 
+* [2025-08-03T14:17:59Z] - **已完成任务**: 完成了重构的第一阶段，包括清理旧的 `lib` 目录，根据新架构创建了完整的目录结构，更新了 `pubspec.yaml` 依赖，实现了核心数据模型（Entities）和数据库基础（Drift）。
+* [2025-08-03T19:29:57Z] - **已完成任务**: 实现了 WebDAV 集成和用户资料管理。创建了 WebDAV 服务、UI、BLoC，并配置了依赖注入。用户现在可以连接到他们的 WebDAV 服务器，并管理他们的个人资料头像。
+* [2025-08-03T19:14:55Z] - **已完成任务**: 实现了基本的漫画阅读器功能，包括从书架导航、使用 BLoC 管理状态、以及通过 PageView 显示页面和处理基本导航。
 * [2025-08-01T17:54:04Z] - **已完成任务**: 优化了应用的关键性能，包括实现图像缓存以加速封面加载，以及在书架中实现了分页无限滚动，以高效处理大数据量列表。
 * [2025-08-01T17:41:38Z] - **已完成任务**: 实现了全面的错误处理和日志记录系统，包括全局异常捕获、BLoC层错误处理和UI错误提示。
 * [2025-08-01T17:33:36Z] - **已完成任务**: 完成了全面的用户界面 (UI) 与用户体验 (UX) 增强，包括主题切换、导航优化和加载指示器。
@@ -350,3 +353,4 @@ This file tracks the project's progress using a task list format.
 [2025-08-02 15:02:40] - APK build failed for the third time with persistent 'intl' package resolution error. Investigating pubspec.yaml.
 [2025-08-02 15:07:58] - APK build finished with an error: tool could not find the generated .apk file. The build may have partially succeeded.
 [2025-08-02 15:09:05] - APK build successful. Artifacts found in build/app/outputs/flutter-apk/. Build process reported a non-fatal error about finding the apk.
+- [SUCCESS] Pushed code to GitHub main branch at 2025-08-02T15:14:13.230Z

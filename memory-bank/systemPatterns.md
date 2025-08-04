@@ -130,3 +130,13 @@ It is optional, but recommended to be updated as the project evolves.
 *   **实现**:
     *   **协调器 (`SyncEngine`)**: 依赖于多个低级服务/仓库的接口。其公共方法（如 `performSync()`）定义了业务流程的各个步骤。
     *   **调用者 (`WebDavBloc`)**: 只需调用协调器的一个方法，而无需关心其内部复杂的实现细节。
+---
+### Architectural Patterns
+[2025-08-03T13:10:51.036Z] - **Refactor Clean Architecture**
+*   **Description**: The refactoring effort formalizes the application's structure based on a strict Clean Architecture. This involves three distinct layers (Presentation, Domain, Data) with a unidirectional dependency flow towards the Domain layer. BLoC is used for state management in the Presentation layer, and UseCases in the Domain layer encapsulate specific business logic.
+*   **Rationale**: This pattern is chosen to maximize modularity, testability, and maintainability, providing a robust foundation for all features outlined in the `specs/refactor_spec.pseudo`. It ensures that the core business logic is independent of UI and data source implementations.
+*   **Implementation**:
+    *   **Directory Structure**: `lib/` is organized into `presentation`, `domain`, `data`, and `core`.
+    *   **Dependency Injection**: `GetIt` is used as a service locator, configured in `injection_container.dart`.
+    *   **Data Flow**: UI (Widget) -> BLoC -> UseCase -> Repository Interface -> Repository Implementation -> DataSource.
+    *   **Documentation**: The complete architecture is detailed in [`architecture/refactor_architecture.md`](../architecture/refactor_architecture.md).

@@ -1,74 +1,34 @@
-import 'package:equatable/equatable.dart';
+part of 'webdav_bloc.dart';
 
-enum WebDAVOperation { backup, restore, login, logout, sync }
-enum WebDavStatus { loggedIn, loggedOut, syncing, syncSuccess, syncFailure }
+enum WebdavStatus { initial, loading, success, failure, syncing }
 
-abstract class WebDAVState extends Equatable {
-  final WebDavStatus status;
-  final String? username;
+class WebdavState extends Equatable {
+  final WebdavStatus status;
+  final WebDAVConfig? config;
+  final String? failureMessage;
   final String? avatarPath;
-  final DateTime? lastSyncTime;
-  final String? errorMessage;
 
-  const WebDAVState({
-    this.status = WebDavStatus.loggedOut,
-    this.username,
+  const WebdavState({
+    this.status = WebdavStatus.initial,
+    this.config,
+    this.failureMessage,
     this.avatarPath,
-    this.lastSyncTime,
-    this.errorMessage,
   });
 
-  @override
-  List<Object?> get props => [status, username, avatarPath, lastSyncTime, errorMessage];
-}
-
-class WebDAVInitial extends WebDAVState {}
-
-class WebDAVAuthInProgress extends WebDAVState {
-  final WebDAVOperation operation;
-
-  const WebDAVAuthInProgress(this.operation) : super(status: WebDavStatus.loggedOut);
-
-  @override
-  List<Object> get props => [operation];
-}
-
-class WebDAVSyncInProgress extends WebDAVState {
-    const WebDAVSyncInProgress({String? username, String? avatarPath, DateTime? lastSyncTime})
-      : super(status: WebDavStatus.syncing, username: username, avatarPath: avatarPath, lastSyncTime: lastSyncTime);
-}
-
-class WebDAVSuccess extends WebDAVState {
-  final String message;
-
-  const WebDAVSuccess(this.message, {WebDavStatus status = WebDavStatus.loggedOut, String? username, String? avatarPath})
-      : super(status: status, username: username, avatarPath: avatarPath);
-
-  @override
-  List<Object?> get props => [message, status, username, avatarPath];
-}
-
-class WebDAVFailure extends WebDAVState {
-  const WebDAVFailure({
-    required String message,
-    WebDavStatus status = WebDavStatus.loggedOut,
-    String? username,
+  WebdavState copyWith({
+    WebdavStatus? status,
+    WebDAVConfig? config,
+    String? failureMessage,
     String? avatarPath,
-    DateTime? lastSyncTime,
-  }) : super(
-          status: status,
-          username: username,
-          avatarPath: avatarPath,
-          lastSyncTime: lastSyncTime,
-          errorMessage: message,
-        );
-}
+  }) {
+    return WebdavState(
+      status: status ?? this.status,
+      config: config ?? this.config,
+      failureMessage: failureMessage ?? this.failureMessage,
+      avatarPath: avatarPath ?? this.avatarPath,
+    );
+  }
 
-class WebDAVLoggedIn extends WebDAVState {
-  const WebDAVLoggedIn({required String username, String? avatarPath, DateTime? lastSyncTime})
-      : super(status: WebDavStatus.loggedIn, username: username, avatarPath: avatarPath, lastSyncTime: lastSyncTime);
-}
-
-class WebDAVLoggedOut extends WebDAVState {
-  const WebDAVLoggedOut() : super(status: WebDavStatus.loggedOut);
+  @override
+  List<Object?> get props => [status, config, failureMessage, avatarPath];
 }

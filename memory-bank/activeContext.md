@@ -1,5 +1,28 @@
 # 当前上下文
 
+**当前焦点:** **项目重构 - 阶段 2 完成，准备进入阶段 3**
+
+**任务:**
+根据 `specs/refactor_spec.pseudo` 规范文档，继续重构应用。
+
+**实施路线图:**
+1.  **[已完成]** 核心架构、数据模型、数据库设置。
+2.  **[进行中]** 基本的文件导入和漫画显示功能。
+3.  **[下一步]** 具有基本功能的阅读界面。
+4.  设置系统和用户偏好。
+5.  WebDAV 集成和用户资料。
+6.  高级功能和打磨。
+
+**最近的变更:**
+* [2025-08-03T14:18:27Z] - 完成了项目的基础设置，包括清理、目录结构创建、依赖更新、实体定义和数据库表结构。项目现在有了一个坚实的、可编译的基础。
+
+**后续步骤:**
+- 开始实现 `FileSystemService` 和漫画导入用例。
+
+---
+
+**旧有上下文(存档):**
+
 **当前焦点:** `HomeScreen` 重构和应用初始化清理。
 
 **任务:**
@@ -202,3 +225,7 @@
 [2025-08-02 15:03:01] - Persistent 'intl' package error. Now investigating `pubspec.yaml` for dependency declaration issues.
 [2025-08-02 15:08:20] - Build process completed with an error, but APK file might exist. Verifying build output directory.
 [2025-08-02 15:09:24] - APK build process complete. Artifacts are available.
+- **Deployment Status (2025-08-02T15:14:54.202Z):** All local changes have been successfully committed and pushed to the `main` branch on GitHub. The repository is up-to-date.
+* [2025-08-03T19:29:40Z] - **当前焦点:** WebDAV 集成和用户资料管理。
+* **状态:** 实现了完整的 WebDAV 功能，包括服务、UI、状态管理和依赖注入。用户现在可以配置 WebDAV、登录、上传头像，并在设置页面看到连接状态。
+* **后续步骤:** 准备进行测试和验证。

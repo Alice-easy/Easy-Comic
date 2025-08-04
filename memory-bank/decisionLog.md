@@ -263,3 +263,19 @@
 - **`WebDavBloc`**: 扩展了`WebDavBloc`以管理用户的登录状态和头像路径，并处理头像更新事件。
 - **`UserProfileSection`**: 创建了一个新的UI组件 (`lib/presentation/features/settings/webdav/widgets/user_profile_section.dart`) 来展示用户头像和信息，并处理相关的用户交互。
 [2025-08-02 14:49:59] - Decided to use 'flutter build apk --release' for building the release version of the APK.
+- **Decision (2025-08-02T15:14:35.558Z):** Decided to commit all current changes (new features, improvements, and untracked files) directly to the `main` branch and push to GitHub.
+- **Reason:** To quickly update the central repository with the latest integrated code state.
+---
+### 决策 (架构)
+[2025-08-03T13:10:51.036Z] - **采纳重构的整洁架构方案**
+
+**决策:**
+- 正式采纳并文档化在 [`architecture/refactor_architecture.md`](../architecture/refactor_architecture.md) 中定义的、基于整洁架构（Clean Architecture）的重构方案。
+
+**理由:**
+- 为了响应 `specs/refactor_spec.pseudo` 中提出的重构要求，需要一个清晰、权威的架构蓝图来指导开发。
+- 所选的整洁架构提供了优秀的可测试性、可维护性和可扩展性，能够将业务逻辑与外部依赖（UI、数据库）完全解耦。
+
+**后续行动:**
+- 所有后续的开发工作都必须遵循此架构文档。
+- `systemPatterns.md` 已同步更新以反映此决策。

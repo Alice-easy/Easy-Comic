@@ -1,89 +1,31 @@
-// lib/data/repositories/settings_repository_impl.dart
-import 'package:easy_comic/domain/entities/webdav_config.dart';
-import 'package:easy_comic/domain/repositories/settings_repository.dart';
-import 'package:easy_comic/data/datasources/local/settings_local_datasource.dart';
-import 'package:flutter/material.dart';
-
-import 'package:easy_comic/core/error/failures.dart';
 import 'package:dartz/dartz.dart';
-import 'package:easy_comic/domain/entities/reader_settings.dart';
+import 'package:easy_comic/core/failures/failures.dart';
+import 'package:easy_comic/data/datasources/local/settings_local_data_source.dart';
+import 'package:easy_comic/domain/entities/app_settings.dart';
+import 'package:easy_comic/domain/repositories/settings_repository.dart';
 
-class SettingsRepositoryImpl implements SettingsRepository {
+class SettingsRepositoryImpl implements ISettingsRepository {
   final SettingsLocalDataSource localDataSource;
 
   SettingsRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<Failure, ReaderSettings>> getReaderSettings() async {
+  Future<Either<Failure, AppSettings>> getSettings() async {
     try {
-      final settings = await localDataSource.getReaderSettings();
+      final settings = await localDataSource.getSettings();
       return Right(settings);
     } catch (e) {
-      return Left(const CacheFailure('Failed to get settings'));
+      return Left(DatabaseFailure('Failed to get settings'));
     }
   }
 
   @override
-  Future<Either<Failure, void>> saveReaderSettings(ReaderSettings settings) async {
+  Future<Either<Failure, Unit>> saveSettings(AppSettings settings) async {
     try {
-      await localDataSource.saveReaderSettings(settings);
-      return const Right(null);
+      await localDataSource.saveSettings(settings);
+      return Right(unit);
     } catch (e) {
-      return Left(const CacheFailure('Failed to save settings'));
-    }
-  }
-
-  @override
-  Future<WebDAVConfig> getWebDAVConfig() async {
-    try {
-      return await localDataSource.getWebDAVConfig();
-    } catch (e) {
-      throw CacheException('Failed to get WebDAV config');
-    }
-  }
-
-  @override
-  Future<void> saveWebDAVConfig(WebDAVConfig config) async {
-    try {
-      await localDataSource.saveWebDAVConfig(config);
-    } catch (e) {
-      throw CacheException('Failed to save WebDAV config');
-    }
-  }
-
-  @override
-  Future<ThemeMode> getThemeMode() async {
-    try {
-      return await localDataSource.getThemeMode();
-    } catch (e) {
-      throw CacheException('Failed to get theme mode');
-    }
-  }
-
-  @override
-  Future<void> setThemeMode(ThemeMode mode) async {
-    try {
-      await localDataSource.saveThemeMode(mode);
-    } catch (e) {
-      throw CacheException('Failed to save theme mode');
-    }
-  }
-
-  @override
-  Future<double> getBrightness() async {
-    try {
-      return await localDataSource.getBrightness();
-    } catch (e) {
-      throw CacheException('Failed to get brightness');
-    }
-  }
-
-  @override
-  Future<void> setBrightness(double brightness) async {
-    try {
-      await localDataSource.saveBrightness(brightness);
-    } catch (e) {
-      throw CacheException('Failed to save brightness');
+      return Left(DatabaseFailure('Failed to save settings'));
     }
   }
 }
