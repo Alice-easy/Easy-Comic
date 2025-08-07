@@ -1,3 +1,0 @@
-@echo off
-echo 启动 Flutter 开发模式...
-flutter run -d windows
