@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Easy Comic</string>
+    
+    <!-- Navigation -->
+    <string name="nav_bookshelf">Bookshelf</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_settings">Settings</string>
+    
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">My Comics</string>
+    <string name="bookshelf_search_hint">Search comics...</string>
+    <string name="bookshelf_empty">No comics found</string>
+    <string name="bookshelf_loading">Loading comics...</string>
+    
+    <!-- Reader -->
+    <string name="reader_title">Reader</string>
+    <string name="reader_page_number">Page %1$d of %2$d</string>
+    <string name="reader_loading">Loading page...</string>
+    <string name="reader_error_loading">Failed to load page</string>
+    <string name="reader_retry">Retry</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_reader">Reader Settings</string>
+    <string name="settings_reader_direction">Reading Direction</string>
+    <string name="settings_reader_direction_left_to_right">Left to Right</string>
+    <string name="settings_reader_direction_right_to_left">Right to Left</string>
+    <string name="settings_reader_zoom">Default Zoom</string>
+    <string name="settings_reader_zoom_fit">Fit to Screen</string>
+    <string name="settings_reader_zoom_fill">Fill Screen</string>
+    <string name="settings_reader_zoom_original">Original Size</string>
+    <string name="settings_webdav">WebDAV Sync</string>
+    <string name="settings_webdav_url">Server URL</string>
+    <string name="settings_webdav_username">Username</string>
+    <string name="settings_webdav_password">Password</string>
+    <string name="settings_webdav_enabled">Enable Sync</string>
+    <string name="settings_webdav_test">Test Connection</string>
+    <string name="settings_webdav_testing">Testing connection...</string>
+    <string name="settings_webdav_success">Connection successful</string>
+    <string name="settings_webdav_failed">Connection failed</string>
+    
+    <!-- Favorites -->
+    <string name="favorites_title">Favorites</string>
+    <string name="favorites_empty">No favorites yet</string>
+    
+    <!-- Common -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_share">Share</string>
+    <string name="common_favorite">Favorite</string>
+    <string name="common_unfavorite">Unfavorite</string>
+    <string name="common_error">Error</string>
+    <string name="common_loading">Loading...</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_empty">Empty</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">Storage Permission</string>
+    <string name="permission_storage_message">This app needs storage permission to read comic files</string>
+    <string name="permission_grant">Grant Permission</string>
+    
+    <!-- File Operations -->
+    <string name="file_select_comic">Select Comic File</string>
+    <string name="file_importing">Importing comic...</string>
+    <string name="file_import_success">Comic imported successfully</string>
+    <string name="file_import_failed">Failed to import comic</string>
+    <string name="file_unsupported_format">Unsupported file format</string>
+    <string name="file_processing_error">Error processing file</string>
+    
+    <!-- WebDAV Sync -->
+    <string name="sync_uploading">Uploading to cloud...</string>
+    <string name="sync_downloading">Downloading from cloud...</string>
+    <string name="sync_success">Sync completed successfully</string>
+    <string name="sync_failed">Sync failed</string>
+    <string name="sync_in_progress">Sync in progress</string>
+</resources>
