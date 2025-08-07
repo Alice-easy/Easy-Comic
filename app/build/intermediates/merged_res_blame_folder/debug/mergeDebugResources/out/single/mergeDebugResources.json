@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.easycomic.app-debug-4:/xml_backup_rules.xml.flat",
+        "source": "com.easycomic.app-main-6:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.easycomic.app-debug-4:/xml_data_extraction_rules.xml.flat",
+        "source": "com.easycomic.app-main-6:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.easycomic.app-debug-4:/xml_file_paths.xml.flat",
+        "source": "com.easycomic.app-main-6:/xml/file_paths.xml"
+    }
+]
