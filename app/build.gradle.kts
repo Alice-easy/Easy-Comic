@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
 }
 
@@ -50,23 +52,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        // AGP 8.7 + Kotlin 2.1 需要 Java 17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.16"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+    // 使用 Kotlin Compose 插件管理 Compose 编译器版本，无需显式指定
 }
 
 dependencies {
@@ -87,7 +83,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
 
     // Coil
     implementation(libs.coil.compose)
@@ -118,10 +114,13 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     
     // Progress tracking
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     
     // RAR/CBR format support
     implementation("com.github.junrar:junrar:7.5.5")
+
+    // Hilt DI
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     // Testing
     testImplementation(libs.junit)
