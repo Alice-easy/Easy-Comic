@@ -343,10 +343,6 @@ int attr windowMinWidthMinor 0x7f030136
 int attr windowNoTitle 0x7f030137
 int bool abc_action_bar_embed_tabs 0x7f040000
 int bool abc_config_actionMenuItemAllCaps 0x7f040001
-int bool enable_system_alarm_service_default 0x7f040002
-int bool enable_system_foreground_service_default 0x7f040003
-int bool enable_system_job_service_default 0x7f040004
-int bool workmanager_test_configuration 0x7f040005
 int color abc_background_cache_hint_selector_material_dark 0x7f050000
 int color abc_background_cache_hint_selector_material_light 0x7f050001
 int color abc_btn_colored_borderless_text_material 0x7f050002
