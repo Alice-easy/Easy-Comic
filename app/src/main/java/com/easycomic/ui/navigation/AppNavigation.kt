@@ -9,11 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-// import com.easycomic.domain.model.Manga
-// import com.easycomic.ui.bookshelf.BookshelfScreen
-// import com.easycomic.ui.bookshelf.BookshelfViewModel
-// import com.easycomic.ui.reader.ReaderScreen
-// import com.easycomic.ui.reader.ReaderViewModel
+import com.easycomic.ui.bookshelf.BookshelfScreen
+import com.easycomic.ui.bookshelf.BookshelfViewModel
+import com.easycomic.ui.reader.ReaderScreen
+import com.easycomic.ui.reader.ReaderViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 导航控制器
@@ -29,10 +29,7 @@ sealed class Screen(val route: String) {
  * 应用导航图
  */
 @Composable
-fun AppNavigation(
-    // bookshelfViewModel: BookshelfViewModel,
-    // readerViewModel: ReaderViewModel
-) {
+fun AppNavigation() {
     val navController = rememberNavController()
     
     NavHost(
@@ -40,16 +37,15 @@ fun AppNavigation(
         startDestination = Screen.Bookshelf.route
     ) {
         composable(Screen.Bookshelf.route) {
-            // BookshelfScreen(
-            //     viewModel = bookshelfViewModel,
-            //     navController = navController,
-            //     onMangaClick = { manga ->
-            //         navController.navigate(Screen.Reader.createRoute(manga.id))
-            //     },
-            //     onAddMangaClick = {
-            //         // TODO: 实现添加漫画功能
-            //     }
-            // )
+            val bookshelfViewModel: BookshelfViewModel = koinViewModel()
+            
+            BookshelfScreen(
+                viewModel = bookshelfViewModel,
+                navController = navController,
+                onMangaClick = { manga ->
+                    navController.navigate(Screen.Reader.createRoute(manga.id))
+                }
+            )
         }
         
         composable(
@@ -61,17 +57,15 @@ fun AppNavigation(
             )
         ) { backStackEntry ->
             val mangaId = backStackEntry.arguments?.getLong("mangaId") ?: 0L
+            val readerViewModel: ReaderViewModel = koinViewModel()
             
-            // 设置漫画ID到ReaderViewModel
-            // readerViewModel.setMangaId(mangaId)
-            
-            // ReaderScreen(
-            //     viewModel = readerViewModel,
-            //     filePath = "", // 将从数据库加载
-            //     onBack = {
-            //         navController.popBackStack()
-            //     }
-            // )
+            ReaderScreen(
+                viewModel = readerViewModel,
+                filePath = "", // This will be handled by the ViewModel
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

@@ -4,7 +4,7 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-v24/values-v24.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\34c65b14227cef8de79f55b7ef0b0d49\\transformed\\appcompat-1.6.1\\res\\values-v24\\values-v24.xml",
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\9918e9f2a25fc3fd60fb594f6adfc622\\transformed\\appcompat-1.6.1\\res\\values-v24\\values-v24.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

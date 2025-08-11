@@ -4,41 +4,7 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-km/values-km.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\410cd54defbdf27d625cb41cb2ea60cc\\transformed\\ui-release\\res\\values-km\\values-km.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,190,270,374,472,560,644,727,812,899,979,1064,1140,1214,1286,1357,1441,1507",
-                        "endColumns": "84,79,103,97,87,83,82,84,86,79,84,75,73,71,70,83,65,117",
-                        "endOffsets": "185,265,369,467,555,639,722,807,894,974,1059,1135,1209,1281,1352,1436,1502,1620"
-                    },
-                    "to": {
-                        "startLines": "36,37,38,39,40,41,42,100,101,102,103,105,106,107,108,110,111,112",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3514,3599,3679,3783,3881,3969,4053,10414,10499,10586,10666,10835,10911,10985,11057,11229,11313,11379",
-                        "endColumns": "84,79,103,97,87,83,82,84,86,79,84,75,73,71,70,83,65,117",
-                        "endOffsets": "3594,3674,3778,3876,3964,4048,4131,10494,10581,10661,10746,10906,10980,11052,11123,11308,11374,11492"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\4ec9627365d92db1d0d8bc8455a5120c\\transformed\\core-1.15.0\\res\\values-km\\values-km.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,150,253,351,451,552,664,776",
-                        "endColumns": "94,102,97,99,100,111,111,100",
-                        "endOffsets": "145,248,346,446,547,659,771,872"
-                    },
-                    "to": {
-                        "startLines": "29,30,31,32,33,34,35,109",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "2793,2888,2991,3089,3189,3290,3402,11128",
-                        "endColumns": "94,102,97,99,100,111,111,100",
-                        "endOffsets": "2883,2986,3084,3184,3285,3397,3509,11224"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\34c65b14227cef8de79f55b7ef0b0d49\\transformed\\appcompat-1.6.1\\res\\values-km\\values-km.xml",
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\9918e9f2a25fc3fd60fb594f6adfc622\\transformed\\appcompat-1.6.1\\res\\values-km\\values-km.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +21,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\3a0948a3cc1f01d2360717df060a0cad\\transformed\\material3-release\\res\\values-km\\values-km.xml",
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\1a401165de25bd41e2543be50ed08f19\\transformed\\core-1.15.0\\res\\values-km\\values-km.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,150,253,351,451,552,664,776",
+                        "endColumns": "94,102,97,99,100,111,111,100",
+                        "endOffsets": "145,248,346,446,547,659,771,872"
+                    },
+                    "to": {
+                        "startLines": "29,30,31,32,33,34,35,109",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "2793,2888,2991,3089,3189,3290,3402,11128",
+                        "endColumns": "94,102,97,99,100,111,111,100",
+                        "endOffsets": "2883,2986,3084,3184,3285,3397,3509,11224"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\5915dd842ed93cea914e0b869a4725d8\\transformed\\material3-release\\res\\values-km\\values-km.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -72,7 +55,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\f11a1fd8ffbef486b12233b42d4dd74e\\transformed\\foundation-release\\res\\values-km\\values-km.xml",
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\bfaf6d44db5c226718c9fc9f49343c56\\transformed\\foundation-release\\res\\values-km\\values-km.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -86,6 +69,23 @@
                         "startOffsets": "11497,11588",
                         "endColumns": "90,91",
                         "endOffsets": "11583,11675"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\680fcb6b3dfa2ff3200257f7fcff4c14\\transformed\\ui-release\\res\\values-km\\values-km.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,190,270,374,472,560,644,727,812,899,979,1064,1140,1214,1286,1357,1441,1507",
+                        "endColumns": "84,79,103,97,87,83,82,84,86,79,84,75,73,71,70,83,65,117",
+                        "endOffsets": "185,265,369,467,555,639,722,807,894,974,1059,1135,1209,1281,1352,1436,1502,1620"
+                    },
+                    "to": {
+                        "startLines": "36,37,38,39,40,41,42,100,101,102,103,105,106,107,108,110,111,112",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3514,3599,3679,3783,3881,3969,4053,10414,10499,10586,10666,10835,10911,10985,11057,11229,11313,11379",
+                        "endColumns": "84,79,103,97,87,83,82,84,86,79,84,75,73,71,70,83,65,117",
+                        "endOffsets": "3594,3674,3778,3876,3964,4048,4131,10494,10581,10661,10746,10906,10980,11052,11123,11308,11374,11492"
                     }
                 }
             ]

@@ -4,7 +4,7 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-sw600dp-v13/values-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\34c65b14227cef8de79f55b7ef0b0d49\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\9918e9f2a25fc3fd60fb594f6adfc622\\transformed\\appcompat-1.6.1\\res\\values-sw600dp-v13\\values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

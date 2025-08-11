@@ -23,193 +23,226 @@
 16    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 16-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:8:5-75
 16-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:8:22-72
-17    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-17-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:9:5-77
-17-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:9:22-74
-18
-19    <permission
-19-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
-20        android:name="com.easycomic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-20-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
-21        android:protectionLevel="signature" />
-21-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
-22
-23    <uses-permission android:name="com.easycomic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-23-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
-23-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+17    <uses-permission
+17-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:9:5-107
+18        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+18-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:9:22-78
+19        android:maxSdkVersion="28" />
+19-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:9:79-105
+20    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+20-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:10:5-77
+20-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:10:22-74
+21
+22    <!-- Required for file access on newer Android versions -->
+23    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+23-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:13:5-14:53
+23-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:13:22-79
 24
-25    <application
-25-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:11:5-55:19
-26        android:name="com.easycomic.EasyComicApplication"
-26-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:12:9-45
-27        android:allowBackup="true"
-27-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:13:9-35
-28        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-28-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\4ec9627365d92db1d0d8bc8455a5120c\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
-29        android:dataExtractionRules="@xml/data_extraction_rules"
-29-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:14:9-65
-30        android:debuggable="true"
-31        android:extractNativeLibs="false"
-32        android:fullBackupContent="@xml/backup_rules"
-32-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:15:9-54
-33        android:label="@string/app_name"
-33-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:16:9-41
-34        android:supportsRtl="true"
-34-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:17:9-35
-35        android:theme="@style/Theme.EasyComic" >
-35-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:18:9-47
-36        <activity
-36-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:21:9-43:20
-37            android:name="com.easycomic.MainActivity"
-37-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:22:13-41
-38            android:exported="true"
-38-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:23:13-36
-39            android:label="@string/app_name"
-39-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:24:13-45
-40            android:theme="@style/Theme.EasyComic" >
-40-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:25:13-51
-41            <intent-filter>
-41-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:26:13-29:29
-42                <action android:name="android.intent.action.MAIN" />
-42-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:27:17-69
-42-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:27:25-66
-43
-44                <category android:name="android.intent.category.LAUNCHER" />
-44-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:28:17-77
-44-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:28:27-74
-45            </intent-filter>
-46            <intent-filter>
-46-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:31:13-42:29
-47                <action android:name="android.intent.action.VIEW" />
-47-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:32:17-69
-47-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:32:25-66
-48
-49                <category android:name="android.intent.category.DEFAULT" />
-49-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:33:17-76
-49-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:33:27-73
-50                <category android:name="android.intent.category.BROWSABLE" />
-50-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:34:17-78
-50-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:34:27-75
-51
-52                <data android:scheme="file" />
-52-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-52-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:23-44
-53                <data android:scheme="content" />
-53-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-53-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:23-44
-54                <data android:mimeType="application/zip" />
-54-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-54-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:23-57
-55                <data android:mimeType="application/rar" />
-55-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-55-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:23-57
-56                <data android:mimeType="application/x-cbz" />
-56-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-56-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:23-57
-57                <data android:mimeType="application/x-cbr" />
-57-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-57-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:23-57
-58                <data android:mimeType="*/*" />
-58-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:35:17-47
-58-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:23-57
-59            </intent-filter>
-60        </activity>
-61
-62        <provider
-63            android:name="androidx.core.content.FileProvider"
-63-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:46:13-62
-64            android:authorities="com.easycomic.fileprovider"
-64-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:47:13-64
-65            android:exported="false"
-65-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:48:13-37
-66            android:grantUriPermissions="true" >
-66-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:49:13-47
-67            <meta-data
-67-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:50:13-52:54
-68                android:name="android.support.FILE_PROVIDER_PATHS"
-68-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:51:17-67
-69                android:resource="@xml/file_paths" />
-69-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:52:17-51
-70        </provider>
-71
-72        <activity
-72-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\0d102b591905930883c512eda8e6e4bf\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:23:9-25:39
-73            android:name="androidx.activity.ComponentActivity"
-73-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\0d102b591905930883c512eda8e6e4bf\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:24:13-63
-74            android:exported="true" />
-74-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\0d102b591905930883c512eda8e6e4bf\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:25:13-36
-75        <activity
-75-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c72990b2f88c004de7ce3208c8f7a7a8\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-76            android:name="androidx.compose.ui.tooling.PreviewActivity"
-76-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c72990b2f88c004de7ce3208c8f7a7a8\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-77            android:exported="true" />
-77-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c72990b2f88c004de7ce3208c8f7a7a8\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-78
-79        <provider
-79-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-80            android:name="androidx.startup.InitializationProvider"
-80-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-81            android:authorities="com.easycomic.androidx-startup"
-81-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-82            android:exported="false" >
-82-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-83            <meta-data
-83-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-84                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-84-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-85                android:value="androidx.startup" />
-85-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\9fd60d84b19842b733e911173fdb59b4\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-86            <meta-data
-86-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c5cfe28b54377507ac91477b3991144a\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:29:13-31:52
-87                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-87-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c5cfe28b54377507ac91477b3991144a\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:30:17-78
-88                android:value="androidx.startup" />
-88-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c5cfe28b54377507ac91477b3991144a\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:31:17-49
+25    <permission
+25-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
+26        android:name="com.easycomic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+26-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
+27        android:protectionLevel="signature" />
+27-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
+28
+29    <uses-permission android:name="com.easycomic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+29-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
+29-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+30
+31    <application
+31-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:16:5-60:19
+32        android:name="com.easycomic.EasyComicApplication"
+32-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:17:9-45
+33        android:allowBackup="true"
+33-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:18:9-35
+34        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+34-->[androidx.core:core:1.15.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\1a401165de25bd41e2543be50ed08f19\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
+35        android:dataExtractionRules="@xml/data_extraction_rules"
+35-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:19:9-65
+36        android:debuggable="true"
+37        android:extractNativeLibs="false"
+38        android:fullBackupContent="@xml/backup_rules"
+38-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:20:9-54
+39        android:label="@string/app_name"
+39-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:21:9-41
+40        android:supportsRtl="true"
+40-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:22:9-35
+41        android:theme="@style/Theme.EasyComic" >
+41-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:23:9-47
+42        <activity
+42-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:26:9-48:20
+43            android:name="com.easycomic.MainActivity"
+43-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:27:13-41
+44            android:exported="true"
+44-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:28:13-36
+45            android:label="@string/app_name"
+45-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:29:13-45
+46            android:theme="@style/Theme.EasyComic" >
+46-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:30:13-51
+47            <intent-filter>
+47-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:31:13-34:29
+48                <action android:name="android.intent.action.MAIN" />
+48-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:32:17-69
+48-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:32:25-66
+49
+50                <category android:name="android.intent.category.LAUNCHER" />
+50-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:33:17-77
+50-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:33:27-74
+51            </intent-filter>
+52            <intent-filter>
+52-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:36:13-47:29
+53                <action android:name="android.intent.action.VIEW" />
+53-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:17-69
+53-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:37:25-66
+54
+55                <category android:name="android.intent.category.DEFAULT" />
+55-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:38:17-76
+55-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:38:27-73
+56                <category android:name="android.intent.category.BROWSABLE" />
+56-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:39:17-78
+56-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:39:27-75
+57
+58                <data android:scheme="file" />
+58-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+58-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:23-44
+59                <data android:scheme="content" />
+59-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+59-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:23-44
+60                <data android:mimeType="application/zip" />
+60-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+60-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:42:23-57
+61                <data android:mimeType="application/rar" />
+61-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+61-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:42:23-57
+62                <data android:mimeType="application/x-cbz" />
+62-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+62-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:42:23-57
+63                <data android:mimeType="application/x-cbr" />
+63-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+63-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:42:23-57
+64                <data android:mimeType="*/*" />
+64-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:40:17-47
+64-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:42:23-57
+65            </intent-filter>
+66        </activity>
+67
+68        <provider
+69            android:name="androidx.core.content.FileProvider"
+69-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:51:13-62
+70            android:authorities="com.easycomic.fileprovider"
+70-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:52:13-64
+71            android:exported="false"
+71-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:53:13-37
+72            android:grantUriPermissions="true" >
+72-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:54:13-47
+73            <meta-data
+73-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:55:13-57:54
+74                android:name="android.support.FILE_PROVIDER_PATHS"
+74-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:56:17-67
+75                android:resource="@xml/file_paths" />
+75-->C:\001\Comic\Easy-Comic\app\src\main\AndroidManifest.xml:57:17-51
+76        </provider>
+77
+78        <activity
+78-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\071c7ada2bd53e6b4bec38281406b8ae\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:23:9-25:39
+79            android:name="androidx.activity.ComponentActivity"
+79-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\071c7ada2bd53e6b4bec38281406b8ae\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:24:13-63
+80            android:exported="true" />
+80-->[androidx.compose.ui:ui-test-manifest:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\071c7ada2bd53e6b4bec38281406b8ae\transformed\ui-test-manifest-1.7.6\AndroidManifest.xml:25:13-36
+81        <activity
+81-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\90bc622485098721510bf0db2387a84d\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+82            android:name="androidx.compose.ui.tooling.PreviewActivity"
+82-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\90bc622485098721510bf0db2387a84d\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+83            android:exported="true" />
+83-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\90bc622485098721510bf0db2387a84d\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+84
+85        <provider
+85-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+86            android:name="androidx.startup.InitializationProvider"
+86-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+87            android:authorities="com.easycomic.androidx-startup"
+87-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+88            android:exported="false" >
+88-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
 89            <meta-data
-89-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-90                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-90-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+89-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+90                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+90-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
 91                android:value="androidx.startup" />
-91-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-92        </provider>
-93
-94        <receiver
-94-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-95            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-96            android:directBootAware="false"
-96-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-97            android:enabled="true"
-97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-98            android:exported="true"
-98-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-99            android:permission="android.permission.DUMP" >
-99-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-100            <intent-filter>
-100-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-101                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-101-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-102            </intent-filter>
-103            <intent-filter>
-103-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-104                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-104-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-104-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-105            </intent-filter>
-106            <intent-filter>
-106-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-107                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-108            </intent-filter>
-109            <intent-filter>
-109-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-110                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-110-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-110-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\2d6923151410a124481fbe295dc33e63\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-111            </intent-filter>
-112        </receiver>
-113    </application>
-114
-115</manifest>
+91-->[androidx.emoji2:emoji2:1.3.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\759f24360c01e4003bfe2867735d7a49\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+92            <meta-data
+92-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\5e4b3178404b0e3b42787cb7544d7742\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:29:13-31:52
+93                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+93-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\5e4b3178404b0e3b42787cb7544d7742\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:30:17-78
+94                android:value="androidx.startup" />
+94-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\5e4b3178404b0e3b42787cb7544d7742\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:31:17-49
+95            <meta-data
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+96                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+97                android:value="androidx.startup" />
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+98        </provider>
+99
+100        <uses-library
+100-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:25:9-27:40
+101            android:name="androidx.window.extensions"
+101-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:26:13-54
+102            android:required="false" />
+102-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:27:13-37
+103        <uses-library
+103-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:28:9-30:40
+104            android:name="androidx.window.sidecar"
+104-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:29:13-51
+105            android:required="false" />
+105-->[androidx.window:window:1.0.0] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\ed143a763cdf7caa08139c6db022a527\transformed\window-1.0.0\AndroidManifest.xml:30:13-37
+106
+107        <service
+107-->[androidx.room:room-runtime:2.6.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\e2f1db0025a309329db58210d0e85237\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
+108            android:name="androidx.room.MultiInstanceInvalidationService"
+108-->[androidx.room:room-runtime:2.6.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\e2f1db0025a309329db58210d0e85237\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
+109            android:directBootAware="true"
+109-->[androidx.room:room-runtime:2.6.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\e2f1db0025a309329db58210d0e85237\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
+110            android:exported="false" />
+110-->[androidx.room:room-runtime:2.6.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\e2f1db0025a309329db58210d0e85237\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
+111
+112        <receiver
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+113            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+113-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+114            android:directBootAware="false"
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+115            android:enabled="true"
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+116            android:exported="true"
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+117            android:permission="android.permission.DUMP" >
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+118            <intent-filter>
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+119                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+120            </intent-filter>
+121            <intent-filter>
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+122                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+123            </intent-filter>
+124            <intent-filter>
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+125                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+126            </intent-filter>
+127            <intent-filter>
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+128                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+128-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+128-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\zxo10\.gradle\caches\8.14.3\transforms\c9fdf1bb46a832bd98da9119532ab1dd\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+129            </intent-filter>
+130        </receiver>
+131    </application>
+132
+133</manifest>

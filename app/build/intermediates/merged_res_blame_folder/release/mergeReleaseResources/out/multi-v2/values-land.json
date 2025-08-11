@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.easycomic.app-mergeReleaseResources-2:/values-land/values-land.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\9918e9f2a25fc3fd60fb594f6adfc622\\transformed\\appcompat-1.6.1\\res\\values-land\\values-land.xml",
+                    "from": {
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,125,196",
+                        "endColumns": "69,70,67",
+                        "endOffsets": "120,191,259"
+                    }
+                }
+            ]
+        }
+    ]
+}
