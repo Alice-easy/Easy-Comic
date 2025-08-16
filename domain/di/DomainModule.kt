@@ -24,4 +24,6 @@ val domainModule = module {
     factory { UpdateRatingUseCase(get<MangaRepository>()) }
     factory { DeleteMangaUseCase(get<MangaRepository>()) }
     factory { DeleteAllMangaUseCase(get<MangaRepository>()) }
+    factory { ImportComicsUseCase(get<MangaRepository>()) }
+    factory { GetCoverUseCase(get<MangaRepository>()) }
 }

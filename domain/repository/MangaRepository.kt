@@ -95,4 +95,9 @@ interface MangaRepository {
      * 获取已读漫画数量
      */
     fun getCompletedCount(): Flow<Int>
+
+    /**
+     * 获取漫画封面
+     */
+    suspend fun getCover(manga: Manga): android.graphics.Bitmap?
 }

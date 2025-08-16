@@ -1,10 +1,15 @@
 package com.easycomic.domain.usecase.manga
 
+import com.easycomic.data.entity.ReadingStatus
 import com.easycomic.domain.model.Manga
 import com.easycomic.domain.repository.MangaRepository
 import com.easycomic.domain.usecase.BaseUseCase
 import com.easycomic.domain.usecase.NoParametersUseCase
+import com.easycomic.utils.ComicParser
+import com.easycomic.utils.RarComicParser
+import com.easycomic.utils.ZipComicParser
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 /**
  * 获取所有漫画用例
@@ -152,5 +157,61 @@ class DeleteAllMangaUseCase(
 ) : BaseUseCase<List<Manga>, Unit> {
     override suspend fun invoke(parameters: List<Manga>) {
         mangaRepository.deleteAllManga(parameters)
+    }
+}
+
+/**
+ * 导入漫画用例
+ */
+class ImportComicsUseCase(
+    private val mangaRepository: MangaRepository
+) : BaseUseCase<File, Unit> {
+    override suspend fun invoke(parameters: File) {
+        if (!parameters.isDirectory) return
+
+        parameters.listFiles()?.forEach { file ->
+            val parser = getParserForFile(file)
+            if (parser != null) {
+                try {
+                    val pageCount = parser.getPageCount()
+                    if (pageCount > 0) {
+                        val manga = Manga(
+                            title = file.nameWithoutExtension,
+                            filePath = file.absolutePath,
+                            fileSize = file.length(),
+                            fileFormat = file.extension.uppercase(),
+                            pageCount = pageCount,
+                            dateAdded = System.currentTimeMillis(),
+                            dateModified = System.currentTimeMillis(),
+                            lastRead = System.currentTimeMillis(),
+                            readingStatus = ReadingStatus.UNREAD
+                        )
+                        mangaRepository.insertOrUpdateManga(manga)
+                    }
+                } finally {
+                    parser.close()
+                }
+            }
+        }
+    }
+
+    private fun getParserForFile(file: File): ComicParser? {
+        val extension = file.extension.lowercase()
+        return when (extension) {
+            "zip", "cbz" -> ZipComicParser(file)
+            "rar", "cbr" -> RarComicParser(file)
+            else -> null
+        }
+    }
+}
+
+/**
+ * 获取封面用例
+ */
+class GetCoverUseCase(
+    private val mangaRepository: MangaRepository
+) : BaseUseCase<Manga, android.graphics.Bitmap?> {
+    override suspend fun invoke(parameters: Manga): android.graphics.Bitmap? {
+        return mangaRepository.getCover(parameters)
     }
 }

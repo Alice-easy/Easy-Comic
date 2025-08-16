@@ -21,3 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Easy Comic"
 include(":app")
+include(":data")
+include(":domain")
+include(":ui_bookshelf")
+include(":ui_reader")
+include(":ui_di")

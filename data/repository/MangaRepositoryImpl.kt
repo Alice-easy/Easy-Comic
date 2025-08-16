@@ -1,11 +1,17 @@
 package com.easycomic.data.repository
 
+import android.graphics.Bitmap
 import com.easycomic.data.dao.MangaDao
 import com.easycomic.data.entity.MangaEntity
 import com.easycomic.domain.model.Manga
 import com.easycomic.domain.repository.MangaRepository
+import com.easycomic.utils.RarComicParser
+import com.easycomic.utils.ZipComicParser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.io.File
 
 /**
  * 漫画仓库实现类
@@ -98,6 +104,21 @@ class MangaRepositoryImpl(
     
     override fun getCompletedCount(): Flow<Int> {
         return mangaDao.getCompletedCount()
+    }
+
+    override suspend fun getCover(manga: Manga): Bitmap? = withContext(Dispatchers.IO) {
+        val file = File(manga.filePath)
+        if (!file.exists()) return@withContext null
+
+        val parser = when (file.extension.lowercase()) {
+            "zip", "cbz" -> ZipComicParser(file)
+            "rar", "cbr" -> RarComicParser(file)
+            else -> null
+        }
+
+        parser?.use {
+            it.getCover()
+        }
     }
 }
 

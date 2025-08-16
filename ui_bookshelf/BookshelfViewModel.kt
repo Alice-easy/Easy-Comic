@@ -2,12 +2,15 @@ package com.easycomic.ui.bookshelf
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.easycomic.domain.model.Manga
 import com.easycomic.domain.usecase.manga.*
 import com.easycomic.data.entity.ReadingStatus
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 
 /**
  * 书架视图模型
@@ -19,7 +22,8 @@ class BookshelfViewModel(
     private val getRecentMangaUseCase: GetRecentMangaUseCase,
     private val deleteMangaUseCase: DeleteMangaUseCase,
     private val deleteAllMangaUseCase: DeleteAllMangaUseCase,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val importComicsUseCase: ImportComicsUseCase
 ) : ViewModel() {
     
     // UI状态
@@ -231,6 +235,22 @@ class BookshelfViewModel(
      */
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    /**
+     * 导入漫画
+     */
+    fun importComics(directory: File) {
+        viewModelScope.launch {
+            try {
+                importComicsUseCase(directory)
+                // Optionally, you can refresh the manga list after import
+                loadAllManga()
+            } catch (e: Exception) {
+                Timber.e(e, "导入漫画失败")
+                _uiState.update { it.copy(error = "导入漫画失败: ${e.message}") }
+            }
+        }
     }
 }
 

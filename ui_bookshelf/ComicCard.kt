@@ -73,10 +73,7 @@ fun ComicCard(
                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
             ) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(manga.coverImagePath)
-                        .crossfade(true)
-                        .build(),
+                    model = manga,
                     contentDescription = manga.title,
                     modifier = Modifier
                         .fillMaxSize()
@@ -247,10 +244,7 @@ fun GridComicCard(
         ) {
             // 封面图片
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(manga.coverImagePath)
-                    .crossfade(true)
-                    .build(),
+                model = manga,
                 contentDescription = manga.title,
                 modifier = Modifier
                     .fillMaxSize()
