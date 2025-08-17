@@ -1,91 +1,78 @@
 package com.easycomic.data.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Index
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 /**
  * 漫画实体类
- * @Entity 定义数据库表结构
+ * @Entity 定义数据库表结构，严格对应 README.md 中的设计
  */
 @Entity(
     tableName = "manga",
     indices = [
-        Index("title"),
-        Index("author"),
-        Index("last_read"),
-        Index("date_added"),
-        Index("is_favorite")
+        Index(value = ["title"], name = "idx_manga_title"),
+        Index(value = ["last_read"], name = "idx_manga_last_read", orders = [Index.Order.DESC]),
+        Index(value = ["is_favorite", "last_read"], name = "idx_manga_favorite", orders = [Index.Order.ASC, Index.Order.DESC])
     ]
 )
 data class MangaEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long = 0,
-    
+
     @ColumnInfo(name = "title")
     val title: String,
-    
-    @ColumnInfo(name = "author")
-    val author: String = "",
-    
-    @ColumnInfo(name = "description")
-    val description: String = "",
-    
+
+    @ColumnInfo(name = "author", defaultValue = "")
+    val author: String? = "",
+
+    @ColumnInfo(name = "description", defaultValue = "")
+    val description: String? = "",
+
     @ColumnInfo(name = "file_path")
     val filePath: String,
-    
-    @ColumnInfo(name = "file_uri")
-    val fileUri: String? = null,
-    
-    @ColumnInfo(name = "file_format")
-    val fileFormat: String = "",
-    
-    @ColumnInfo(name = "file_size")
-    val fileSize: Long = 0,
-    
-    @ColumnInfo(name = "page_count")
-    val pageCount: Int = 0,
-    
-    @ColumnInfo(name = "current_page")
-    val currentPage: Int = 0,
-    
-    @ColumnInfo(name = "cover_image_path")
-    val coverImagePath: String? = null,
-    
-    @ColumnInfo(name = "thumbnail_path")
-    val thumbnailPath: String? = null,
-    
-    @ColumnInfo(name = "rating")
-    val rating: Float = 0f,
-    
-    @ColumnInfo(name = "is_favorite")
-    val isFavorite: Boolean = false,
-    
-    @ColumnInfo(name = "reading_status")
-    val readingStatus: ReadingStatus = ReadingStatus.UNREAD,
-    
-    @ColumnInfo(name = "tags")
-    val tags: String = "",
-    
-    @ColumnInfo(name = "last_read")
-    val lastRead: Long = System.currentTimeMillis(),
-    
-    @ColumnInfo(name = "date_added")
-    val dateAdded: Long = System.currentTimeMillis(),
-    
-    @ColumnInfo(name = "date_modified")
-    val dateModified: Long = System.currentTimeMillis()
-)
 
-/**
- * 阅读状态枚举
- */
-enum class ReadingStatus {
-    UNREAD,     // 未读
-    READING,    // 阅读中
-    COMPLETED,  // 已完成
-    PAUSED,     // 暂停
-    DROPPED     // 放弃
-}
+    @ColumnInfo(name = "file_size")
+    val fileSize: Long,
+
+    @ColumnInfo(name = "format")
+    val format: String,
+
+    @ColumnInfo(name = "cover_path")
+    val coverPath: String? = null,
+
+    @ColumnInfo(name = "page_count", defaultValue = "0")
+    val pageCount: Int = 0,
+
+    @ColumnInfo(name = "current_page", defaultValue = "1")
+    val currentPage: Int = 1,
+
+    @ColumnInfo(name = "reading_progress", defaultValue = "0.0")
+    val readingProgress: Float = 0.0f,
+
+    @ColumnInfo(name = "is_favorite", defaultValue = "0")
+    val isFavorite: Boolean = false,
+
+    @ColumnInfo(name = "is_completed", defaultValue = "0")
+    val isCompleted: Boolean = false,
+
+    @ColumnInfo(name = "date_added")
+    val dateAdded: Long,
+
+    @ColumnInfo(name = "last_read", defaultValue = "0")
+    val lastRead: Long = 0,
+
+    @ColumnInfo(name = "reading_time", defaultValue = "0")
+    val readingTime: Long = 0,
+
+    @ColumnInfo(name = "rating", defaultValue = "0.0")
+    val rating: Float = 0.0f,
+
+    @ColumnInfo(name = "created_at")
+    val createdAt: Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Long = System.currentTimeMillis()
+)

@@ -1,13 +1,14 @@
 package com.easycomic.data.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 
 /**
  * 书签实体类
+ * 严格对应 README.md 中的设计
  */
 @Entity(
     tableName = "bookmark",
@@ -20,31 +21,27 @@ import androidx.room.ColumnInfo
         )
     ],
     indices = [
-        Index("manga_id"),
-        Index("page_number"),
-        Index("created_at")
+        Index(value = ["manga_id"], name = "idx_bookmark_manga_id"),
+        Index(value = ["manga_id", "page_number"], unique = true)
     ]
 )
 data class BookmarkEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     val id: Long = 0,
-    
+
     @ColumnInfo(name = "manga_id")
     val mangaId: Long,
-    
+
     @ColumnInfo(name = "page_number")
     val pageNumber: Int,
-    
-    @ColumnInfo(name = "name")
-    val name: String = "",
-    
-    @ColumnInfo(name = "description")
-    val description: String = "",
-    
+
+    @ColumnInfo(name = "bookmark_name")
+    val bookmarkName: String?,
+
+    @ColumnInfo(name = "notes")
+    val notes: String?,
+
     @ColumnInfo(name = "created_at")
-    val createdAt: Long = System.currentTimeMillis(),
-    
-    @ColumnInfo(name = "updated_at")
-    val updatedAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis()
 )

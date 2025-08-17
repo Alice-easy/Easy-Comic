@@ -110,7 +110,7 @@ interface BookmarkDao {
      */
     @Query("""
         SELECT * FROM bookmark 
-        ORDER BY created_at DESC 
+        ORDER BY id DESC 
         LIMIT :limit
     """)
     fun getRecentBookmarks(limit: Int = 20): Flow<List<BookmarkEntity>>

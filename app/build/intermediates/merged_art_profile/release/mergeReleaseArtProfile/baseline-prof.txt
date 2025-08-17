@@ -2845,6 +2845,59 @@ Landroidx/navigation/NavigatorState;
 HSPLandroidx/navigation/common/R$styleable;-><clinit>()V
 Landroidx/navigation/common/R$styleable;
 
+# Baseline Profiles for navigation-fragment
+
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator$Companion;-><init>()V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator$observer$1;-><init>(Landroidx/navigation/fragment/DialogFragmentNavigator;)V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator$onAttach$1;-><init>(Landroidx/navigation/fragment/DialogFragmentNavigator;)V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator$onAttach$1;->onAttachFragment(Landroidx/fragment/app/FragmentManager;Landroidx/fragment/app/Fragment;)V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator;-><clinit>()V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator;-><init>(Landroid/content/Context;Landroidx/fragment/app/FragmentManager;)V
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator;->access$getRestoredTagsAwaitingAttach$p(Landroidx/navigation/fragment/DialogFragmentNavigator;)Ljava/util/Set;
+HSPLandroidx/navigation/fragment/DialogFragmentNavigator;->onAttach(Landroidx/navigation/NavigatorState;)V
+HSPLandroidx/navigation/fragment/FragmentNavigator$Companion;-><init>()V
+HSPLandroidx/navigation/fragment/FragmentNavigator$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;-><init>(Landroidx/navigation/Navigator;)V
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;->equals(Ljava/lang/Object;)Z
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;->getClassName()Ljava/lang/String;
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;->hashCode()I
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;->onInflate(Landroid/content/Context;Landroid/util/AttributeSet;)V
+HSPLandroidx/navigation/fragment/FragmentNavigator$Destination;->setClassName(Ljava/lang/String;)Landroidx/navigation/fragment/FragmentNavigator$Destination;
+HSPLandroidx/navigation/fragment/FragmentNavigator;-><clinit>()V
+HSPLandroidx/navigation/fragment/FragmentNavigator;-><init>(Landroid/content/Context;Landroidx/fragment/app/FragmentManager;I)V
+HSPLandroidx/navigation/fragment/FragmentNavigator;->createDestination()Landroidx/navigation/NavDestination;
+HSPLandroidx/navigation/fragment/FragmentNavigator;->createDestination()Landroidx/navigation/fragment/FragmentNavigator$Destination;
+HSPLandroidx/navigation/fragment/FragmentNavigator;->navigate(Landroidx/navigation/NavBackStackEntry;Landroidx/navigation/NavOptions;Landroidx/navigation/Navigator$Extras;)V
+HSPLandroidx/navigation/fragment/FragmentNavigator;->navigate(Ljava/util/List;Landroidx/navigation/NavOptions;Landroidx/navigation/Navigator$Extras;)V
+HSPLandroidx/navigation/fragment/NavHostFragment$Companion;-><init>()V
+HSPLandroidx/navigation/fragment/NavHostFragment$Companion;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;-><clinit>()V
+HSPLandroidx/navigation/fragment/NavHostFragment;-><init>()V
+HSPLandroidx/navigation/fragment/NavHostFragment;->createFragmentNavigator()Landroidx/navigation/Navigator;
+HSPLandroidx/navigation/fragment/NavHostFragment;->getContainerId()I
+HSPLandroidx/navigation/fragment/NavHostFragment;->onAttach(Landroid/content/Context;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onCreate(Landroid/os/Bundle;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onCreateNavController(Landroidx/navigation/NavController;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onCreateNavHostController(Landroidx/navigation/NavHostController;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;
+HSPLandroidx/navigation/fragment/NavHostFragment;->onInflate(Landroid/content/Context;Landroid/util/AttributeSet;Landroid/os/Bundle;)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onPrimaryNavigationFragmentChanged(Z)V
+HSPLandroidx/navigation/fragment/NavHostFragment;->onViewCreated(Landroid/view/View;Landroid/os/Bundle;)V
+Landroidx/navigation/fragment/DialogFragmentNavigator$Companion;
+Landroidx/navigation/fragment/DialogFragmentNavigator$observer$1;
+Landroidx/navigation/fragment/DialogFragmentNavigator$onAttach$1;
+Landroidx/navigation/fragment/DialogFragmentNavigator;
+Landroidx/navigation/fragment/FragmentNavigator$Companion;
+Landroidx/navigation/fragment/FragmentNavigator$Destination;
+Landroidx/navigation/fragment/FragmentNavigator$Extras;
+Landroidx/navigation/fragment/FragmentNavigator;
+Landroidx/navigation/fragment/NavHostFragment$Companion;
+Landroidx/navigation/fragment/NavHostFragment;
+PLandroidx/navigation/fragment/NavHostFragment;->onDestroyView()V
+HSPLandroidx/navigation/fragment/R$styleable;-><clinit>()V
+Landroidx/navigation/fragment/R$styleable;
+
 # Baseline Profiles for navigation-runtime
 
 HSPLandroidx/navigation/ActivityNavigator$Companion;-><init>()V
@@ -2951,6 +3004,34 @@ PLandroidx/navigation/NavControllerViewModel;->onCleared()V
 HSPLandroidx/navigation/R$styleable;-><clinit>()V
 Landroidx/navigation/R$id;
 Landroidx/navigation/R$styleable;
+
+# Baseline profile rules for androidx.compose.material3
+# =============================================
+
+HSPLandroidx/compose/material3/CardColors;->**(**)**
+HSPLandroidx/compose/material3/CardElevation;->**(**)**
+HSPLandroidx/compose/material3/CardKt**->**(**)**
+HSPLandroidx/compose/material3/CheckDrawingCache;->**(**)**
+HSPLandroidx/compose/material3/CheckboxColors;->**(**)**
+HSPLandroidx/compose/material3/CheckboxKt**->**(**)**
+HSPLandroidx/compose/material3/ColorScheme**->**(**)**
+HSPLandroidx/compose/material3/ContentColorKt;->**(**)**
+HSPLandroidx/compose/material3/DefaultPlatformTextStyle_androidKt;->**(**)**
+HSPLandroidx/compose/material3/InteractiveComponentSizeKt;->**(**)**
+HSPLandroidx/compose/material3/MinimumInteractiveComponentSizeModifier**->**(**)**
+HSPLandroidx/compose/material3/ShapeDefaults;->**(**)**
+HSPLandroidx/compose/material3/Shapes;->**(**)**
+HSPLandroidx/compose/material3/ShapesKt**->**(**)**
+HSPLandroidx/compose/material3/SurfaceKt**->**(**)**
+HSPLandroidx/compose/material3/TextKt**->**(**)**
+HSPLandroidx/compose/material3/CheckboxTokens;->**(**)**
+HSPLandroidx/compose/material3/ColorDarkTokens;->**(**)**
+HSPLandroidx/compose/material3/ColorLightTokens;->**(**)**
+HSPLandroidx/compose/material3/ElevationTokens;->**(**)**
+HSPLandroidx/compose/material3/FilledCardTokens;->**(**)**
+HSPLandroidx/compose/material3/PaletteTokens;->**(**)**
+HSPLandroidx/compose/material3/ShapeTokens;->**(**)**
+HSPLandroidx/compose/material3/TypographyTokens;->**(**)**
 
 # Baseline profiles for androidx.fragment
 
@@ -3430,45 +3511,6 @@ PLandroidx/fragment/app/FragmentViewLifecycleOwner;->performSave(Landroid/os/Bun
 PLandroidx/fragment/app/FragmentViewLifecycleOwner;->setCurrentState(Landroidx/lifecycle/Lifecycle$State;)V
 PLandroidx/fragment/app/SpecialEffectsController;->enqueueRemove(Landroidx/fragment/app/FragmentStateManager;)V
 
-# Baseline profile rules for androidx.compose.material3
-# =============================================
-
-HSPLandroidx/compose/material3/CardColors;->**(**)**
-HSPLandroidx/compose/material3/CardElevation;->**(**)**
-HSPLandroidx/compose/material3/CardKt**->**(**)**
-HSPLandroidx/compose/material3/CheckDrawingCache;->**(**)**
-HSPLandroidx/compose/material3/CheckboxColors;->**(**)**
-HSPLandroidx/compose/material3/CheckboxKt**->**(**)**
-HSPLandroidx/compose/material3/ColorScheme**->**(**)**
-HSPLandroidx/compose/material3/ContentColorKt;->**(**)**
-HSPLandroidx/compose/material3/DefaultPlatformTextStyle_androidKt;->**(**)**
-HSPLandroidx/compose/material3/InteractiveComponentSizeKt;->**(**)**
-HSPLandroidx/compose/material3/MinimumInteractiveComponentSizeModifier**->**(**)**
-HSPLandroidx/compose/material3/ShapeDefaults;->**(**)**
-HSPLandroidx/compose/material3/Shapes;->**(**)**
-HSPLandroidx/compose/material3/ShapesKt**->**(**)**
-HSPLandroidx/compose/material3/SurfaceKt**->**(**)**
-HSPLandroidx/compose/material3/TextKt**->**(**)**
-HSPLandroidx/compose/material3/CheckboxTokens;->**(**)**
-HSPLandroidx/compose/material3/ColorDarkTokens;->**(**)**
-HSPLandroidx/compose/material3/ColorLightTokens;->**(**)**
-HSPLandroidx/compose/material3/ElevationTokens;->**(**)**
-HSPLandroidx/compose/material3/FilledCardTokens;->**(**)**
-HSPLandroidx/compose/material3/PaletteTokens;->**(**)**
-HSPLandroidx/compose/material3/ShapeTokens;->**(**)**
-HSPLandroidx/compose/material3/TypographyTokens;->**(**)**
-
-# Baseline profile rules for androidx.compose.animation.core
-# =============================================
-# In practice it seems like almost every class in animation/core ends up getting loaded in even a
-# relatively small sample, and most end up getting marked as "HSP". Since Animation is a high value
-# target for performance - fade in, scroll, etc we are going to be liberal in the animation profile
-# rules and just mark the entire module.
-
-HSPLandroidx/compose/animation/core/**->**(**)**
-
-Landroidx/compose/animation/core/**;
-
 # Baseline profile rules for androidx.compose.material.ripple
 # =============================================
 HSPLandroidx/compose/material/ripple/AndroidRippleIndicationInstance;->**(**)**
@@ -3490,24 +3532,6 @@ HSPLandroidx/compose/material/ripple/StateLayer;->**(**)**
 
 Landroidx/compose/material/ripple/*;
 
-# Baseline profile rules for androidx.compose.animation
-# =============================================
-HSPLandroidx/compose/animation/AndroidFlingSpline**;->**(**)**
-HSPLandroidx/compose/animation/AnimatedVisibilityKt**->**(**)**
-HSPLandroidx/compose/animation/AnimatedVisibilityScope;-><init>(**)V
-HSPLandroidx/compose/animation/ChangeSize;->**(**)**
-HSPLandroidx/compose/animation/ColorVectorConverterKt**->**(**)**
-HSPLandroidx/compose/animation/CrossfadeAnimationItem;->**(**)**
-HSPLandroidx/compose/animation/CrossfadeKt**->**(**)**
-HSPLandroidx/compose/animation/EnterExitTransitionKt;->**(**)**
-HSPLandroidx/compose/animation/FlingCalculator**;->**(**)**
-HSPLandroidx/compose/animation/SingleValueAnimationKt;->**(**)**
-HSPLandroidx/compose/animation/SplineBasedFloatDecayAnimationSpec**->**(**)**
-HSPLandroidx/compose/animation/SplineBasedDecayKt;->**(**)**
-HSPLandroidx/compose/animation/TransitionData;->**(**)**
-
-# Include all of androidx.compose.animation
-Landroidx/compose/animation/*;
 # Baseline profile rules for androidx.compose.foundation.layout
 # =============================================
 # Layout is incredibly important for performance, and represents many hot code paths. For now, we
@@ -3576,12 +3600,35 @@ HSPLandroidx/compose/foundation/text/selection/TextFieldSelectionManager;->**(**
 # Include all of foundation
 Landroidx/compose/foundation/**;
 
-# Baseline profile rules for androidx.compose.ui.unit
+# Baseline profile rules for androidx.compose.animation.core
 # =============================================
-# everything in unit is relatively small and in the hot path, so we just add everything
-HSPLandroidx/compose/ui/unit/**->**(**)**
-Landroidx/compose/ui/unit/**
+# In practice it seems like almost every class in animation/core ends up getting loaded in even a
+# relatively small sample, and most end up getting marked as "HSP". Since Animation is a high value
+# target for performance - fade in, scroll, etc we are going to be liberal in the animation profile
+# rules and just mark the entire module.
 
+HSPLandroidx/compose/animation/core/**->**(**)**
+
+Landroidx/compose/animation/core/**;
+
+# Baseline profile rules for androidx.compose.animation
+# =============================================
+HSPLandroidx/compose/animation/AndroidFlingSpline**;->**(**)**
+HSPLandroidx/compose/animation/AnimatedVisibilityKt**->**(**)**
+HSPLandroidx/compose/animation/AnimatedVisibilityScope;-><init>(**)V
+HSPLandroidx/compose/animation/ChangeSize;->**(**)**
+HSPLandroidx/compose/animation/ColorVectorConverterKt**->**(**)**
+HSPLandroidx/compose/animation/CrossfadeAnimationItem;->**(**)**
+HSPLandroidx/compose/animation/CrossfadeKt**->**(**)**
+HSPLandroidx/compose/animation/EnterExitTransitionKt;->**(**)**
+HSPLandroidx/compose/animation/FlingCalculator**;->**(**)**
+HSPLandroidx/compose/animation/SingleValueAnimationKt;->**(**)**
+HSPLandroidx/compose/animation/SplineBasedFloatDecayAnimationSpec**->**(**)**
+HSPLandroidx/compose/animation/SplineBasedDecayKt;->**(**)**
+HSPLandroidx/compose/animation/TransitionData;->**(**)**
+
+# Include all of androidx.compose.animation
+Landroidx/compose/animation/*;
 # Baseline profile rules for androidx.compose.ui.geometry
 # =============================================
 # All of geometry is highly used, small, and mathy, so we include everything
@@ -3591,6 +3638,12 @@ Landroidx/compose/ui/geometry/*;
 # =============================================
 HSPLandroidx/compose/ui/util/MathHelpersKt;->lerp(FFF)F
 Landroidx/compose/ui/util/MathHelpersKt;
+
+# Baseline profile rules for androidx.compose.ui.unit
+# =============================================
+# everything in unit is relatively small and in the hot path, so we just add everything
+HSPLandroidx/compose/ui/unit/**->**(**)**
+Landroidx/compose/ui/unit/**
 
 # Baseline profile rules for androidx.compose.ui.graphics
 # =============================================

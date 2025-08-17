@@ -4,14 +4,12 @@ import android.graphics.Bitmap
 import com.easycomic.data.dao.MangaDao
 import com.easycomic.data.entity.MangaEntity
 import com.easycomic.domain.model.Manga
+import com.easycomic.domain.model.ReadingStatus
 import com.easycomic.domain.repository.MangaRepository
-import com.easycomic.utils.RarComicParser
-import com.easycomic.utils.ZipComicParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.io.File
 
 /**
  * 漫画仓库实现类
@@ -46,9 +44,14 @@ class MangaRepositoryImpl(
         }
     }
     
-    override fun getMangaByStatus(status: com.easycomic.data.entity.ReadingStatus): Flow<List<Manga>> {
-        return mangaDao.getMangaByStatus(status).map { entities ->
-            entities.map { it.toDomain() }
+    override fun getMangaByStatus(status: ReadingStatus): Flow<List<Manga>> {
+        return mangaDao.getAllManga().map { entities ->
+            val filtered = when (status) {
+                ReadingStatus.READING -> entities.filter { it.readingProgress > 0f && !it.isCompleted }
+                ReadingStatus.COMPLETED -> entities.filter { it.isCompleted }
+                ReadingStatus.UNREAD -> entities.filter { it.readingProgress == 0f && !it.isCompleted }
+            }
+            filtered.map { it.toDomain() }
         }
     }
     
@@ -68,12 +71,12 @@ class MangaRepositoryImpl(
         return mangaDao.insertAllManga(entities)
     }
     
-    override suspend fun updateReadingProgress(
-        mangaId: Long,
-        currentPage: Int,
-        status: com.easycomic.data.entity.ReadingStatus
-    ) {
-        mangaDao.updateReadingProgress(mangaId, currentPage, status)
+    override suspend fun updateReadingProgress(mangaId: Long, currentPage: Int, status: ReadingStatus) {
+        val manga = mangaDao.getMangaById(mangaId) ?: return
+        val pageCount = manga.pageCount
+        val progress = if (pageCount > 0) currentPage.toFloat() / pageCount.toFloat() else 0f
+        val isCompleted = status == ReadingStatus.COMPLETED
+        mangaDao.updateReadingProgress(mangaId, currentPage, progress, isCompleted, System.currentTimeMillis())
     }
     
     override suspend fun toggleFavorite(mangaId: Long) {
@@ -106,19 +109,9 @@ class MangaRepositoryImpl(
         return mangaDao.getCompletedCount()
     }
 
+    // TODO: Implement comic file parsing and cover extraction
     override suspend fun getCover(manga: Manga): Bitmap? = withContext(Dispatchers.IO) {
-        val file = File(manga.filePath)
-        if (!file.exists()) return@withContext null
-
-        val parser = when (file.extension.lowercase()) {
-            "zip", "cbz" -> ZipComicParser(file)
-            "rar", "cbr" -> RarComicParser(file)
-            else -> null
-        }
-
-        parser?.use {
-            it.getCover()
-        }
+        null
     }
 }
 
@@ -126,26 +119,27 @@ class MangaRepositoryImpl(
  * MangaEntity 转换为 Manga 领域模型
  */
 private fun MangaEntity.toDomain(): Manga {
+    val status = when {
+        isCompleted -> ReadingStatus.COMPLETED
+        currentPage > 1 -> ReadingStatus.READING
+        else -> ReadingStatus.UNREAD
+    }
     return Manga(
         id = id,
         title = title,
-        author = author,
-        description = description,
+        author = author ?: "",
+        description = description ?: "",
         filePath = filePath,
-        fileUri = fileUri,
-        fileFormat = fileFormat,
         fileSize = fileSize,
         pageCount = pageCount,
         currentPage = currentPage,
-        coverImagePath = coverImagePath,
-        thumbnailPath = thumbnailPath,
-        rating = rating,
         isFavorite = isFavorite,
-        readingStatus = readingStatus,
-        tags = if (tags.isBlank()) emptyList() else tags.split(",").map { it.trim() },
-        lastRead = lastRead,
         dateAdded = dateAdded,
-        dateModified = dateModified
+        lastRead = lastRead,
+        rating = rating,
+        coverImagePath = coverPath, // Map entity's coverPath to domain's coverImagePath
+        readingStatus = status,
+        tags = emptyList() // Domain model expects tags, provide empty list
     )
 }
 
@@ -153,25 +147,26 @@ private fun MangaEntity.toDomain(): Manga {
  * Manga 领域模型转换为 MangaEntity
  */
 private fun Manga.toEntity(): MangaEntity {
+    val progress = if (pageCount > 0) currentPage.toFloat() / pageCount.toFloat() else 0f
     return MangaEntity(
         id = id,
         title = title,
         author = author,
         description = description,
         filePath = filePath,
-        fileUri = fileUri,
-        fileFormat = fileFormat,
         fileSize = fileSize,
         pageCount = pageCount,
         currentPage = currentPage,
-        coverImagePath = coverImagePath,
-        thumbnailPath = thumbnailPath,
-        rating = rating,
         isFavorite = isFavorite,
-        readingStatus = readingStatus,
-        tags = tags.joinToString(","),
-        lastRead = lastRead,
         dateAdded = dateAdded,
-        dateModified = dateModified
+        lastRead = lastRead ?: 0L,
+        rating = rating,
+        coverPath = coverImagePath,
+        readingProgress = progress,
+        isCompleted = readingStatus == ReadingStatus.COMPLETED,
+        format = filePath.substringAfterLast('.', ""),
+        readingTime = 0, // Domain model doesn't have this, provide default
+        createdAt = dateAdded, // Use dateAdded as createdAt
+        updatedAt = System.currentTimeMillis()
     )
 }

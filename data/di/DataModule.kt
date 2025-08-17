@@ -5,9 +5,11 @@ import com.easycomic.data.dao.MangaDao
 import com.easycomic.data.dao.ReadingHistoryDao
 import com.easycomic.data.database.AppDatabase
 import com.easycomic.data.repository.BookmarkRepositoryImpl
+import com.easycomic.data.repository.ComicImportRepositoryImpl
 import com.easycomic.data.repository.MangaRepositoryImpl
 import com.easycomic.data.repository.ReadingHistoryRepositoryImpl
 import com.easycomic.domain.repository.BookmarkRepository
+import com.easycomic.domain.repository.ComicImportRepository
 import com.easycomic.domain.repository.MangaRepository
 import com.easycomic.domain.repository.ReadingHistoryRepository
 import org.koin.android.ext.koin.androidContext
@@ -20,7 +22,7 @@ val dataModule = module {
     
     // 数据库
     single {
-        AppDatabase.getDatabase(androidContext(), get())
+        AppDatabase.getDatabase(androidContext())
     }
     
     // DAO
@@ -32,4 +34,5 @@ val dataModule = module {
     single<MangaRepository> { MangaRepositoryImpl(get()) }
     single<BookmarkRepository> { BookmarkRepositoryImpl(get()) }
     single<ReadingHistoryRepository> { ReadingHistoryRepositoryImpl(get()) }
+    single<ComicImportRepository> { ComicImportRepositoryImpl(androidContext(), get()) }
 }

@@ -66,7 +66,9 @@ attr actionOverflowButtonStyle
 attr actionOverflowMenuStyle
 attr actionProviderClass
 attr actionViewClass
+attr activityAction
 attr activityChooserViewStyle
+attr activityName
 attr alertDialogButtonGroupStyle
 attr alertDialogCenterButtons
 attr alertDialogStyle
@@ -74,6 +76,7 @@ attr alertDialogTheme
 attr allowStacking
 attr alpha
 attr alphabeticModifiers
+attr alwaysExpand
 attr argType
 attr arrowHeadLength
 attr arrowShaftLength
@@ -108,6 +111,7 @@ attr checkMarkTint
 attr checkMarkTintMode
 attr checkboxStyle
 attr checkedTextViewStyle
+attr clearTop
 attr closeIcon
 attr closeItemLayout
 attr collapseContentDescription
@@ -135,6 +139,7 @@ attr controlBackground
 attr customNavigationLayout
 attr data
 attr dataPattern
+attr defaultNavHost
 attr defaultQueryHint
 attr destination
 attr dialogCornerRadius
@@ -165,6 +170,8 @@ attr emojiCompatEnabled
 attr enterAnim
 attr exitAnim
 attr expandActivityOverflowButtonDrawable
+attr finishPrimaryWithSecondary
+attr finishSecondaryWithPrimary
 attr firstBaselineToTopHeight
 attr font
 attr fontFamily
@@ -237,6 +244,7 @@ attr paddingTopNoTitle
 attr panelBackground
 attr panelMenuListTheme
 attr panelMenuListWidth
+attr placeholderActivityName
 attr popEnterAnim
 attr popExitAnim
 attr popUpTo
@@ -246,6 +254,7 @@ attr popupMenuStyle
 attr popupTheme
 attr popupWindowStyle
 attr preserveIconSpacing
+attr primaryActivityName
 attr progressBarPadding
 attr progressBarStyle
 attr queryBackground
@@ -260,6 +269,8 @@ attr route
 attr searchHintIcon
 attr searchIcon
 attr searchViewStyle
+attr secondaryActivityAction
+attr secondaryActivityName
 attr seekBarStyle
 attr selectableItemBackground
 attr selectableItemBackgroundBorderless
@@ -272,6 +283,10 @@ attr singleChoiceItemLayout
 attr spinBars
 attr spinnerDropDownItemStyle
 attr spinnerStyle
+attr splitLayoutDirection
+attr splitMinSmallestWidth
+attr splitMinWidth
+attr splitRatio
 attr splitTrack
 attr srcCompat
 attr startDestination
@@ -574,6 +589,7 @@ dimen notification_small_icon_size_as_large
 dimen notification_subtext_size
 dimen notification_top_pad
 dimen notification_top_pad_large_text
+dimen sliding_pane_detail_pane_width
 dimen tooltip_corner_radius
 dimen tooltip_horizontal_padding
 dimen tooltip_margin
@@ -753,6 +769,7 @@ id add
 id alertTitle
 id always
 id androidx_compose_ui_view_composition_context
+id androidx_window_activity_scope
 id async
 id beginning
 id blocking
@@ -781,6 +798,8 @@ id expand_activities_button
 id expanded_menu
 id forever
 id fragment_container_view_tag
+id ghost_view
+id ghost_view_holder
 id group_divider
 id hide_graphics_layer_in_inspector_tag
 id hide_ime_id
@@ -799,10 +818,13 @@ id line1
 id line3
 id listMode
 id list_item
+id locale
+id ltr
 id message
 id middle
 id multiply
 id nav_controller_view_tag
+id nav_host_fragment_container
 id never
 id none
 id normal
@@ -812,6 +834,7 @@ id notification_main_column_container
 id off
 id on
 id parentPanel
+id parent_matrix
 id pooling_container_listener_holder_tag
 id progress_circular
 id progress_horizontal
@@ -819,6 +842,9 @@ id radio
 id report_drawn
 id right_icon
 id right_side
+id rtl
+id save_non_transition_alpha
+id save_overlay_view
 id screen
 id scrollIndicatorDown
 id scrollIndicatorUp
@@ -838,6 +864,8 @@ id shortcut
 id showCustom
 id showHome
 id showTitle
+id sliding_pane_detail_container
+id sliding_pane_layout
 id spacer
 id special_effects_controller_view_tag
 id split_action_bar
@@ -870,6 +898,11 @@ id titleDividerNoCustom
 id title_template
 id top
 id topPanel
+id transition_current_scene
+id transition_layout_save
+id transition_position
+id transition_scene_layoutid_cache
+id transition_transform
 id unchecked
 id uniform
 id up
@@ -1473,7 +1506,9 @@ styleable ActionMenuItemView android_minWidth
 styleable ActionMenuView
 styleable ActionMode background backgroundSplit closeItemLayout height subtitleTextStyle titleTextStyle
 styleable ActivityChooserView expandActivityOverflowButtonDrawable initialActivityCount
+styleable ActivityFilter activityAction activityName
 styleable ActivityNavigator android_name action data dataPattern targetPackage
+styleable ActivityRule alwaysExpand
 styleable AlertDialog android_layout buttonIconDimen buttonPanelSideLayout listItemLayout listLayout multiChoiceItemLayout showTitle singleChoiceItemLayout
 styleable AnimatedStateListDrawableCompat android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
 styleable AnimatedStateListDrawableItem android_id android_drawable
@@ -1489,11 +1524,13 @@ styleable Capability queryPatterns shortcutMatchRequired
 styleable CheckedTextView android_checkMark checkMarkCompat checkMarkTint checkMarkTintMode
 styleable ColorStateListItem android_color android_alpha android_lStar alpha lStar
 styleable CompoundButton android_button buttonCompat buttonTint buttonTintMode
+styleable DialogFragmentNavigator android_name
 styleable DrawerArrowToggle arrowHeadLength arrowShaftLength barLength color drawableSize gapBetweenBars spinBars thickness
 styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFallbackQuery fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
 styleable FontFamilyFont android_font android_fontWeight android_fontStyle android_ttcIndex android_fontVariationSettings font fontStyle fontVariationSettings fontWeight ttcIndex
 styleable Fragment android_name android_id android_tag
 styleable FragmentContainerView android_name android_tag
+styleable FragmentNavigator android_name
 styleable GradientColor android_startColor android_endColor android_type android_centerX android_centerY android_gradientRadius android_tileMode android_centerColor android_startX android_startY android_endX android_endY
 styleable GradientColorItem android_color android_offset
 styleable LinearLayoutCompat android_gravity android_orientation android_baselineAligned android_baselineAlignedChildIndex android_weightSum divider dividerPadding measureWithLargestChild showDividers
@@ -1507,6 +1544,7 @@ styleable NavArgument android_name android_defaultValue argType nullable
 styleable NavDeepLink android_autoVerify action mimeType uri
 styleable NavGraphNavigator startDestination
 styleable NavHost navGraph
+styleable NavHostFragment defaultNavHost
 styleable NavInclude graph
 styleable Navigator android_label android_id route
 styleable PopupWindow android_popupBackground android_popupAnimationStyle overlapAnchor
@@ -1514,6 +1552,9 @@ styleable PopupWindowBackgroundState state_above_anchor
 styleable RecycleListView paddingBottomNoButtons paddingTopNoTitle
 styleable SearchView android_focusable android_maxWidth android_inputType android_imeOptions closeIcon commitIcon defaultQueryHint goIcon iconifiedByDefault layout queryBackground queryHint searchHintIcon searchIcon submitBackground suggestionRowLayout voiceIcon
 styleable Spinner android_entries android_popupBackground android_prompt android_dropDownWidth popupTheme
+styleable SplitPairFilter primaryActivityName secondaryActivityAction secondaryActivityName
+styleable SplitPairRule clearTop finishPrimaryWithSecondary finishSecondaryWithPrimary splitLayoutDirection splitMinSmallestWidth splitMinWidth splitRatio
+styleable SplitPlaceholderRule placeholderActivityName splitLayoutDirection splitMinSmallestWidth splitMinWidth splitRatio
 styleable StateListDrawable android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
 styleable StateListDrawableItem android_drawable
 styleable SwitchCompat android_textOn android_textOff android_thumb showText splitTrack switchMinWidth switchPadding switchTextAppearance thumbTextPadding thumbTint thumbTintMode track trackTint trackTintMode

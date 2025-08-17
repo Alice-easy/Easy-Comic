@@ -4,6 +4,14 @@
     <attr format="dimension" name="height"/>
     <attr format="boolean" name="isLightTheme"/>
     <attr format="reference" name="nestedScrollViewStyle"/>
+    <attr format="enum" name="splitLayoutDirection">
+        <enum name="locale" value="0"/>
+        <enum name="ltr" value="1"/>
+        <enum name="rtl" value="2"/>
+    </attr>
+    <attr format="dimension" name="splitMinSmallestWidth"/>
+    <attr format="dimension" name="splitMinWidth"/>
+    <attr format="float" name="splitRatio"/>
     <attr format="string" name="title"/>
     <bool name="abc_action_bar_embed_tabs">true</bool>
     <bool name="abc_config_actionMenuItemAllCaps">true</bool>
@@ -213,6 +221,7 @@
     <dimen name="notification_subtext_size">13sp</dimen>
     <dimen name="notification_top_pad">10dp</dimen>
     <dimen name="notification_top_pad_large_text">5dp</dimen>
+    <dimen name="sliding_pane_detail_pane_width">300dp</dimen>
     <dimen name="tooltip_corner_radius">2dp</dimen>
     <dimen name="tooltip_horizontal_padding">16dp</dimen>
     <dimen name="tooltip_margin">8dp</dimen>
@@ -261,10 +270,13 @@
     <item name="action_menu_divider" type="id"/>
     <item name="action_menu_presenter" type="id"/>
     <item name="androidx_compose_ui_view_composition_context" type="id"/>
+    <item name="androidx_window_activity_scope" type="id"/>
     <item name="coil_request_manager" type="id"/>
     <item name="compose_view_saveable_id_tag" type="id"/>
     <item name="consume_window_insets_tag" type="id"/>
     <item name="fragment_container_view_tag" type="id"/>
+    <item name="ghost_view" type="id"/>
+    <item name="ghost_view_holder" type="id"/>
     <item name="hide_graphics_layer_in_inspector_tag" type="id"/>
     <item name="hide_in_inspector_tag" type="id"/>
     <item name="home" type="id"/>
@@ -273,10 +285,16 @@
     <item name="line1" type="id"/>
     <item name="line3" type="id"/>
     <item name="nav_controller_view_tag" type="id"/>
+    <item name="nav_host_fragment_container" type="id"/>
+    <item name="parent_matrix" type="id"/>
     <item name="pooling_container_listener_holder_tag" type="id"/>
     <item name="progress_circular" type="id"/>
     <item name="progress_horizontal" type="id"/>
     <item name="report_drawn" type="id"/>
+    <item name="save_non_transition_alpha" type="id"/>
+    <item name="save_overlay_view" type="id"/>
+    <item name="sliding_pane_detail_container" type="id"/>
+    <item name="sliding_pane_layout" type="id"/>
     <item name="special_effects_controller_view_tag" type="id"/>
     <item name="split_action_bar" type="id"/>
     <item name="tag_accessibility_actions" type="id"/>
@@ -295,6 +313,11 @@
     <item name="text" type="id"/>
     <item name="text2" type="id"/>
     <item name="title" type="id"/>
+    <item name="transition_current_scene" type="id"/>
+    <item name="transition_layout_save" type="id"/>
+    <item name="transition_position" type="id"/>
+    <item name="transition_scene_layoutid_cache" type="id"/>
+    <item name="transition_transform" type="id"/>
     <item name="up" type="id"/>
     <id name="view_tree_lifecycle_owner"/>
     <id name="view_tree_on_back_pressed_dispatcher_owner"/>
@@ -2137,12 +2160,22 @@
         
         <attr format="reference" name="expandActivityOverflowButtonDrawable"/>
     </declare-styleable>
+    <declare-styleable name="ActivityFilter">
+        
+        <attr format="string" name="activityName"/>
+        
+        <attr format="string" name="activityAction"/>
+    </declare-styleable>
     <declare-styleable name="ActivityNavigator">
         <attr name="android:name"/>
         <attr format="string" name="action"/>
         <attr format="string" name="data"/>
         <attr format="string" name="dataPattern"/>
         <attr format="string" name="targetPackage"/>
+    </declare-styleable>
+    <declare-styleable name="ActivityRule">
+        
+        <attr format="boolean" name="alwaysExpand"/>
     </declare-styleable>
     <declare-styleable name="AlertDialog">
         <attr name="android:layout"/>
@@ -2757,6 +2790,9 @@
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>
+    <declare-styleable name="DialogFragmentNavigator">
+        <attr name="android:name"/>
+    </declare-styleable>
     <declare-styleable name="DrawerArrowToggle">
         
         <attr format="color" name="color"/>
@@ -2839,6 +2875,9 @@
     <declare-styleable name="FragmentContainerView">
         <attr name="android:name"/>
         <attr name="android:tag"/>
+    </declare-styleable>
+    <declare-styleable name="FragmentNavigator">
+        <attr name="android:name"/>
     </declare-styleable>
     <declare-styleable name="GradientColor">
         
@@ -3111,6 +3150,9 @@
     <declare-styleable name="NavHost">
         <attr format="reference" name="navGraph"/>
     </declare-styleable>
+    <declare-styleable name="NavHostFragment">
+        <attr format="boolean" name="defaultNavHost"/>
+    </declare-styleable>
     <declare-styleable name="NavInclude">
         <attr format="reference" name="graph"/>
     </declare-styleable>
@@ -3181,6 +3223,34 @@
         <attr name="android:dropDownWidth"/>
         
         <attr name="android:entries"/>
+    </declare-styleable>
+    <declare-styleable name="SplitPairFilter">
+        
+        <attr format="string" name="primaryActivityName"/>
+        
+        <attr format="string" name="secondaryActivityName"/>
+        
+        <attr format="string" name="secondaryActivityAction"/>
+    </declare-styleable>
+    <declare-styleable name="SplitPairRule">
+        
+        <attr format="boolean" name="finishPrimaryWithSecondary"/>
+        
+        <attr format="boolean" name="finishSecondaryWithPrimary"/>
+        
+        <attr format="boolean" name="clearTop"/>
+        <attr name="splitRatio"/>
+        <attr name="splitMinWidth"/>
+        <attr name="splitMinSmallestWidth"/>
+        <attr name="splitLayoutDirection"/>
+    </declare-styleable>
+    <declare-styleable name="SplitPlaceholderRule">
+        
+        <attr format="string" name="placeholderActivityName"/>
+        <attr name="splitRatio"/>
+        <attr name="splitMinWidth"/>
+        <attr name="splitMinSmallestWidth"/>
+        <attr name="splitLayoutDirection"/>
     </declare-styleable>
     <declare-styleable name="StateListDrawable">
         

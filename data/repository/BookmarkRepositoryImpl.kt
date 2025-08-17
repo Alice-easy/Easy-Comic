@@ -87,10 +87,10 @@ private fun BookmarkEntity.toDomain(): Bookmark {
         id = id,
         mangaId = mangaId,
         pageNumber = pageNumber,
-        name = name,
-        description = description,
+        name = bookmarkName ?: "", // Map entity's bookmarkName to domain's name
+        description = notes ?: "", // Map entity's notes to domain's description
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = createdAt // Entity doesn't have updated_at, use created_at
     )
 }
 
@@ -102,9 +102,8 @@ private fun Bookmark.toEntity(): BookmarkEntity {
         id = id,
         mangaId = mangaId,
         pageNumber = pageNumber,
-        name = name,
-        description = description,
-        createdAt = createdAt,
-        updatedAt = updatedAt
+        bookmarkName = name, // Map domain's name to entity's bookmarkName
+        notes = description, // Map domain's description to entity's notes
+        createdAt = createdAt
     )
 }

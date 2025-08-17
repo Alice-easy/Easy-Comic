@@ -37,12 +37,11 @@ val uiModule = module {
     }
     
     // ReaderViewModel
-    viewModel {
+    viewModel { params ->
         ReaderViewModel(
+            savedStateHandle = params.get(),
             getMangaByIdUseCase = get(),
-            updateReadingProgressUseCase = get(),
-            bookmarkRepository = get(),
-            readingHistoryRepository = get()
+            updateReadingProgressUseCase = get()
         )
     }
 }

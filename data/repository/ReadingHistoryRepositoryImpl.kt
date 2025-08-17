@@ -92,10 +92,10 @@ private fun ReadingHistoryEntity.toDomain(): ReadingHistory {
         id = id,
         mangaId = mangaId,
         pageNumber = pageNumber,
-        progressPercentage = progressPercentage,
-        readingDuration = readingDuration,
-        readAt = readAt,
-        sessionId = sessionId
+        progressPercentage = 0f, // Entity does not have this info, default to 0
+        readingDuration = readingTime,
+        readAt = sessionEnd,
+        sessionId = sessionStart.toString() // Convert Long to String
     )
 }
 
@@ -107,9 +107,10 @@ private fun ReadingHistory.toEntity(): ReadingHistoryEntity {
         id = id,
         mangaId = mangaId,
         pageNumber = pageNumber,
-        progressPercentage = progressPercentage,
-        readingDuration = readingDuration,
-        readAt = readAt,
-        sessionId = sessionId
+        readingTime = readingDuration,
+        sessionStart = sessionId.toLongOrNull() ?: 0L, // Convert String to Long
+        sessionEnd = readAt,
+        readingSpeed = null, // Entity field is nullable, domain model doesn't have it
+        createdAt = readAt // Use readAt as creation time, as entity requires it
     )
 }

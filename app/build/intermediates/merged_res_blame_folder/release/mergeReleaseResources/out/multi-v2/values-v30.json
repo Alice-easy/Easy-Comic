@@ -4,7 +4,7 @@
             "outputFile": "com.easycomic.app-mergeReleaseResources-2:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\zxo10\\.gradle\\caches\\8.14.3\\transforms\\5915dd842ed93cea914e0b869a4725d8\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\b61b99cf121e3eb8fd6d24d244c2a393\\transformed\\material3-release\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

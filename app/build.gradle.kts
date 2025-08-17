@@ -114,6 +114,12 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.0")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     implementation("io.insert-koin:koin-androidx-navigation:3.5.0")
+
+    // Project modules
+    implementation(project(":data"))
+    implementation(project(":domain"))
+    implementation(project(":ui_bookshelf"))
+    implementation(project(":ui_reader"))
     
     // Room database
     implementation(libs.androidx.room.runtime)
@@ -137,10 +143,14 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-        androidTestImplementation("org.mockito:mockito-android:5.8.0")
+    androidTestImplementation("org.mockito:mockito-android:5.8.0")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     androidTestImplementation("com.google.truth:truth:1.1.5")
     androidTestImplementation("app.cash.turbine:turbine:1.0.0")
+    
+    // Koin testing
+    androidTestImplementation("io.insert-koin:koin-test:3.5.0")
+    androidTestImplementation("io.insert-koin:koin-test-junit4:3.5.0")
         
     // Debug testing tools
     debugImplementation(libs.androidx.ui.tooling)
