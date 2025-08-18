@@ -1,0 +1,14 @@
+{
+  "backup_time": "2025-08-18T13:49:11.314534",
+  "project_path": "C:\\000\\Comic\\Easy-Comic\\code_cleaner",
+  "total_files": 1,
+  "total_size": 1305,
+  "files": [
+    {
+      "path": "logs\\cleanup_20250818_134843.log",
+      "size": 1305,
+      "type": "log_file",
+      "reason": "匹配过期文件模式: .log"
+    }
+  ]
+}
