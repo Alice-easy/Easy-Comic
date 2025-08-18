@@ -13,13 +13,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
-class BookshelfViewModel(
+open class BookshelfViewModel(
     private val getAllMangaUseCase: GetAllMangaUseCase,
     private val importComicsUseCase: ImportComicsUseCase
 ) : ViewModel() {
 
     private val _comics = MutableStateFlow<List<Manga>>(emptyList())
-    val comics: StateFlow<List<Manga>> = _comics.asStateFlow()
+    open fun getComics(): StateFlow<List<Manga>> = _comics.asStateFlow()
 
     init {
         loadComics()
@@ -40,9 +40,7 @@ class BookshelfViewModel(
     fun importComic(path: String) {
         viewModelScope.launch {
             try {
-                // ImportComicsUseCase expects a File object
                 importComicsUseCase(File(path))
-                // Refresh the list after import
                 loadComics()
             } catch (e: Exception) {
                 Timber.e(e, "Failed to import comic")

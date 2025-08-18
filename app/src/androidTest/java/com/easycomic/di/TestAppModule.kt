@@ -1,40 +1,37 @@
 package com.easycomic.di
 
-import androidx.room.Room
-import com.easycomic.data.database.AppDatabase
-import com.easycomic.data.repository.BookmarkRepositoryImpl
-import com.easycomic.data.repository.ComicImportRepositoryImpl
-import com.easycomic.data.repository.MangaRepositoryImpl
-import com.easycomic.data.repository.ReadingHistoryRepositoryImpl
-import com.easycomic.domain.repository.BookmarkRepository
-import com.easycomic.domain.repository.ComicImportRepository
-import com.easycomic.domain.repository.MangaRepository
-import com.easycomic.domain.repository.ReadingHistoryRepository
-import org.koin.android.ext.koin.androidContext
+import com.easycomic.fakes.FakeComicImportRepository
+import com.easycomic.fakes.FakeComicParserFactory
+import com.easycomic.fakes.FakeMangaRepository
+import com.easycomic.ui_bookshelf.BookshelfViewModel
+import com.easycomic.ui_reader.ReaderViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 /**
- * 用于仪器测试的 Koin 模块
+ * Koin module for instrumentation tests.
+ * It provides fake repositories and the real UseCases and ViewModel
+ * to test the UI layer in a controlled environment.
+ *
+ * Using fully qualified names to avoid build/import issues.
  */
-val testModule = module {
-    // 使用内存数据库替换真实的数据库
-    single {
-        Room.inMemoryDatabaseBuilder(
-            androidContext(),
-            AppDatabase::class.java
-        )
-        .allowMainThreadQueries() // 仅在测试中使用
-        .build()
+object TestAppModule {
+    val module = module {
+        // Provide Fake Repositories
+        single<com.easycomic.domain.repository.MangaRepository> { FakeMangaRepository() }
+        single<com.easycomic.domain.repository.ComicImportRepository> { FakeComicImportRepository() }
+        single<com.easycomic.domain.parser.ComicParserFactory> { FakeComicParserFactory() }
+
+        // Provide real UseCases, which will get the Fake Repositories
+        factory { com.easycomic.domain.usecase.manga.GetAllMangaUseCase(get()) }
+        factory { com.easycomic.domain.usecase.manga.ImportComicsUseCase(get()) }
+        factory { com.easycomic.domain.usecase.manga.GetMangaByIdUseCase(get()) }
+        factory { com.easycomic.domain.usecase.manga.UpdateReadingProgressUseCase(get()) }
+
+        // Provide real ViewModels, which will get the real UseCases
+        viewModel { BookshelfViewModel(get(), get()) }
+        viewModel { (savedStateHandle: androidx.lifecycle.SavedStateHandle) -> 
+            ReaderViewModel(savedStateHandle, get(), get(), get()) 
+        }
     }
-
-    // DAO (将使用内存数据库)
-    single { get<AppDatabase>().mangaDao() }
-    single { get<AppDatabase>().bookmarkDao() }
-    single { get<AppDatabase>().readingHistoryDao() }
-
-    // 仓库实现 (将使用内存数据库)
-    single<MangaRepository> { MangaRepositoryImpl(get()) }
-    single<BookmarkRepository> { BookmarkRepositoryImpl(get()) }
-    single<ReadingHistoryRepository> { ReadingHistoryRepositoryImpl(get()) }
-    single<ComicImportRepository> { ComicImportRepositoryImpl(androidContext(), get()) }
 }

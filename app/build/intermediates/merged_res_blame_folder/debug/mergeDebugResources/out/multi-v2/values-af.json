@@ -4,7 +4,24 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-af/values-af.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\b61b99cf121e3eb8fd6d24d244c2a393\\transformed\\material3-release\\res\\values-af\\values-af.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\6b415a689a4f27eaf8a98a738e0b0157\\transformed\\foundation-release\\res\\values-af\\values-af.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,142",
+                        "endColumns": "86,84",
+                        "endOffsets": "137,222"
+                    },
+                    "to": {
+                        "startLines": "113,114",
+                        "startColumns": "4,4",
+                        "startOffsets": "11395,11482",
+                        "endColumns": "86,84",
+                        "endOffsets": "11477,11562"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\eec6140cead5ae1541040a5f7adbe2bb\\transformed\\material3-release\\res\\values-af\\values-af.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\6180c4f83bd0aa1792b60ca5ee09dc36\\transformed\\core-1.15.0\\res\\values-af\\values-af.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\f5d0e1df92343d0d7b359b44a06a8449\\transformed\\core-1.15.0\\res\\values-af\\values-af.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -38,7 +55,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\9f2434d7ce8d74b7155b5696680781fb\\transformed\\ui-release\\res\\values-af\\values-af.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\b2be53e327a056976c9bdc277f1a5d58\\transformed\\ui-release\\res\\values-af\\values-af.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +72,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\2b9dfcbb2ef0e625900a3b79ade48461\\transformed\\appcompat-1.6.1\\res\\values-af\\values-af.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\d656553cfcbe79f9f73b9f1bea1a2eab\\transformed\\appcompat-1.6.1\\res\\values-af\\values-af.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -69,23 +86,6 @@
                         "startOffsets": "105,213,309,415,500,603,721,798,874,965,1058,1153,1247,1346,1439,1534,1633,1728,1822,1903,2010,2115,2212,2320,2423,2525,2679,10654",
                         "endColumns": "107,95,105,84,102,117,76,75,90,92,94,93,98,92,94,98,94,93,80,106,104,96,107,102,101,153,97,80",
                         "endOffsets": "208,304,410,495,598,716,793,869,960,1053,1148,1242,1341,1434,1529,1628,1723,1817,1898,2005,2110,2207,2315,2418,2520,2674,2772,10730"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\00f5ed6633c160a66b02aa8dc101eec0\\transformed\\foundation-release\\res\\values-af\\values-af.xml",
-                    "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,142",
-                        "endColumns": "86,84",
-                        "endOffsets": "137,222"
-                    },
-                    "to": {
-                        "startLines": "113,114",
-                        "startColumns": "4,4",
-                        "startOffsets": "11395,11482",
-                        "endColumns": "86,84",
-                        "endOffsets": "11477,11562"
                     }
                 }
             ]

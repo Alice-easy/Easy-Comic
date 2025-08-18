@@ -1,5 +1,6 @@
 package com.easycomic.ui_reader
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +8,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -19,12 +22,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.easycomic.ui_reader.ReaderUiState
-import com.easycomic.ui_reader.ReadingDirection
-import com.easycomic.ui_reader.ReadingMode
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,8 +86,7 @@ fun ReaderScreen(
                     when (settings.readingDirection) {
                         ReadingDirection.HORIZONTAL -> HorizontalReader(
                             uiState = uiState,
-                            onPreviousPage = { viewModel.previousPage() },
-                            onNextPage = { viewModel.nextPage() }
+                            viewModel = viewModel
                         )
                         ReadingDirection.VERTICAL -> VerticalReader(
                             uiState = uiState,
@@ -99,36 +99,49 @@ fun ReaderScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HorizontalReader(
     uiState: ReaderUiState,
-    onPreviousPage: () -> Unit,
-    onNextPage: () -> Unit
+    viewModel: ReaderViewModel
 ) {
-    if (uiState.currentPageBitmap != null) {
-        ComicPageDisplay(
-            bitmap = uiState.currentPageBitmap,
-            isLoading = uiState.isLoadingImage,
-            readingMode = uiState.settings.readingMode,
-            onTap = { /* Handled by parent Box */ }
-        )
-    } else if (uiState.isLoadingImage) {
-        LoadingIndicator(progress = null)
+    val pagerState = rememberPagerState(initialPage = uiState.currentPage) {
+        uiState.pageCount
     }
 
-    // Clickable areas for navigation
-    Row(Modifier.fillMaxSize()) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .weight(0.2f)
-            .clickable(onClick = onPreviousPage))
-        Spacer(modifier = Modifier
-            .fillMaxHeight()
-            .weight(0.6f))
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .weight(0.2f)
-            .clickable(onClick = onNextPage))
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != uiState.currentPage) {
+            viewModel.goToPage(pagerState.currentPage)
+        }
+    }
+    
+    LaunchedEffect(uiState.currentPage) {
+        if (pagerState.currentPage != uiState.currentPage) {
+            pagerState.animateScrollToPage(uiState.currentPage)
+        }
+    }
+
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("ReaderPager"),
+        userScrollEnabled = !uiState.settings.isMenuVisible
+    ) { pageIndex ->
+        val pageBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, key1 = pageIndex) {
+            value = viewModel.getPageBitmap(pageIndex)
+        }
+
+        if (pageBitmap != null) {
+            ComicPageDisplay(
+                bitmap = pageBitmap!!,
+                isLoading = uiState.isLoadingImage && pageIndex == uiState.currentPage,
+                readingMode = uiState.settings.readingMode,
+                onTap = { viewModel.toggleMenu() }
+            )
+        } else {
+            LoadingIndicator(progress = null)
+        }
     }
 }
 

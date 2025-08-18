@@ -1,5 +1,6 @@
 package com.easycomic.data.parser
 
+import com.easycomic.domain.parser.ComicParser
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipFile

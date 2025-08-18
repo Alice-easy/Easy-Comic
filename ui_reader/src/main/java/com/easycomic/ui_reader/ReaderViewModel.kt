@@ -5,10 +5,9 @@ import android.graphics.BitmapFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.easycomic.data.parser.ComicParser
-import com.easycomic.data.parser.RarComicParser
-import com.easycomic.data.parser.ZipComicParser
 import com.easycomic.domain.model.Manga
+import com.easycomic.domain.parser.ComicParser
+import com.easycomic.domain.parser.ComicParserFactory
 import com.easycomic.domain.usecase.manga.GetMangaByIdUseCase
 import com.easycomic.domain.usecase.manga.UpdateReadingProgressUseCase
 import kotlinx.coroutines.Dispatchers
@@ -35,10 +34,11 @@ data class ReaderSettings(
 class ReaderViewModel(
     savedStateHandle: SavedStateHandle,
     private val getMangaByIdUseCase: GetMangaByIdUseCase,
-    private val updateReadingProgressUseCase: UpdateReadingProgressUseCase
+    private val updateReadingProgressUseCase: UpdateReadingProgressUseCase,
+    private val comicParserFactory: ComicParserFactory
 ) : ViewModel() {
 
-    private val mangaId: Long = savedStateHandle.get<Long>("mangaId")!!
+    private val mangaId: Long by lazy { savedStateHandle.get<Long>("mangaId")!! }
 
     private val _uiState = MutableStateFlow(ReaderUiState())
     val uiState: StateFlow<ReaderUiState> = _uiState.asStateFlow()
@@ -60,7 +60,7 @@ class ReaderViewModel(
                     return@launch
                 }
 
-                comicParser = getParserForFile(File(manga.filePath))
+                comicParser = comicParserFactory.create(File(manga.filePath))
                 if (comicParser == null) {
                     _uiState.update { it.copy(isLoading = false, error = "不支持的文件格式") }
                     return@launch
@@ -143,14 +143,6 @@ class ReaderViewModel(
         }
     }
 
-    private fun getParserForFile(file: File): ComicParser? {
-        val extension = file.extension.lowercase()
-        return when (extension) {
-            "zip", "cbz" -> ZipComicParser(file)
-            "rar", "cbr" -> RarComicParser(file)
-            else -> null
-        }
-    }
 
     fun toggleMenu() {
         _uiState.update {

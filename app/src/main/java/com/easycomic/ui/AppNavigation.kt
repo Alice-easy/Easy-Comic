@@ -25,10 +25,12 @@ fun AppNavigation() {
         }
         composable(
             route = "reader/{mangaId}",
-            arguments = listOf(navArgument("mangaId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val mangaId = backStackEntry.arguments?.getString("mangaId") ?: return@composable
-            val viewModel: ReaderViewModel = koinViewModel { parametersOf(mangaId) }
+            arguments = listOf(navArgument("mangaId") { type = NavType.LongType })
+        ) {
+            // The viewModel is created by the framework with the SavedStateHandle,
+            // so we don't need to manually pass the mangaId here.
+            // Koin will automatically provide the ViewModel with the correct SavedStateHandle.
+            val viewModel: ReaderViewModel = koinViewModel()
             ReaderScreen(
                 viewModel = viewModel,
                 onBack = { navController.navigateUp() }

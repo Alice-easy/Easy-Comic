@@ -18,7 +18,7 @@ class EasyComicApplication : Application() {
         // 初始化日志 - 简化版本，暂时不考虑BuildConfig
         try {
             Timber.plant(Timber.DebugTree())
-            Timber.d("EasyComic Application started with Koin")
+            Timber.d("TEST_APP_CLASS", "!!!!!!!!!!!!!! PRODUCTION EasyComicApplication CREATED !!!!!!!!!!!!!!")
         } catch (e: Exception) {
             // 如果Timber初始化失败，忽略
         }

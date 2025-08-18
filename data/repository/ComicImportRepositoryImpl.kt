@@ -3,7 +3,7 @@ package com.easycomic.data.repository
 import android.content.Context
 import com.easycomic.data.dao.MangaDao
 import com.easycomic.data.entity.MangaEntity
-import com.easycomic.data.parser.ComicParser
+import com.easycomic.domain.parser.ComicParser
 import com.easycomic.data.parser.RarComicParser
 import com.easycomic.data.parser.ZipComicParser
 import com.easycomic.domain.repository.ComicImportRepository

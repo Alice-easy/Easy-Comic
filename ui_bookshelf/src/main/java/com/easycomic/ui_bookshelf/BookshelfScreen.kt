@@ -34,7 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun BookshelfScreen(
     viewModel: BookshelfViewModel = koinViewModel(),
-    onNavigateToReader: (String) -> Unit
+    onNavigateToReader: (Long) -> Unit
 ) {
     val openDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree(),
@@ -52,7 +52,7 @@ fun BookshelfScreen(
             }
         }
     )
-    val mangas by viewModel.comics.collectAsStateWithLifecycle()
+    val mangas by viewModel.getComics().collectAsStateWithLifecycle()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,11 +87,11 @@ fun BookshelfScreen(
 }
 
 @Composable
-fun MangaItem(manga: Manga, onMangaClick: (String) -> Unit) {
+fun MangaItem(manga: Manga, onMangaClick: (Long) -> Unit) {
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .clickable { onMangaClick(manga.filePath) }
+            .clickable { onMangaClick(manga.id) }
     ) {
         Column(
             modifier = Modifier.padding(8.dp)

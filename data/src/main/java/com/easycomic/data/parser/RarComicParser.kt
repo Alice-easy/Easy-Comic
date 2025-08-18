@@ -1,7 +1,7 @@
 package com.easycomic.data.parser
 
+import com.easycomic.domain.parser.ComicParser
 import com.github.junrar.Junrar
-import com.github.junrar.rarfile.FileHeader
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
