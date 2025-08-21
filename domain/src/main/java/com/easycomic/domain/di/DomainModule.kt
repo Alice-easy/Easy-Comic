@@ -1,26 +1,23 @@
 package com.easycomic.domain.di
 
 import com.easycomic.domain.usecase.*
-import com.easycomic.domain.usecase.manga.*
 import org.koin.dsl.module
 
+/**
+ * Domain层依赖注入模块
+ * 
+ * 配置Domain层的所有用例类的依赖注入，包括聚合UseCase类和单独的UseCase类。
+ * 采用聚合模式减少类的数量，提高可维护性。
+ * 
+ * @author EasyComic Team
+ * @since 1.0.0
+ */
 val domainModule = module {
-    // Manga相关用例
-    factory { GetAllMangaUseCase(get()) }
-    factory { GetMangaByIdUseCase(get()) }
-    factory { SearchMangaUseCase(get()) }
-    factory { GetFavoriteMangaUseCase(get()) }
-    factory { GetRecentMangaUseCase(get()) }
-    factory { InsertOrUpdateMangaUseCase(get()) }
-    factory { UpdateReadingProgressUseCase(get()) }
-    factory { ToggleFavoriteUseCase(get()) }
-    factory { UpdateRatingUseCase(get()) }
-    factory { DeleteMangaUseCase(get()) }
-    factory { DeleteAllMangaUseCase(get()) }
-    factory { ImportComicsUseCase(get()) }
-    factory { GetCoverUseCase(get()) }
+    // 聚合UseCase类
+    factory { MangaUseCases(get()) }
+    factory { ThemeUseCases(get()) }
     
-    // 主题相关用例
+    // 单独的UseCase类
     factory { GetThemePreferenceUseCase(get()) }
     factory { UpdateThemePreferenceUseCase(get()) }
 }

@@ -151,4 +151,16 @@ interface MangaDao {
      */
     @Query("SELECT COUNT(*) FROM manga WHERE is_completed = 1")
     fun getCompletedCount(): Flow<Int>
+    
+    /**
+     * 获取正在阅读的漫画（优化：直接在数据库层过滤）
+     */
+    @Query("SELECT * FROM manga WHERE reading_progress > 0 AND is_completed = 0 ORDER BY last_read DESC")
+    fun getReadingManga(): Flow<List<MangaEntity>>
+    
+    /**
+     * 获取未读的漫画（优化：直接在数据库层过滤）
+     */
+    @Query("SELECT * FROM manga WHERE reading_progress = 0 AND is_completed = 0 ORDER BY date_added DESC")
+    fun getUnreadManga(): Flow<List<MangaEntity>>
 }
