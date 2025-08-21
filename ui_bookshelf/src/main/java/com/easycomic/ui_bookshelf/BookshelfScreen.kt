@@ -37,9 +37,12 @@ fun BookshelfScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val importProgress by viewModel.importProgress.collectAsStateWithLifecycle()
     val isImporting by viewModel.isImporting.collectAsStateWithLifecycle()
+    val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
+    val selectedMangas by viewModel.selectedMangas.collectAsStateWithLifecycle()
     
     var showSearchBar by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
+    var showBatchMenu by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
     
@@ -75,6 +78,13 @@ fun BookshelfScreen(
                         showSearchBar = false
                         viewModel.searchComics("")
                     }
+                )
+            } else if (selectionMode) {
+                SelectionTopAppBar(
+                    selectedCount = selectedMangas.size,
+                    onClearSelection = { viewModel.clearSelection() },
+                    onSelectAll = { viewModel.selectAllVisibleMangas(mangas) },
+                    onBatchAction = { showBatchMenu = true }
                 )
             } else {
                 TopAppBar(
@@ -153,14 +163,53 @@ fun BookshelfScreen(
                     items(mangas, key = { it.id }) { manga ->
                         GridComicCard(
                             manga = manga,
-                            onClick = { onNavigateToReader(manga.id) },
-                            onLongClick = { /* TODO: 实现长按选择 */ },
+                            searchQuery = searchQuery,
+                            isSelected = selectedMangas.contains(manga.id),
+                            selectionMode = selectionMode,
+                            onClick = { 
+                                if (selectionMode) {
+                                    viewModel.toggleMangaSelection(manga.id)
+                                } else {
+                                    onNavigateToReader(manga.id)
+                                }
+                            },
+                            onLongClick = { 
+                                if (!selectionMode) {
+                                    viewModel.enterSelectionMode(manga.id)
+                                } else {
+                                    viewModel.toggleMangaSelection(manga.id)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
             }
         }
+    }
+    
+    // 批量操作菜单
+    if (showBatchMenu) {
+        BatchActionBottomSheet(
+            selectedCount = selectedMangas.size,
+            onDeleteSelected = {
+                viewModel.deleteSelectedMangas()
+                showBatchMenu = false
+            },
+            onMarkAsFavorite = {
+                viewModel.markSelectedAsFavorite(true)
+                showBatchMenu = false
+            },
+            onMarkAsNotFavorite = {
+                viewModel.markSelectedAsFavorite(false)
+                showBatchMenu = false
+            },
+            onMarkAsRead = {
+                viewModel.markSelectedAsRead()
+                showBatchMenu = false
+            },
+            onDismiss = { showBatchMenu = false }
+        )
     }
 }
 
@@ -350,6 +399,124 @@ private fun SortDropdownMenu(
             trailingIcon = if (currentSortOrder == BookshelfViewModel.SortOrder.PROGRESS_DESC) {
                 { Icon(Icons.Default.Check, contentDescription = null) }
             } else null
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectionTopAppBar(
+    selectedCount: Int,
+    onClearSelection: () -> Unit,
+    onSelectAll: () -> Unit,
+    onBatchAction: () -> Unit
+) {
+    TopAppBar(
+        title = { Text("已选择 $selectedCount 项") },
+        navigationIcon = {
+            IconButton(onClick = onClearSelection) {
+                Icon(Icons.Default.Close, contentDescription = "取消选择")
+            }
+        },
+        actions = {
+            IconButton(onClick = onSelectAll) {
+                Icon(Icons.Default.CheckBox, contentDescription = "全选")
+            }
+            IconButton(onClick = onBatchAction) {
+                Icon(Icons.Default.MoreVert, contentDescription = "批量操作")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BatchActionBottomSheet(
+    selectedCount: Int,
+    onDeleteSelected: () -> Unit,
+    onMarkAsFavorite: () -> Unit,
+    onMarkAsNotFavorite: () -> Unit,
+    onMarkAsRead: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+    
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "批量操作 ($selectedCount 项)",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            
+            ListItem(
+                headlineContent = { Text("添加到收藏") },
+                leadingContent = {
+                    Icon(Icons.Default.Favorite, contentDescription = null)
+                },
+                modifier = Modifier.clickable { onMarkAsFavorite() }
+            )
+            
+            ListItem(
+                headlineContent = { Text("从收藏移除") },
+                leadingContent = {
+                    Icon(Icons.Default.FavoriteBorder, contentDescription = null)
+                },
+                modifier = Modifier.clickable { onMarkAsNotFavorite() }
+            )
+            
+            ListItem(
+                headlineContent = { Text("标记为已读") },
+                leadingContent = {
+                    Icon(Icons.Default.Done, contentDescription = null)
+                },
+                modifier = Modifier.clickable { onMarkAsRead() }
+            )
+            
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            
+            ListItem(
+                headlineContent = { Text("删除选中项") },
+                leadingContent = {
+                    Icon(
+                        Icons.Default.Delete, 
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                },
+                modifier = Modifier.clickable { showDeleteConfirmation = true }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+    
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text("确认删除") },
+            text = { Text("确定要删除选中的 $selectedCount 个漫画吗？此操作不可撤销。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteSelected()
+                        showDeleteConfirmation = false
+                    }
+                ) {
+                    Text("删除", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text("取消")
+                }
+            }
         )
     }
 }

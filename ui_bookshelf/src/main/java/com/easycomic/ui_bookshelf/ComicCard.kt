@@ -17,13 +17,63 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.easycomic.domain.model.Manga
+
+/**
+ * 创建带高亮效果的文本
+ */
+@Composable
+private fun highlightText(
+    text: String,
+    searchQuery: String,
+    style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.titleSmall,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    highlightColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+): AnnotatedString {
+    return if (searchQuery.isBlank()) {
+        AnnotatedString(text)
+    } else {
+        buildAnnotatedString {
+            val query = searchQuery.lowercase()
+            val lowerText = text.lowercase()
+            var currentIndex = 0
+            
+            while (currentIndex < text.length) {
+                val matchIndex = lowerText.indexOf(query, currentIndex)
+                if (matchIndex == -1) {
+                    // 没有更多匹配，添加剩余文本
+                    append(text.substring(currentIndex))
+                    break
+                } else {
+                    // 添加匹配前的文本
+                    if (matchIndex > currentIndex) {
+                        append(text.substring(currentIndex, matchIndex))
+                    }
+                    // 添加高亮的匹配文本
+                    withStyle(
+                        SpanStyle(
+                            background = highlightColor,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append(text.substring(matchIndex, matchIndex + query.length))
+                    }
+                    currentIndex = matchIndex + query.length
+                }
+            }
+        }
+    }
+}
 
 /**
  * 漫画卡片组件
@@ -35,6 +85,7 @@ fun ComicCard(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     selectionMode: Boolean = false,
+    searchQuery: String = "", // 新增搜索关键词参数
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onFavoriteClick: (() -> Unit)? = null
@@ -141,7 +192,12 @@ fun ComicCard(
             ) {
                 // 标题
                 Text(
-                    text = manga.title,
+                    text = highlightText(
+                        text = manga.title,
+                        searchQuery = searchQuery,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
                     modifier = Modifier
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.titleSmall,
@@ -155,7 +211,12 @@ fun ComicCard(
                 // 作者
                 if (manga.author.isNotBlank()) {
                     Text(
-                        text = manga.author,
+                        text = highlightText(
+                            text = manga.author,
+                            searchQuery = searchQuery,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        ),
                         modifier = Modifier
                             .fillMaxWidth(),
                         style = MaterialTheme.typography.bodySmall,
@@ -214,6 +275,7 @@ fun GridComicCard(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     selectionMode: Boolean = false,
+    searchQuery: String = "", // 新增搜索关键词参数
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onFavoriteClick: (() -> Unit)? = null
@@ -317,7 +379,12 @@ fun GridComicCard(
                     .padding(8.dp)
             ) {
                 Text(
-                    text = manga.title,
+                    text = highlightText(
+                        text = manga.title,
+                        searchQuery = searchQuery,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium,
