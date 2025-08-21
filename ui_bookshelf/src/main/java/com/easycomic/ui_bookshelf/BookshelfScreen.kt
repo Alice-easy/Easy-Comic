@@ -29,7 +29,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun BookshelfScreen(
     viewModel: BookshelfViewModel = koinViewModel(),
-    onNavigateToReader: (Long) -> Unit
+    onNavigateToReader: (Long) -> Unit,
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val mangas by viewModel.getComics().collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -101,6 +102,9 @@ fun BookshelfScreen(
                         }
                         IconButton(onClick = { showSortMenu = true }) {
                             Icon(Icons.Default.Sort, contentDescription = "排序")
+                        }
+                        IconButton(onClick = onNavigateToSettings) {
+                            Icon(Icons.Default.Settings, contentDescription = "设置")
                         }
                         SortDropdownMenu(
                             expanded = showSortMenu,

@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.easycomic.ui.animation.AppAnimations
+import com.easycomic.ui.settings.SettingsScreen
 import com.easycomic.ui_bookshelf.BookshelfScreen
 import com.easycomic.ui_reader.ReaderScreen
 import com.easycomic.ui_reader.ReaderViewModel
@@ -15,11 +17,21 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "bookshelf") {
+    NavHost(
+        navController = navController, 
+        startDestination = "bookshelf",
+        enterTransition = { AppAnimations.slideInFromRight() },
+        exitTransition = { AppAnimations.slideOutToLeft() },
+        popEnterTransition = { AppAnimations.slideInFromLeft() },
+        popExitTransition = { AppAnimations.slideOutToRight() }
+    ) {
         composable("bookshelf") {
             BookshelfScreen(
                 onNavigateToReader = { mangaId ->
                     navController.navigate("reader/$mangaId")
+                },
+                onNavigateToSettings = {
+                    navController.navigate("settings")
                 }
             )
         }
@@ -34,6 +46,11 @@ fun AppNavigation() {
             ReaderScreen(
                 viewModel = viewModel,
                 onBack = { navController.navigateUp() }
+            )
+        }
+        composable("settings") {
+            SettingsScreen(
+                onNavigateBack = { navController.navigateUp() }
             )
         }
     }

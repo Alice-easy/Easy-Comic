@@ -1,9 +1,11 @@
 package com.easycomic.domain.di
 
+import com.easycomic.domain.usecase.*
 import com.easycomic.domain.usecase.manga.*
 import org.koin.dsl.module
 
 val domainModule = module {
+    // Manga相关用例
     factory { GetAllMangaUseCase(get()) }
     factory { GetMangaByIdUseCase(get()) }
     factory { SearchMangaUseCase(get()) }
@@ -17,4 +19,8 @@ val domainModule = module {
     factory { DeleteAllMangaUseCase(get()) }
     factory { ImportComicsUseCase(get()) }
     factory { GetCoverUseCase(get()) }
+    
+    // 主题相关用例
+    factory { GetThemePreferenceUseCase(get()) }
+    factory { UpdateThemePreferenceUseCase(get()) }
 }

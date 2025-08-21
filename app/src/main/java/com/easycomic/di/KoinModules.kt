@@ -3,6 +3,7 @@ package com.easycomic.di
 import android.content.Context
 import com.easycomic.data.di.dataModule
 import com.easycomic.domain.di.domainModule
+import com.easycomic.ui.di.uiModule
 import com.easycomic.ui_bookshelf.di.bookshelfModule
 import com.easycomic.ui_reader.di.readerModule
 import org.koin.android.ext.koin.androidContext
@@ -12,6 +13,7 @@ object KoinModules {
     fun getAllModules() = listOf(
         dataModule,
         domainModule,
+        uiModule,
         bookshelfModule,
         readerModule
     )
