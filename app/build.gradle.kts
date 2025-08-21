@@ -3,6 +3,92 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("jacoco") // Phase 4: 测试覆盖率
+}
+
+android {
+    namespace = "com.easycomic"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.easycomic"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+        
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
+    }
+    
+    // Phase 4: 测试覆盖率配置
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    buildFeatures {
+        compose = true
+    }
+}
+
+// Phase 4: Jacoco 测试覆盖率任务
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+    
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+    
+    val fileFilter = listOf(
+        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+        "**/*Test*.*", "android/**/*.*", "**/databinding/*", "**/*Binding.*",
+        "**/di/*", "**/injection/*", "**/*Module*.*", "**/*Component*.*"
+    )
+    
+    val debugTree = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+    
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree("${layout.buildDirectory}") {
+        include("**/*.exec", "**/*.ec")
+    })
 }
 
 android {
@@ -94,6 +180,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
     testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.robolectric)
 
     // Android Testing
     androidTestImplementation(libs.junit) // Add base JUnit for @Rule support

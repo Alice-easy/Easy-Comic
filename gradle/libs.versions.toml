@@ -25,6 +25,9 @@ truth = "1.4.4"
 junrar = "7.5.5"
 koin = "3.5.0"
 timber = "5.0.1"
+mockk = "1.13.12"
+turbine = "1.0.0"
+robolectric = "4.13"
 
 [libraries]
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
@@ -81,6 +84,10 @@ mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mo
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib" }

@@ -4,7 +4,7 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\d656553cfcbe79f9f73b9f1bea1a2eab\\transformed\\appcompat-1.6.1\\res\\values-land\\values-land.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\cda3c013fca7ee2eee2d4d481f1398fa\\transformed\\appcompat-1.6.1\\res\\values-land\\values-land.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

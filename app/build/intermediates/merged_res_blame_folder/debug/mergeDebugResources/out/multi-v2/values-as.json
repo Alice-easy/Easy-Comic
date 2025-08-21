@@ -4,7 +4,7 @@
             "outputFile": "com.easycomic.app-mergeDebugResources-2:/values-as/values-as.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\6b415a689a4f27eaf8a98a738e0b0157\\transformed\\foundation-release\\res\\values-as\\values-as.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\ffb2632c58b8752f823666469783493d\\transformed\\foundation-release\\res\\values-as\\values-as.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -21,41 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\b2be53e327a056976c9bdc277f1a5d58\\transformed\\ui-release\\res\\values-as\\values-as.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,200,285,378,476,563,660,759,848,938,1021,1106,1185,1260,1335,1409,1484,1550",
-                        "endColumns": "94,84,92,97,86,96,98,88,89,82,84,78,74,74,73,74,65,117",
-                        "endOffsets": "195,280,373,471,558,655,754,843,933,1016,1101,1180,1255,1330,1404,1479,1545,1663"
-                    },
-                    "to": {
-                        "startLines": "36,37,38,39,40,41,42,100,101,102,103,105,106,107,108,110,111,112",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3598,3693,3778,3871,3969,4056,4153,10508,10597,10687,10770,10938,11017,11092,11167,11342,11417,11483",
-                        "endColumns": "94,84,92,97,86,96,98,88,89,82,84,78,74,74,73,74,65,117",
-                        "endOffsets": "3688,3773,3866,3964,4051,4148,4247,10592,10682,10765,10850,11012,11087,11162,11236,11412,11478,11596"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\f5d0e1df92343d0d7b359b44a06a8449\\transformed\\core-1.15.0\\res\\values-as\\values-as.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,156,259,367,472,576,676,805",
-                        "endColumns": "100,102,107,104,103,99,128,100",
-                        "endOffsets": "151,254,362,467,571,671,800,901"
-                    },
-                    "to": {
-                        "startLines": "29,30,31,32,33,34,35,109",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "2848,2949,3052,3160,3265,3369,3469,11241",
-                        "endColumns": "100,102,107,104,103,99,128,100",
-                        "endOffsets": "2944,3047,3155,3260,3364,3464,3593,11337"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\eec6140cead5ae1541040a5f7adbe2bb\\transformed\\material3-release\\res\\values-as\\values-as.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\d15ccae660018cf2878bcb0ba7572d0b\\transformed\\material3-release\\res\\values-as\\values-as.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -72,7 +38,41 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\d656553cfcbe79f9f73b9f1bea1a2eab\\transformed\\appcompat-1.6.1\\res\\values-as\\values-as.xml",
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\5dd2abfae23e50be57e73965e42f7c9d\\transformed\\core-1.15.0\\res\\values-as\\values-as.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,156,259,367,472,576,676,805",
+                        "endColumns": "100,102,107,104,103,99,128,100",
+                        "endOffsets": "151,254,362,467,571,671,800,901"
+                    },
+                    "to": {
+                        "startLines": "29,30,31,32,33,34,35,109",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "2848,2949,3052,3160,3265,3369,3469,11241",
+                        "endColumns": "100,102,107,104,103,99,128,100",
+                        "endOffsets": "2944,3047,3155,3260,3364,3464,3593,11337"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\737be96b3e94dc15f83a9629b64d1bd5\\transformed\\ui-release\\res\\values-as\\values-as.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,200,285,378,476,563,660,759,848,938,1021,1106,1185,1260,1335,1409,1484,1550",
+                        "endColumns": "94,84,92,97,86,96,98,88,89,82,84,78,74,74,73,74,65,117",
+                        "endOffsets": "195,280,373,471,558,655,754,843,933,1016,1101,1180,1255,1330,1404,1479,1545,1663"
+                    },
+                    "to": {
+                        "startLines": "36,37,38,39,40,41,42,100,101,102,103,105,106,107,108,110,111,112",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3598,3693,3778,3871,3969,4056,4153,10508,10597,10687,10770,10938,11017,11092,11167,11342,11417,11483",
+                        "endColumns": "94,84,92,97,86,96,98,88,89,82,84,78,74,74,73,74,65,117",
+                        "endOffsets": "3688,3773,3866,3964,4051,4148,4247,10592,10682,10765,10850,11012,11087,11162,11236,11412,11478,11596"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Easy\\.gradle\\caches\\8.14.3\\transforms\\cda3c013fca7ee2eee2d4d481f1398fa\\transformed\\appcompat-1.6.1\\res\\values-as\\values-as.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
