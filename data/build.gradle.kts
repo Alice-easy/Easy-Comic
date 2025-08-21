@@ -54,6 +54,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // DataStore for preferences
+    implementation(libs.androidx.datastore.preferences)
+
     // DocumentFile for SAF
     implementation("androidx.documentfile:documentfile:1.0.1")
 

@@ -8,6 +8,9 @@ import com.easycomic.data.repository.ImportProgress
 import com.easycomic.domain.model.Manga
 import com.easycomic.domain.usecase.manga.GetAllMangaUseCase
 import com.easycomic.domain.usecase.manga.ImportComicsUseCase
+import com.easycomic.domain.usecase.manga.DeleteComicsUseCase
+import com.easycomic.domain.usecase.manga.UpdateMangaFavoriteStatusUseCase
+import com.easycomic.domain.usecase.manga.MarkMangasAsReadUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +22,10 @@ import java.io.File
 open class BookshelfViewModel(
     private val getAllMangaUseCase: GetAllMangaUseCase,
     private val importComicsUseCase: ImportComicsUseCase,
-    private val comicImportRepository: ComicImportRepositoryImpl
+    private val comicImportRepository: ComicImportRepositoryImpl,
+    private val deleteComicsUseCase: DeleteComicsUseCase,
+    private val updateMangaFavoriteStatusUseCase: UpdateMangaFavoriteStatusUseCase,
+    private val markMangasAsReadUseCase: MarkMangasAsReadUseCase
 ) : ViewModel() {
 
     private val _comics = MutableStateFlow<List<Manga>>(emptyList())
@@ -214,10 +220,9 @@ open class BookshelfViewModel(
     fun deleteSelectedMangas() {
         viewModelScope.launch {
             try {
-                val selectedIds = _selectedMangas.value
-                // TODO: 实现删除逻辑，需要添加删除用例
-                // deleteComicsUseCase(selectedIds.toList())
-                Timber.d("删除漫画: $selectedIds")
+                val selectedIds = _selectedMangas.value.toList()
+                deleteComicsUseCase.deleteMultiple(selectedIds)
+                Timber.d("成功删除漫画: $selectedIds")
                 
                 // 清除选择状态
                 clearSelection()
@@ -236,10 +241,9 @@ open class BookshelfViewModel(
     fun markSelectedAsFavorite(isFavorite: Boolean) {
         viewModelScope.launch {
             try {
-                val selectedIds = _selectedMangas.value
-                // TODO: 实现批量更新收藏状态的用例
-                // updateMangaFavoriteStatusUseCase(selectedIds.toList(), isFavorite)
-                Timber.d("更新收藏状态: $selectedIds -> $isFavorite")
+                val selectedIds = _selectedMangas.value.toList()
+                updateMangaFavoriteStatusUseCase.updateMultiple(selectedIds, isFavorite)
+                Timber.d("成功更新收藏状态: $selectedIds -> $isFavorite")
                 
                 // 清除选择状态
                 clearSelection()
@@ -258,10 +262,9 @@ open class BookshelfViewModel(
     fun markSelectedAsRead() {
         viewModelScope.launch {
             try {
-                val selectedIds = _selectedMangas.value
-                // TODO: 实现批量标记为已读的用例
-                // markMangasAsReadUseCase(selectedIds.toList())
-                Timber.d("标记为已读: $selectedIds")
+                val selectedIds = _selectedMangas.value.toList()
+                markMangasAsReadUseCase.markMultipleAsRead(selectedIds)
+                Timber.d("成功标记为已读: $selectedIds")
                 
                 // 清除选择状态
                 clearSelection()

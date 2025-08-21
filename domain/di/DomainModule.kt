@@ -3,7 +3,10 @@ package com.easycomic.domain.di
 import com.easycomic.domain.repository.BookmarkRepository
 import com.easycomic.domain.repository.MangaRepository
 import com.easycomic.domain.repository.ReadingHistoryRepository
+import com.easycomic.domain.repository.ThemeRepository
 import com.easycomic.domain.usecase.manga.*
+import com.easycomic.domain.usecase.GetThemePreferenceUseCase
+import com.easycomic.domain.usecase.UpdateThemePreferenceUseCase
 import org.koin.dsl.module
 
 /**
@@ -26,4 +29,13 @@ val domainModule = module {
     factory { DeleteAllMangaUseCase(get<MangaRepository>()) }
     factory { ImportComicsUseCase(get<MangaRepository>()) }
     factory { GetCoverUseCase(get<MangaRepository>()) }
+    
+    // 批量操作用例
+    factory { DeleteComicsUseCase(get<MangaRepository>()) }
+    factory { UpdateMangaFavoriteStatusUseCase(get<MangaRepository>()) }
+    factory { MarkMangasAsReadUseCase(get<MangaRepository>()) }
+    
+    // 主题用例
+    factory { GetThemePreferenceUseCase(get<ThemeRepository>()) }
+    factory { UpdateThemePreferenceUseCase(get<ThemeRepository>()) }
 }

@@ -135,10 +135,10 @@ private fun HorizontalReader(
         userScrollEnabled = !uiState.settings.isMenuVisible
     ) { pageIndex ->
         val pageBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, key1 = pageIndex) {
-            value = try {
-                viewModel.getPageBitmap(pageIndex)
+            try {
+                value = viewModel.getPageBitmap(pageIndex)
             } catch (e: Exception) {
-                null
+                value = null
             }
         }
 

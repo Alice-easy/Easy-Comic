@@ -66,6 +66,11 @@ class MangaRepositoryImpl(
         return mangaDao.insertOrUpdateManga(entity)
     }
     
+    override suspend fun updateManga(manga: Manga): Long {
+        val entity = manga.toEntity()
+        return mangaDao.insertOrUpdateManga(entity)
+    }
+    
     override suspend fun insertAllManga(mangaList: List<Manga>): List<Long> {
         val entities = mangaList.map { it.toEntity() }
         return mangaDao.insertAllManga(entities)

@@ -52,6 +52,11 @@ interface MangaRepository {
     suspend fun insertOrUpdateManga(manga: Manga): Long
     
     /**
+     * 更新漫画信息
+     */
+    suspend fun updateManga(manga: Manga): Long
+    
+    /**
      * 批量添加漫画
      */
     suspend fun insertAllManga(mangaList: List<Manga>): List<Long>
