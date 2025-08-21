@@ -43,6 +43,9 @@ data class MangaEntity(
     @ColumnInfo(name = "cover_path")
     val coverPath: String? = null,
 
+    @ColumnInfo(name = "cover_image_path")
+    val coverImagePath: String? = null,
+
     @ColumnInfo(name = "page_count", defaultValue = "0")
     val pageCount: Int = 0,
 
@@ -64,11 +67,17 @@ data class MangaEntity(
     @ColumnInfo(name = "last_read", defaultValue = "0")
     val lastRead: Long = 0,
 
+    @ColumnInfo(name = "last_modified", defaultValue = "0")
+    val lastModified: Long = 0,
+
     @ColumnInfo(name = "reading_time", defaultValue = "0")
     val readingTime: Long = 0,
 
     @ColumnInfo(name = "rating", defaultValue = "0.0")
     val rating: Float = 0.0f,
+
+    @ColumnInfo(name = "is_from_saf", defaultValue = "0")
+    val isFromSAF: Boolean = false,
 
     @ColumnInfo(name = "created_at")
     val createdAt: Long = System.currentTimeMillis(),

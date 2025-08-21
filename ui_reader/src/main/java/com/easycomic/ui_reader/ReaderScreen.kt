@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.math.roundToInt
 
+/**
+ * 阅读器主界面
+ * 支持水平和垂直阅读模式，双指缩放，手势翻页
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen(
@@ -63,6 +68,7 @@ fun ReaderScreen(
                 ReaderBottomBar(
                     currentPage = uiState.currentPage + 1,
                     maxPage = uiState.pageCount,
+                    progress = uiState.readingProgress,
                     onPageSelected = { page -> viewModel.goToPage(page - 1) },
                     onPreviousPage = { viewModel.previousPage() },
                     onNextPage = { viewModel.nextPage() }
@@ -129,7 +135,12 @@ private fun HorizontalReader(
         userScrollEnabled = !uiState.settings.isMenuVisible
     ) { pageIndex ->
         val pageBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, key1 = pageIndex) {
-            value = viewModel.getPageBitmap(pageIndex)
+            try {
+                val bitmap = viewModel.getPageBitmap(pageIndex)
+                value = bitmap
+            } catch (e: Exception) {
+                value = null
+            }
         }
 
         if (pageBitmap != null) {
@@ -155,7 +166,12 @@ private fun VerticalReader(uiState: ReaderUiState, viewModel: ReaderViewModel) {
     ) {
         items(uiState.pageCount) { pageIndex ->
             val pageBitmap by produceState<android.graphics.Bitmap?>(initialValue = null, key1 = pageIndex) {
-                value = viewModel.getPageBitmap(pageIndex)
+                try {
+                    val bitmap = viewModel.getPageBitmap(pageIndex)
+                    value = bitmap
+                } catch (e: Exception) {
+                    value = null
+                }
             }
 
             if (pageBitmap != null) {
@@ -197,7 +213,7 @@ private fun ReaderTopAppBar(
         title = { Text(text = title.ifEmpty { "Reader" }, maxLines = 1) },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         actions = {
@@ -255,7 +271,7 @@ fun SettingsMenu(
                 )
             }
         )
-        Divider()
+        HorizontalDivider()
         // Reading Direction
         Text("Reading Direction", modifier = Modifier.padding(16.dp))
         DropdownMenuItem(
@@ -286,6 +302,7 @@ fun SettingsMenu(
 private fun ReaderBottomBar(
     currentPage: Int,
     maxPage: Int,
+    progress: Float,
     onPageSelected: (Int) -> Unit,
     onPreviousPage: () -> Unit,
     onNextPage: () -> Unit
@@ -317,6 +334,14 @@ private fun ReaderBottomBar(
                 valueRange = 1f..maxPage.toFloat(),
                 steps = if (maxPage > 1) maxPage - 2 else 0
             )
+            
+            // 显示阅读进度百分比
+            Text(
+                text = "进度: ${(progress * 100).roundToInt()}%",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -325,7 +350,7 @@ private fun ReaderBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onPreviousPage, enabled = currentPage > 1) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Previous Page")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Page")
             }
             Text(
                 text = "$currentPage/$maxPage",
@@ -333,7 +358,7 @@ private fun ReaderBottomBar(
                 modifier = Modifier.clickable(enabled = maxPage > 0) { showPageSelector = true }
             )
             IconButton(onClick = onNextPage, enabled = currentPage < maxPage) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Next Page")
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Page")
             }
         }
     }
@@ -348,7 +373,14 @@ private fun ComicPageDisplay(
 ) {
     var zoom by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
+    var lastTapTime by remember { mutableStateOf(0L) }
+    
     val contentScale = if (readingMode == ReadingMode.FIT) ContentScale.Fit else ContentScale.FillWidth
+    
+    // 缩放限制
+    val minZoom = 0.5f
+    val maxZoom = 5f
+    val doubleTapZoom = 2f
 
     Box(
         modifier = Modifier
@@ -356,12 +388,59 @@ private fun ComicPageDisplay(
             .clipToBounds()
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, gestureZoom, _ ->
-                    zoom = (zoom * gestureZoom).coerceIn(0.5f, 5f)
-                    offset += pan
+                    val newZoom = (zoom * gestureZoom).coerceIn(minZoom, maxZoom)
+                    
+                    // 计算新的偏移量，确保图片不会移出边界
+                    val maxOffsetX = (size.width * (newZoom - 1)) / 2
+                    val maxOffsetY = (size.height * (newZoom - 1)) / 2
+                    
+                    val newOffset = Offset(
+                        x = (offset.x + pan.x).coerceIn(-maxOffsetX, maxOffsetX),
+                        y = (offset.y + pan.y).coerceIn(-maxOffsetY, maxOffsetY)
+                    )
+                    
+                    zoom = newZoom
+                    offset = newOffset
                 }
             }
             .pointerInput(Unit) {
-                detectTapGestures(onTap = { onTap() })
+                detectTapGestures(
+                    onTap = { tapOffset ->
+                        val currentTime = System.currentTimeMillis()
+                        
+                        // 检查是否为双击
+                        if (currentTime - lastTapTime < 300) {
+                            // 双击缩放
+                            if (zoom > 1.5f) {
+                                // 缩放到适合屏幕
+                                zoom = 1f
+                                offset = Offset.Zero
+                            } else {
+                                // 放大到双击缩放级别
+                                zoom = doubleTapZoom
+                                // 以点击位置为中心缩放
+                                val centerX = size.width / 2
+                                val centerY = size.height / 2
+                                offset = Offset(
+                                    x = (centerX - tapOffset.x) * (doubleTapZoom - 1),
+                                    y = (centerY - tapOffset.y) * (doubleTapZoom - 1)
+                                ).let { newOffset ->
+                                    val maxOffsetX = (size.width * (doubleTapZoom - 1)) / 2
+                                    val maxOffsetY = (size.height * (doubleTapZoom - 1)) / 2
+                                    Offset(
+                                        x = newOffset.x.coerceIn(-maxOffsetX, maxOffsetX),
+                                        y = newOffset.y.coerceIn(-maxOffsetY, maxOffsetY)
+                                    )
+                                }
+                            }
+                        } else {
+                            // 单击切换菜单
+                            onTap()
+                        }
+                        
+                        lastTapTime = currentTime
+                    }
+                )
             }
     ) {
         Image(
@@ -377,6 +456,24 @@ private fun ComicPageDisplay(
                 ),
             contentScale = contentScale
         )
+        
+        // 显示缩放指示器
+        if (zoom != 1f) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = "${(zoom * 100).roundToInt()}%",
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+        
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }

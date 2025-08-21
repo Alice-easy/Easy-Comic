@@ -54,6 +54,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
+    // DocumentFile for SAF
+    implementation("androidx.documentfile:documentfile:1.0.1")
+
     // Koin for dependency injection
     implementation("io.insert-koin:koin-android:3.5.0")
 
@@ -63,6 +66,9 @@ dependencies {
 
     // Junrar for RAR file parsing
     implementation(libs.junrar)
+
+    // Timber for logging
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // Testing
     testImplementation(libs.junit)

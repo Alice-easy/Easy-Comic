@@ -90,6 +90,7 @@ MERGED from [com.jakewharton.timber:timber:5.0.1] C:\Users\Easy\.gradle\caches\8
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\42748c0791720e5bf8d89799ad5a4340\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\15632bd7a53b7d582ebd4ef3f9f8aa49\transformed\sqlite-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\e2d73a12ad45859d79be9ffe382a9610\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\a527b7086e3e7efa2fb1310d38a4ba90\transformed\documentfile-1.0.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\33c6d56afbfa5eec3a7e30236123f080\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\32ed371f20eaa8aab810e22c83e56421\transformed\profileinstaller-1.3.1\AndroidManifest.xml:17:1-55:12
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\053b02e1df16600685cee30f5dfd2c34\transformed\startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
@@ -389,6 +390,8 @@ MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Easy\.gradle\caches\8.14.3\t
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\15632bd7a53b7d582ebd4ef3f9f8aa49\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\e2d73a12ad45859d79be9ffe382a9610\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\e2d73a12ad45859d79be9ffe382a9610\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\a527b7086e3e7efa2fb1310d38a4ba90\transformed\documentfile-1.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\a527b7086e3e7efa2fb1310d38a4ba90\transformed\documentfile-1.0.1\AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\33c6d56afbfa5eec3a7e30236123f080\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Easy\.gradle\caches\8.14.3\transforms\33c6d56afbfa5eec3a7e30236123f080\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Easy\.gradle\caches\8.14.3\transforms\32ed371f20eaa8aab810e22c83e56421\transformed\profileinstaller-1.3.1\AndroidManifest.xml:21:5-44
