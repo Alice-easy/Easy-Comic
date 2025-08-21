@@ -42,6 +42,10 @@ dependencies {
     api(project(":domain"))
     implementation(project(":data"))
 
+    // Kotlin BOM and stdlib
+    implementation(platform(libs.kotlin.bom))
+    implementation(libs.kotlin.stdlib)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -64,8 +68,14 @@ dependencies {
     // Coil for image loading
     implementation(libs.coil.compose)
 
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
