@@ -295,7 +295,7 @@ private fun MangaEntity.toDomain(): Manga {
         currentPage = currentPage,
         isFavorite = isFavorite,
         dateAdded = dateAdded,
-        lastRead = if (lastRead > 0) lastRead else null,
+        lastRead = lastRead,
         rating = rating,
         coverImagePath = coverPath,
         readingStatus = status,

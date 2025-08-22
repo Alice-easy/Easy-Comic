@@ -1,5 +1,7 @@
 package com.easycomic.data.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.easycomic.data.database.AppDatabase
 import com.easycomic.data.repository.*
@@ -17,6 +19,11 @@ import org.koin.dsl.module
  * 3. 环境配置支持
  */
 val optimizedDataModule = module {
+    
+    // DataStore - 重用DataModule中的定义
+    single<DataStore<Preferences>> {
+        androidContext().dataStore
+    }
     
     // 数据库配置
     single {
@@ -56,7 +63,7 @@ val optimizedDataModule = module {
     }
     
     single<ThemeRepository> { 
-        ThemeRepositoryImpl(context = androidContext())
+        ThemeRepositoryImpl(dataStore = get())
     }
     
     single<ComicImportRepository> { 
