@@ -190,13 +190,13 @@ private fun CoverImageSection(
  */
 @Composable
 private fun CoverImage(
-    coverImagePath: String,
+    coverImagePath: String?,
     title: String,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(coverImagePath)
+            .data(coverImagePath ?: "")
             .crossfade(true)
             .build(),
         contentDescription = title,
@@ -254,7 +254,7 @@ private fun ProgressIndicator(
     modifier: Modifier = Modifier
 ) {
     LinearProgressIndicator(
-        progress = { progress / 100f },
+        progress = progress / 100f,
         modifier = modifier
             .fillMaxWidth()
             .height(3.dp),

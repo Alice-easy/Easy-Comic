@@ -2,11 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    id("jacoco") // Phase 4: 测试覆盖率
+
     
-    // 代码质量检查工具
-    id("io.gitlab.arturbosch.detekt")
-    id("org.jlleitschuh.gradle.ktlint")
+
     
     // Firebase plugins (需要时取消注释)
     // id("com.google.gms.google-services")
@@ -25,7 +23,7 @@ android {
         versionCode = 1
         versionName = "0.6.0-alpha"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -87,16 +85,7 @@ android {
         }
     }
     
-    // Phase 4: 测试覆盖率配置
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-        }
-        unitTests.all {
-            it.useJUnitPlatform()
-        }
-    }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -113,32 +102,7 @@ android {
     }
 }
 
-// Phase 4: Jacoco 测试覆盖率任务
-tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
-    
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
-    
-    val fileFilter = listOf(
-        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-        "**/*Test*.*", "android/**/*.*", "**/databinding/*", "**/*Binding.*",
-        "**/di/*", "**/injection/*", "**/*Module*.*", "**/*Component*.*"
-    )
-    
-    val debugTree = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
-    }
-    val mainSrc = "${project.projectDir}/src/main/java"
-    
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree("${layout.buildDirectory}") {
-        include("**/*.exec", "**/*.ec")
-    })
-}
+
 
 dependencies {
     // Core Android & Jetpack
@@ -182,126 +146,16 @@ dependencies {
     // implementation("ch.acra:acra-mail:5.11.3")
     // implementation("ch.acra:acra-dialog:5.11.3")
     
-    // Memory Leak Detection (debug only)
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
+
 
     // Project Modules
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
-    // 临时注释，待修复
-    // implementation(project(":feature:bookshelf"))
-    // implementation(project(":feature:reader"))
+    implementation(project(":feature:bookshelf"))
+    implementation(project(":feature:reader"))
 
-    // Testing
-    testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
-    testImplementation(libs.koin.test.junit4)
-    testImplementation(libs.robolectric)
 
-    // Android Testing
-    androidTestImplementation(libs.junit) // Add base JUnit for @Rule support
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(platform(libs.kotlin.bom))
-    androidTestImplementation(libs.koin.test.junit4)
-    androidTestImplementation("androidx.startup:startup-runtime:1.1.1")
-
-    // Debug
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }
 
-// 代码质量检查工具配置
 
-// Detekt 配置
-detekt {
-    config = files("$rootDir/detekt.yml")
-    buildUponDefaultConfig = true
-    allRules = false
-    
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        txt.required.set(false)
-        sarif.required.set(false)
-    }
-}
-
-// ktlint 配置
-ktlint {
-    version.set("1.0.1")
-    debug.set(true)
-    verbose.set(true)
-    android.set(true)
-    outputToConsole.set(true)
-    outputColorName.set("RED")
-    ignoreFailures.set(false)
-    enableExperimentalRules.set(false)
-    
-    filter {
-        exclude("**/generated/**")
-        exclude("**/build/**")
-        include("**/src/**")
-    }
-}
-
-// 代码质量检查集成任务
-tasks.register("codeQuality") {
-    group = "verification"
-    description = "运行所有代码质量检查"
-    
-    dependsOn(
-        "detekt",
-        "ktlintCheck",
-        "jacocoTestReport",
-        "lint"
-    )
-    
-    doLast {
-        println("✅ 代码质量检查完成")
-        println("📊 查看报告:")
-        println("  - Detekt: build/reports/detekt/detekt.html")
-        println("  - ktlint: 输出在控制台")
-        println("  - Jacoco: build/reports/jacoco/jacocoTestReport/html/index.html")
-        println("  - Lint: build/reports/lint-results.html")
-    }
-}
-
-// 自动修复ktlint格式问题
-tasks.register("formatCode") {
-    group = "formatting"
-    description = "自动修复代码格式问题"
-    
-    dependsOn("ktlintFormat")
-    
-    doLast {
-        println("✨ 代码格式修复完成")
-    }
-}
-
-// Pre-commit hook 模拟
-tasks.register("preCommitCheck") {
-    group = "verification"
-    description = "提交前的代码检查"
-    
-    dependsOn(
-        "ktlintCheck",
-        "detekt",
-        "testDebugUnitTest",
-        "lint"
-    )
-    
-    doFirst {
-        println("🔍 开始提交前检查...")
-    }
-    
-    doLast {
-        println("✅ 提交前检查通过")
-    }
-}

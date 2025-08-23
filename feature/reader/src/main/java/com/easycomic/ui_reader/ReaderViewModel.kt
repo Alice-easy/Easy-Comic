@@ -2,7 +2,6 @@ package com.easycomic.ui_reader
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.easycomic.domain.model.Manga
@@ -28,15 +27,13 @@ import java.io.File
  * 实现300ms防抖机制优化性能
  */
 class ReaderViewModel(
-    savedStateHandle: SavedStateHandle,
     private val getMangaByIdUseCase: GetMangaByIdUseCase,
     private val updateReadingProgressUseCase: UpdateReadingProgressUseCase,
     private val comicParserFactory: ComicParserFactory
 ) : ViewModel() {
 
-    private val mangaId: Long by lazy { 
-        savedStateHandle.get<Long>("mangaId") ?: throw IllegalArgumentException("Missing mangaId")
-    }
+    // mangaId可以通过setMangaId动态设置
+    private var mangaId: Long = 0L
 
     private val _uiState = MutableStateFlow(ReaderUiState())
     val uiState: StateFlow<ReaderUiState> = _uiState.asStateFlow()
@@ -63,12 +60,24 @@ class ReaderViewModel(
         private const val SAVE_PROGRESS_DEBOUNCE_MS = 300L // 300ms防抖
         private const val MENU_AUTO_HIDE_DELAY_MS = 3000L // 3秒后自动隐藏菜单
     }
-
-    init {
-        loadManga()
+    
+    /**
+     * 设置要阅读的漫画ID并开始加载
+     */
+    fun setMangaId(newMangaId: Long) {
+        if (mangaId != newMangaId) {
+            mangaId = newMangaId
+            clearCache()
+            loadManga()
+        }
     }
 
     private fun loadManga() {
+        if (mangaId <= 0L) {
+            _uiState.update { it.copy(isLoading = false, error = "请选择要阅读的漫画") }
+            return
+        }
+        
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
@@ -301,11 +310,9 @@ class ReaderViewModel(
             val manga = currentState.manga ?: return
             
             updateReadingProgressUseCase(
-                UpdateReadingProgressUseCase.Params(
-                    mangaId = manga.id,
-                    currentPage = currentState.currentPage,
-                    pageCount = currentState.pageCount
-                )
+                mangaId = manga.id,
+                currentPage = currentState.currentPage,
+                status = com.easycomic.domain.model.ReadingStatus.READING
             )
             
             Timber.d("Progress saved: page ${currentState.currentPage}/${currentState.pageCount}")
@@ -402,6 +409,19 @@ class ReaderViewModel(
                 null
             }
         }
+    }
+
+    /**
+     * 清空图片缓存
+     */
+    private fun clearCache() {
+        imageCache.values.forEach { cached ->
+            if (!cached.bitmap.isRecycled) {
+                cached.bitmap.recycle()
+            }
+        }
+        imageCache.clear()
+        currentMemoryUsage = 0L
     }
 
     override fun onCleared() {

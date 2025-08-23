@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,10 +17,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.collectAsState
 import com.easycomic.data.repository.ImportProgress
 import com.easycomic.domain.model.Manga
-import com.easycomic.ui_bookshelf.R
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,14 +29,14 @@ fun BookshelfScreen(
     onNavigateToReader: (Long) -> Unit,
     onNavigateToSettings: () -> Unit = {}
 ) {
-    val mangas by viewModel.getComics().collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val importProgress by viewModel.importProgress.collectAsStateWithLifecycle()
-    val isImporting by viewModel.isImporting.collectAsStateWithLifecycle()
-    val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
-    val selectedMangas by viewModel.selectedMangas.collectAsStateWithLifecycle()
+    val mangas by viewModel.getComics().collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val sortOrder by viewModel.sortOrder.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val importProgress by viewModel.importProgress.collectAsState()
+    val isImporting by viewModel.isImporting.collectAsState()
+    val selectionMode by viewModel.selectionMode.collectAsState()
+    val selectedMangas by viewModel.selectedMangas.collectAsState()
     
     var showSearchBar by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
@@ -89,7 +86,7 @@ fun BookshelfScreen(
                 )
             } else {
                 TopAppBar(
-                    title = { Text(stringResource(id = R.string.bookshelf_title)) },
+                    title = { Text("书架") },
                     actions = {
                         IconButton(
                             onClick = { viewModel.refreshComics() },
@@ -259,7 +256,7 @@ private fun ImportProgressDialog(
                             Text("正在导入: ${progress.processed} / ${progress.total}")
                             Spacer(modifier = Modifier.height(8.dp))
                             LinearProgressIndicator(
-                                progress = { progress.processed.toFloat() / progress.total.toFloat() },
+                                progress = progress.processed.toFloat() / progress.total.toFloat(),
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

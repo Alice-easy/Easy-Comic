@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.easycomic.ui_bookshelf.BookshelfViewModel
-import com.easycomic.ui_bookshelf.R
 
 /**
  * 书架顶部应用栏组件
@@ -47,7 +46,7 @@ fun BookshelfTopBar(
         )
     } else {
         TopAppBar(
-            title = { Text(stringResource(id = R.string.bookshelf_title)) },
+            title = { Text("书架") },
             actions = {
                 IconButton(
                     onClick = onRefresh,

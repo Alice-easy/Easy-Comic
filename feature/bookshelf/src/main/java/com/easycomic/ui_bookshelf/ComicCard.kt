@@ -173,7 +173,7 @@ fun ComicCard(
                 // 阅读进度指示器
                 if (manga.progressPercentage > 0f && manga.progressPercentage < 100f) {
                     LinearProgressIndicator(
-                        progress = { manga.progressPercentage / 100f },
+                        progress = manga.progressPercentage / 100f,
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter)
@@ -357,7 +357,7 @@ fun GridComicCard(
                 // 阅读进度指示器
                 if (manga.progressPercentage > 0f && manga.progressPercentage < 100f) {
                     LinearProgressIndicator(
-                        progress = { manga.progressPercentage / 100f },
+                        progress = manga.progressPercentage / 100f,
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter)

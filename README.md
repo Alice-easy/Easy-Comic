@@ -44,15 +44,6 @@
 
 ---
 
-## 🎬 功能演示
-
-| 📚 **智能书架** | 📖 **沉浸阅读** | ⚡ **性能监控** |
-|:---:|:---:|:---:|
-| ![书架界面](https://via.placeholder.com/200x350/4CAF50/FFFFFF?text=智能书架) | ![阅读界面](https://via.placeholder.com/200x350/2196F3/FFFFFF?text=沉浸阅读) | ![性能监控](https://via.placeholder.com/200x350/FF9800/FFFFFF?text=性能监控) |
-| 响应式网格布局<br/>搜索筛选功能<br/>批量操作支持 | 双击缩放手势<br/>流畅翻页动画<br/>进度记忆功能 | 实时性能数据<br/>内存使用追踪<br/>启动时间分析 |
-
----
-
 ## 🏗️ 架构设计
 
 Easy Comic 采用 **Clean Architecture** 三层架构，通过严格的依赖倒置实现高度模块化：

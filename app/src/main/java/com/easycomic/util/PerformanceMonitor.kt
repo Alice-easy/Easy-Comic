@@ -15,7 +15,7 @@ object PerformanceMonitor {
     
     private var appStartTime: Long = 0
     private var firstFrameTime: Long = 0
-    private var isMonitoringEnabled = true
+    private var monitoringEnabled = true
     
     // 性能目标常量
     private const val TARGET_COLD_START_MS = 2000L // 目标冷启动时间 < 2秒
@@ -29,7 +29,6 @@ object PerformanceMonitor {
      */
     fun startAppLaunch() {
         appStartTime = System.currentTimeMillis()
-        Timber.d("应用启动监控开始: $appStartTime")
     }
     
     /**
@@ -39,21 +38,16 @@ object PerformanceMonitor {
         firstFrameTime = System.currentTimeMillis()
         val startupTime = firstFrameTime - appStartTime
         
-        Timber.i("启动时间监控 - 首帧渲染: ${startupTime}ms")
-        
-        // 检查是否达标
-        val targetTime = TARGET_COLD_START_MS
-        if (startupTime > targetTime) {
-            Timber.w("启动时间超标: ${startupTime}ms > ${targetTime}ms")
-        } else {
-            Timber.i("启动时间达标: ${startupTime}ms < ${targetTime}ms")
+        // 性能监控记录（仅调试模式）
+        if (monitoringEnabled) {
+            Timber.i("启动时间: ${startupTime}ms")
         }
     }
     
     /**
      * 监控操作响应时间
      */
-    inline fun <T> measureOperation(
+    fun <T> measureOperation(
         operationName: String,
         targetMs: Long = 500L,
         operation: () -> T
@@ -62,10 +56,8 @@ object PerformanceMonitor {
         val result = operation()
         val duration = System.currentTimeMillis() - startTime
         
-        if (duration > targetMs) {
-            Timber.w("操作响应超标 [$operationName]: ${duration}ms > ${targetMs}ms")
-        } else {
-            Timber.d("操作响应达标 [$operationName]: ${duration}ms")
+        if (monitoringEnabled && duration > targetMs) {
+            Timber.w("操作响应超标 [$operationName]: ${duration}ms")
         }
         
         return result
@@ -119,8 +111,8 @@ object PerformanceMonitor {
         )
         
         // 检查内存使用是否超标
-        if (totalPss > MAX_MEMORY_MB) {
-            Timber.w("内存使用超标: ${totalPss}MB > ${MAX_MEMORY_MB}MB")
+        if (monitoringEnabled && totalPss > MAX_MEMORY_MB) {
+            Timber.w("内存使用超标: ${totalPss}MB")
         }
         
         return info
@@ -130,12 +122,10 @@ object PerformanceMonitor {
      * 定期监控内存使用情况
      */
     fun logMemoryUsage(context: Context, tag: String = "") {
-        if (!isMonitoringEnabled) return
+        if (!monitoringEnabled) return
         
         val memInfo = getCurrentMemoryUsage(context)
-        Timber.d("内存监控 [$tag]: Java=${memInfo.javaHeapUsedMB}/${memInfo.javaHeapMaxMB}MB, " +
-                "Native=${memInfo.nativeHeapMB}MB, Total=${memInfo.totalPssMB}MB, " +
-                "Available=${memInfo.availableMemoryMB}MB, LowMemory=${memInfo.isLowMemory}")
+        Timber.v("内存监控 [$tag]: Total=${memInfo.totalPssMB}MB")
     }
     
     /**
@@ -144,20 +134,19 @@ object PerformanceMonitor {
     fun checkForMemoryLeaks(context: Context) {
         val memInfo = getCurrentMemoryUsage(context)
         
-        if (memInfo.isLowMemory) {
-            Timber.w("检测到内存压力状况，建议进行内存清理")
+        if (memInfo.isLowMemory && monitoringEnabled) {
+            Timber.w("检测到内存压力状况")
         }
         
         // Java堆使用率检查
         val heapUsagePercent = (memInfo.javaHeapUsedMB.toDouble() / memInfo.javaHeapMaxMB * 100).toInt()
-        if (heapUsagePercent > 80) {
+        if (heapUsagePercent > 80 && monitoringEnabled) {
             Timber.w("Java堆使用率过高: $heapUsagePercent%")
         }
         
-        // 建议GC
+        // 自动GC
         if (heapUsagePercent > 70) {
             System.gc()
-            Timber.d("建议GC清理内存")
         }
     }
     
@@ -165,8 +154,7 @@ object PerformanceMonitor {
      * 启用/禁用性能监控
      */
     fun setMonitoringEnabled(enabled: Boolean) {
-        isMonitoringEnabled = enabled
-        Timber.d("性能监控${if (enabled) "启用" else "禁用"}")
+        monitoringEnabled = enabled
     }
     
     /**

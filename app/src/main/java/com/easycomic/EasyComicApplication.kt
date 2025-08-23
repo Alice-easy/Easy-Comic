@@ -5,9 +5,9 @@ import com.easycomic.di.KoinModules
 import timber.log.Timber
 
 /**
- * 应用程序入口类 - 简化版本
+ * Easy Comic 应用程序入口类
  * 
- * 用于虚拟机测试
+ * 现代化Android漫画阅读器
  */
 class EasyComicApplication : Application() {
     
@@ -18,23 +18,14 @@ class EasyComicApplication : Application() {
         initializeLogging()
         
         // 初始化Koin依赖注入
-        try {
-            KoinModules.initializeKoin(this)
-            Timber.d("Koin初始化完成")
-        } catch (e: Exception) {
-            Timber.e(e, "Koin初始化失败")
-        }
-        
-        Timber.i("Easy Comic 虚拟机测试版本启动")
+        KoinModules.initializeKoin(this)
     }
     
     /**
      * 初始化日志系统
      */
     private fun initializeLogging() {
-        // 简化版本：总是使用Debug模式
+        // 仅在debug模式下启用日志
         Timber.plant(Timber.DebugTree())
-        
-        Timber.i("Easy Comic启动 - 虚拟机测试版本")
     }
 }

@@ -9,11 +9,10 @@ import org.koin.dsl.module
 
 val readerModule = module {
     // Factory for creating comic parsers
-    factory<ComicParserFactory> { ComicParserFactoryImpl() }
+    factory<ComicParserFactory> { ComicParserFactoryImpl(get()) }
 
-    viewModel { (savedStateHandle: SavedStateHandle) ->
+    viewModel {
         ReaderViewModel(
-            savedStateHandle = savedStateHandle,
             getMangaByIdUseCase = get(),
             updateReadingProgressUseCase = get(),
             comicParserFactory = get()

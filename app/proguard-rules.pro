@@ -277,3 +277,8 @@
 -dontwarn javax.inject.**
 -dontwarn sun.misc.Unsafe
 -dontwarn java.lang.invoke.**
+
+# SLF4J相关警告抑制
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontwarn org.slf4j.impl.StaticMDCBinder
+-dontwarn org.slf4j.impl.StaticMarkerBinder

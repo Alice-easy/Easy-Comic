@@ -12,7 +12,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.collectAsState
 import kotlin.math.roundToInt
 
 /**
@@ -39,7 +38,7 @@ fun ReaderScreen(
     viewModel: ReaderViewModel,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
     val settings = uiState.settings
 
     val errorMessage = uiState.error
@@ -212,7 +211,7 @@ private fun ReaderTopAppBar(
         title = { Text(text = title.ifEmpty { "Reader" }, maxLines = 1) },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
         },
         actions = {
@@ -242,7 +241,7 @@ fun SettingsMenu(
     onDismiss: () -> Unit,
     viewModel: ReaderViewModel
 ) {
-    val settings by viewModel.uiState.collectAsStateWithLifecycle()
+    val settings by viewModel.uiState.collectAsState()
 
     DropdownMenu(
         expanded = expanded,
@@ -270,7 +269,7 @@ fun SettingsMenu(
                 )
             }
         )
-        HorizontalDivider()
+        Divider()
         // Reading Direction
         Text("Reading Direction", modifier = Modifier.padding(16.dp))
         DropdownMenuItem(
@@ -349,7 +348,7 @@ private fun ReaderBottomBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onPreviousPage, enabled = currentPage > 1) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Page")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Previous Page")
             }
             Text(
                 text = "$currentPage/$maxPage",
@@ -357,7 +356,7 @@ private fun ReaderBottomBar(
                 modifier = Modifier.clickable(enabled = maxPage > 0) { showPageSelector = true }
             )
             IconButton(onClick = onNextPage, enabled = currentPage < maxPage) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Page")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Next Page")
             }
         }
     }
