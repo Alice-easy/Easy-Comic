@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Simple comic book icon -->
+    <group android:scaleX="0.5"
+           android:scaleY="0.5"
+           android:pivotX="54"
+           android:pivotY="54">
+        
+        <!-- Book cover -->
+        <path
+            android:fillColor="#006C50"
+            android:pathData="M30,20 L78,20 L78,88 L30,88 Z"/>
+        
+        <!-- Book pages -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M32,22 L76,22 L76,86 L32,86 Z"/>
+        
+        <!-- Text lines -->
+        <path
+            android:fillColor="#006C50"
+            android:pathData="M38,30 L70,30 L70,32 L38,32 Z"/>
+        
+        <path
+            android:fillColor="#006C50"
+            android:pathData="M38,38 L70,38 L70,40 L38,40 Z"/>
+        
+        <path
+            android:fillColor="#006C50"
+            android:pathData="M38,46 L70,46 L70,48 L38,48 Z"/>
+        
+        <!-- Simple shape instead of circle -->
+        <path
+            android:fillColor="#8FF7D0"
+            android:pathData="M48,53 L72,53 L72,77 L48,77 Z"/>
+            
+    </group>
+</vector>

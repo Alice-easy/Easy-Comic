@@ -1,8 +1,8 @@
 [versions]
 # Android 和 Kotlin 版本
 agp = "8.2.0"
-kotlin = "1.9.20"
-ksp = "1.9.20-1.0.14"
+kotlin = "1.9.22"
+ksp = "1.9.22-1.0.17"
 compose-bom = "2023.10.01"
 androidx-core-ktx = "1.12.0"
 androidx-lifecycle = "2.7.0"

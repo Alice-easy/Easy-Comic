@@ -75,7 +75,7 @@ val optimizedDataModule = module {
     
     // 文件解析器
     single<com.easycomic.domain.parser.ComicParserFactory> { 
-        com.easycomic.data.parser.ComicParserFactoryImpl()
+        com.easycomic.data.parser.ComicParserFactoryImpl(androidContext())
     }
     
     // 文件管理器

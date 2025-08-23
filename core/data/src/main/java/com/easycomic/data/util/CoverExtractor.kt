@@ -84,6 +84,31 @@ class CoverExtractor {
         }
         
         /**
+         * 从页面名称列表中选择最佳封面页面
+         */
+        fun selectCoverPage(pageNames: List<String>): String {
+            if (pageNames.isEmpty()) {
+                throw IllegalArgumentException("Page names list cannot be empty")
+            }
+            
+            // 查找明确的封面文件
+            val coverFiles = pageNames.filter { isCoverFile(it) && isImageFile(it) }
+            if (coverFiles.isNotEmpty()) {
+                // 按优先级排序并返回最佳封面
+                return sortImagesByPriority(coverFiles).first()
+            }
+            
+            // 没有找到明确的封面文件，使用排序后的第一张图片
+            val imageFiles = pageNames.filter { isImageFile(it) }
+            if (imageFiles.isNotEmpty()) {
+                return sortImagesByPriority(imageFiles).first()
+            }
+            
+            // 如果没有找到任何图片文件，返回第一个文件
+            return pageNames.first()
+        }
+        
+        /**
          * 根据优先级对图片文件进行排序
          * 封面文件优先，然后按照扩展名优先级和自然序排序
          */

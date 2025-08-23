@@ -160,7 +160,7 @@ class OptimizedSAFZipComicParser(
         val pageNames = getPageNames()
         if (pageNames.isEmpty()) return null
         
-        val coverPageName = coverExtractor.selectCoverPage(pageNames)
+        val coverPageName = CoverExtractor.selectCoverPage(pageNames)
         return findEntryStreamAsync(coverPageName)
     }
     
@@ -367,15 +367,6 @@ private data class PageMetadata(
     val size: Long,
     val compressedSize: Long,
     val isLargeFile: Boolean
-)
-
-/**
- * 页面信息
- */
-data class PageInfo(
-    val index: Int,
-    val name: String,
-    val size: Long
 )
 
 /**

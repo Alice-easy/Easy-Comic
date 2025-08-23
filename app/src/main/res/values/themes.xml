@@ -17,11 +17,4 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/brand_primary</item>
     </style>
-    
-    <!-- Brand colors -->
-    <color name="brand_primary">#FF6B35</color>
-    <color name="brand_secondary">#F7931E</color>
-    <color name="brand_accent">#FFE066</color>
-    <color name="brand_dark">#D84315</color>
-    <color name="brand_light">#FFCC80</color>
 </resources>

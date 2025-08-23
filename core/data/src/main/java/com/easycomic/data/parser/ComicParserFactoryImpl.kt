@@ -13,11 +13,11 @@ import java.io.File
  */
 class ComicParserFactoryImpl(
     private val context: Context
-) {
+) : ComicParserFactory {
     
     private val fileManager = FileManager(context)
 
-    fun create(file: File): ComicParser? {
+    override fun create(file: File): ComicParser? {
         val extension = file.extension.lowercase()
         return when (extension) {
             "zip", "cbz" -> ZipComicParser(file)

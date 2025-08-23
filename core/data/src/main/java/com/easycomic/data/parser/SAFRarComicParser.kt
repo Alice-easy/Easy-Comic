@@ -7,7 +7,6 @@ import com.easycomic.data.util.CoverExtractor
 import com.easycomic.data.util.NaturalOrderComparator
 import com.easycomic.domain.parser.ComicParser
 import com.github.junrar.Archive
-import com.github.junrar.extract.ExtractArchive
 import com.github.junrar.rarfile.FileHeader
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -133,7 +132,7 @@ class SAFRarComicParser(
         if (pageNames.isEmpty()) return null
         
         // 使用封面提取器选择最佳封面
-        val coverPageName = coverExtractor.selectCoverPage(pageNames)
+        val coverPageName = CoverExtractor.selectCoverPage(pageNames)
         return extractFileToStream(coverPageName)
     }
     
@@ -216,7 +215,7 @@ class SAFRarComicParser(
                 ?: return null
             
             val outputStream = ByteArrayOutputStream()
-            ExtractArchive.extractFile(currentArchive, fileHeader, outputStream)
+            currentArchive.extractFile(fileHeader, outputStream)
             
             return outputStream.toByteArray().inputStream()
             

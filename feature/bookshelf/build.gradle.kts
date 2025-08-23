@@ -34,7 +34,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4" // Compatible with Kotlin 1.9.20
+        kotlinCompilerExtensionVersion = "1.5.8" // Compatible with Kotlin 1.9.22
     }
     lint {
         baseline = file("lint-baseline.xml")

@@ -27,4 +27,8 @@
     <color name="md_theme_light_inverseOnSurface">#F0F1EE</color>
     <color name="md_theme_light_inversePrimary">#7FDAB4</color>
     <color name="seed">#006C50</color>
+    
+    <!-- Brand colors for splash screen -->
+    <color name="brand_primary">#006C50</color>
+    <color name="brand_secondary">#8FF7D0</color>
 </resources>

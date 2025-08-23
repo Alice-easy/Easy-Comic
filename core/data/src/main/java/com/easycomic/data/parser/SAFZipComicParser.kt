@@ -9,6 +9,7 @@ import com.easycomic.data.util.NaturalOrderComparator
 import com.easycomic.domain.parser.ComicParser
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -58,7 +59,7 @@ class SAFZipComicParser(
         if (pageNames.isEmpty()) return null
         
         // 使用封面提取器选择最佳封面
-        val coverPageName = coverExtractor.selectCoverPage(pageNames)
+        val coverPageName = CoverExtractor.selectCoverPage(pageNames)
         return findEntryStream(coverPageName)
     }
     

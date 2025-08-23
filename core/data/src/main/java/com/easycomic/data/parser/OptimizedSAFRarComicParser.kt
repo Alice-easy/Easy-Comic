@@ -7,7 +7,6 @@ import com.easycomic.data.util.CoverExtractor
 import com.easycomic.data.util.NaturalOrderComparator
 import com.easycomic.domain.parser.ComicParser
 import com.github.junrar.Archive
-import com.github.junrar.extract.ExtractArchive
 import com.github.junrar.rarfile.FileHeader
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -258,7 +257,7 @@ class OptimizedSAFRarComicParser(
         val pageNames = getPageNames()
         if (pageNames.isEmpty()) return null
         
-        val coverPageName = coverExtractor.selectCoverPage(pageNames)
+        val coverPageName = CoverExtractor.selectCoverPage(pageNames)
         return extractFileToStreamAsync(coverPageName)
     }
     
@@ -283,7 +282,7 @@ class OptimizedSAFRarComicParser(
                     ?: return@withContext null
                 
                 val outputStream = ByteArrayOutputStream()
-                ExtractArchive.extractFile(currentArchive, fileHeader, outputStream)
+                currentArchive.extractFile(fileHeader, outputStream)
                 
                 val extractedData = outputStream.toByteArray()
                 

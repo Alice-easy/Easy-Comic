@@ -70,8 +70,9 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             isDebuggable = true
-            enableAndroidTestCoverage = true
-            enableUnitTestCoverage = true
+            // 禁用代码覆盖率以避免DEX错误
+            enableAndroidTestCoverage = false
+            enableUnitTestCoverage = false
             
             // 调试版本不使用混淆
             isMinifyEnabled = false
@@ -188,8 +189,9 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:bookshelf"))
-    implementation(project(":feature:reader"))
+    // 临时注释，待修复
+    // implementation(project(":feature:bookshelf"))
+    // implementation(project(":feature:reader"))
 
     // Testing
     testImplementation(libs.junit)
