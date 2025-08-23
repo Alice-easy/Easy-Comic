@@ -12,7 +12,7 @@
 
 **🚀 基于 Clean Architecture 的专业级 Android 漫画阅读器**
 
-*采用现代 Android 开发最佳实践，提供流畅的阅读体验和强大的文件解析能力*
+_采用现代 Android 开发最佳实践，提供流畅的阅读体验和强大的文件解析能力_
 
 [📱 下载体验](#-快速开始) • [🏗️ 架构设计](#️-架构设计) • [⚡ 性能表现](#-性能优化) • [🤝 参与贡献](#-贡献指南)
 
@@ -23,24 +23,26 @@
 ## ✨ 为什么选择 Easy Comic？
 
 ### 🎯 **专业级架构设计**
+
 - 🏗️ **Clean Architecture** - 严格三层架构，依赖倒置，完全可测试
 - 📦 **模块化设计** - 核心模块与功能模块分离，易于维护和扩展
 - 🔧 **现代技术栈** - Jetpack Compose + Room + Koin + Coroutines
 
 ### ⚡ **卓越性能表现**
+
 - 🚀 **极速启动** - 冷启动时间 < 200ms，比同类应用快 7.5 倍
 - 💾 **智能内存管理** - 内存占用 < 120MB，LRU 缓存策略
 - 📖 **流畅翻页** - 翻页响应 < 50ms，60fps 丝滑动画
 
 ### 📁 **强大文件支持**
+
 - 🗂️ **多格式解析** - ZIP/RAR/CBZ/CBR 完整支持
 - 📱 **SAF 集成** - Storage Access Framework 安全文件访问
 - 🔍 **智能识别** - 自动编码检测，自然排序算法
 
 ### 🧪 **质量保证**
+
 - ✅ **230+ 自动化测试** - 87%+ 测试覆盖率，TDD 开发模式
-- 🔍 **代码质量监控** - Detekt + ktlint + Jacoco 完整工具链
-- 📊 **性能监控** - 实时性能追踪，内存使用分析
 
 ---
 
@@ -52,7 +54,6 @@ Easy Comic 采用 **Clean Architecture** 三层架构，通过严格的依赖倒
 📱 Easy-Comic
 ├── 🎨 app/                    # 应用主模块 & 依赖注入
 │   ├── di/                   # Koin 依赖注入配置
-│   ├── performance/          # 性能监控系统
 │   └── ui/                   # 应用级 UI 组件
 ├── 📦 core/                   # 核心模块组
 │   ├── 🧠 domain/           # Domain 层 - 纯 Kotlin 业务逻辑
@@ -81,19 +82,18 @@ Easy Comic 采用 **Clean Architecture** 三层架构，通过严格的依赖倒
 
 ### 📊 性能基准测试
 
-| 📈 **性能指标** | 🎯 **目标值** | ✅ **实际表现** | 🚀 **优化倍数** |
-|:---:|:---:|:---:|:---:|
-| **🚀 冷启动时间** | < 1500ms | **< 200ms** | **7.5x 超越** |
-| **📖 翻页响应** | < 100ms | **< 50ms** | **2x 超越** |
-| **🔍 搜索响应** | < 500ms | **< 300ms** | **1.7x 超越** |
-| **💾 内存占用** | < 150MB | **< 120MB** | **20% 节省** |
+|  📈 **性能指标**  | 🎯 **目标值** | ✅ **实际表现** | 🚀 **优化倍数** |
+| :---------------: | :-----------: | :-------------: | :-------------: |
+| **🚀 冷启动时间** |   < 1500ms    |   **< 200ms**   |  **7.5x 超越**  |
+|  **📖 翻页响应**  |    < 100ms    |   **< 50ms**    |   **2x 超越**   |
+|  **🔍 搜索响应**  |    < 500ms    |   **< 300ms**   |  **1.7x 超越**  |
+|  **💾 内存占用**  |    < 150MB    |   **< 120MB**   |  **20% 节省**   |
 
 ### 🧠 核心优化策略
 
 - **🗂️ LRU 缓存** - 智能图片缓存，最大 120MB
 - **🔄 预加载机制** - 前后 3 页智能预加载
 - **🧹 内存管理** - 自动垃圾回收，压力检测
-- **📊 实时监控** - PerformanceTracker 性能追踪
 
 ---
 
@@ -101,22 +101,22 @@ Easy Comic 采用 **Clean Architecture** 三层架构，通过严格的依赖倒
 
 ### 🏗️ 核心技术
 
-| **层级** | **技术选型** | **版本** | **应用场景** |
-|:---:|:---:|:---:|:---:|
-| **🎨 UI 层** | Jetpack Compose | 2023.10.01 | 声明式 UI，Material Design 3 |
-| **🧠 业务层** | Pure Kotlin | 1.9.20 | Domain 模型，UseCase 业务逻辑 |
-| **💾 数据层** | Room + DataStore | 2.6.1 + 1.0.0 | 本地数据库，用户偏好存储 |
-| **🔧 依赖注入** | Koin | 3.5.3 | 轻量级 DI 框架 |
-| **🌊 异步编程** | Coroutines + Flow | 1.8.0 | 响应式数据流 |
+|    **层级**     |   **技术选型**    |   **版本**    |         **应用场景**          |
+| :-------------: | :---------------: | :-----------: | :---------------------------: |
+|  **🎨 UI 层**   |  Jetpack Compose  |  2023.10.01   | 声明式 UI，Material Design 3  |
+|  **🧠 业务层**  |    Pure Kotlin    |    1.9.20     | Domain 模型，UseCase 业务逻辑 |
+|  **💾 数据层**  | Room + DataStore  | 2.6.1 + 1.0.0 |   本地数据库，用户偏好存储    |
+| **🔧 依赖注入** |       Koin        |     3.5.3     |        轻量级 DI 框架         |
+| **🌊 异步编程** | Coroutines + Flow |     1.8.0     |         响应式数据流          |
 
 ### 🧪 质量保证
 
-| **测试类型** | **技术框架** | **覆盖范围** |
-|:---:|:---:|:---:|
-| **🧩 单元测试** | JUnit + MockK + Truth | Domain 层 UseCase，Repository |
-| **🔄 Flow 测试** | Turbine | 响应式数据流验证 |
-| **🎨 UI 测试** | Compose Test | Compose UI 组件测试 |
-| **📊 覆盖率分析** | Jacoco | 代码覆盖率分析，目标 90%+ |
+|   **测试类型**    |     **技术框架**      |         **覆盖范围**          |
+| :---------------: | :-------------------: | :---------------------------: |
+|  **🧩 单元测试**  | JUnit + MockK + Truth | Domain 层 UseCase，Repository |
+| **🔄 Flow 测试**  |        Turbine        |       响应式数据流验证        |
+|  **🎨 UI 测试**   |     Compose Test      |      Compose UI 组件测试      |
+| **📊 覆盖率分析** |        Jacoco         |   代码覆盖率分析，目标 90%+   |
 
 ---
 
@@ -232,10 +232,10 @@ cd Easy-Comic
 [![GitHub forks](https://img.shields.io/github/forks/your-username/Easy-Comic.svg?style=social&label=Fork&maxAge=2592000)](https://github.com/your-username/Easy-Comic/fork)
 [![GitHub watchers](https://img.shields.io/github/watchers/your-username/Easy-Comic.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/your-username/Easy-Comic)
 
-**📧 联系我们**: [easy-comic@ea.cloudns.ch](mailto:your-email@example.com)  
+**📧 联系我们**: [easy-comic@ea.cloudns.ch](mailto:your-email@example.com)
 
 ---
 
-*Built with ❤️ by the Easy Comic Team*
+_Built with ❤️ by the Easy Comic Team_
 
 </div>

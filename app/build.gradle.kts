@@ -6,10 +6,7 @@ plugins {
     
 
     
-    // Firebase plugins (需要时取消注释)
-    // id("com.google.gms.google-services")
-    // id("com.google.firebase.crashlytics")
-    // id("com.google.firebase.firebase-perf")
+
 }
 
 android {
@@ -64,25 +61,7 @@ android {
             // 版本命名
             versionNameSuffix = ""
         }
-        debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-            isDebuggable = true
-            // 禁用代码覆盖率以避免DEX错误
-            enableAndroidTestCoverage = false
-            enableUnitTestCoverage = false
-            
-            // 调试版本不使用混淆
-            isMinifyEnabled = false
-            isShrinkResources = false
-        }
-        
-        create("beta") {
-            initWith(getByName("release"))
-            applicationIdSuffix = ".beta"
-            versionNameSuffix = "-beta"
-            isDebuggable = false
-        }
+
     }
     
 
@@ -134,17 +113,7 @@ dependencies {
     implementation(libs.junrar)
     implementation("org.apache.commons:commons-compress:1.26.2")
     
-    // Crash Reporting & Performance Monitoring (取消注释以启用)
-    // Firebase (需要配置 google-services.json)
-    // implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    // implementation("com.google.firebase:firebase-crashlytics-ktx")
-    // implementation("com.google.firebase:firebase-analytics-ktx")
-    // implementation("com.google.firebase:firebase-perf-ktx")
-    
-    // Alternative: ACRA for crash reporting (开源选项)
-    // implementation("ch.acra:acra-core:5.11.3")
-    // implementation("ch.acra:acra-mail:5.11.3")
-    // implementation("ch.acra:acra-dialog:5.11.3")
+
     
 
 
