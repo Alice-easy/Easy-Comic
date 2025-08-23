@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">輕鬆漫畫</string>
+    
+    <!-- Navigation -->
+    <string name="nav_bookshelf">書架</string>
+    <string name="nav_favorites">收藏</string>
+    <string name="nav_settings">設定</string>
+    
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">我的漫畫</string>
+    <string name="bookshelf_search_hint">搜尋漫畫...</string>
+    <string name="bookshelf_empty">未找到漫畫</string>
+    <string name="bookshelf_loading">正在載入漫畫...</string>
+    
+    <!-- Reader -->
+    <string name="reader_title">閱讀器</string>
+    <string name="reader_page_number">第 %1$d 頁，共 %2$d 頁</string>
+    <string name="reader_loading">正在載入頁面...</string>
+    <string name="reader_error_loading">頁面載入失敗</string>
+    <string name="reader_retry">重試</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_theme">主題</string>
+    <string name="settings_theme_system">跟隨系統</string>
+    <string name="settings_theme_light">淺色</string>
+    <string name="settings_theme_dark">深色</string>
+    <string name="settings_reader">閱讀設定</string>
+    <string name="settings_reader_direction">閱讀方向</string>
+    <string name="settings_reader_direction_left_to_right">從左到右</string>
+    <string name="settings_reader_direction_right_to_left">從右到左</string>
+    <string name="settings_reader_zoom">預設縮放</string>
+    <string name="settings_reader_zoom_fit">適應螢幕</string>
+    <string name="settings_reader_zoom_fill">填滿螢幕</string>
+    <string name="settings_reader_zoom_original">原始大小</string>
+    <string name="settings_webdav">WebDAV 同步</string>
+    <string name="settings_webdav_url">伺服器位址</string>
+    <string name="settings_webdav_username">使用者名稱</string>
+    <string name="settings_webdav_password">密碼</string>
+    <string name="settings_webdav_enabled">啟用同步</string>
+    <string name="settings_webdav_test">測試連線</string>
+    <string name="settings_webdav_testing">正在測試連線...</string>
+    <string name="settings_webdav_success">連線成功</string>
+    <string name="settings_webdav_failed">連線失敗</string>
+    
+    <!-- Favorites -->
+    <string name="favorites_title">收藏夾</string>
+    <string name="favorites_empty">暫無收藏</string>
+    
+    <!-- Common -->
+    <string name="common_ok">確定</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_delete">刪除</string>
+    <string name="common_share">分享</string>
+    <string name="common_favorite">收藏</string>
+    <string name="common_unfavorite">取消收藏</string>
+    <string name="common_error">錯誤</string>
+    <string name="common_loading">載入中...</string>
+    <string name="common_retry">重試</string>
+    <string name="common_empty">空</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">儲存權限</string>
+    <string name="permission_storage_message">此應用程式需要儲存權限來讀取漫畫檔案</string>
+    <string name="permission_grant">授予權限</string>
+    
+    <!-- File Operations -->
+    <string name="file_select_comic">選擇漫畫檔案</string>
+    <string name="file_importing">正在匯入漫畫...</string>
+    <string name="file_import_success">漫畫匯入成功</string>
+    <string name="file_import_failed">匯入漫畫失敗</string>
+    <string name="file_unsupported_format">不支援的檔案格式</string>
+    <string name="file_processing_error">檔案處理錯誤</string>
+    
+    <!-- WebDAV Sync -->
+    <string name="sync_uploading">正在上傳至雲端...</string>
+    <string name="sync_downloading">正在從雲端下載...</string>
+    <string name="sync_success">同步完成</string>
+    <string name="sync_failed">同步失敗</string>
+    <string name="sync_in_progress">正在同步</string>
+</resources>

@@ -8,4 +8,20 @@
         <item name="android:windowBackground">@color/md_theme_light_background</item>
         <item name="android:textColorPrimary">@color/md_theme_light_onBackground</item>
     </style>
+    
+    <!-- Splash screen theme for Android 11 and below -->
+    <style name="Theme.EasyComic.SplashScreen" parent="Theme.EasyComic">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/brand_primary</item>
+    </style>
+    
+    <!-- Brand colors -->
+    <color name="brand_primary">#FF6B35</color>
+    <color name="brand_secondary">#F7931E</color>
+    <color name="brand_accent">#FFE066</color>
+    <color name="brand_dark">#D84315</color>
+    <color name="brand_light">#FFCC80</color>
 </resources>

@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">イージーコミック</string>
+    
+    <!-- Navigation -->
+    <string name="nav_bookshelf">本棚</string>
+    <string name="nav_favorites">お気に入り</string>
+    <string name="nav_settings">設定</string>
+    
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">マイコミック</string>
+    <string name="bookshelf_search_hint">コミックを検索...</string>
+    <string name="bookshelf_empty">コミックが見つかりません</string>
+    <string name="bookshelf_loading">コミックを読み込み中...</string>
+    
+    <!-- Reader -->
+    <string name="reader_title">リーダー</string>
+    <string name="reader_page_number">%1$d / %2$d ページ</string>
+    <string name="reader_loading">ページを読み込み中...</string>
+    <string name="reader_error_loading">ページの読み込みに失敗しました</string>
+    <string name="reader_retry">再試行</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_theme">テーマ</string>
+    <string name="settings_theme_system">システム設定に従う</string>
+    <string name="settings_theme_light">ライト</string>
+    <string name="settings_theme_dark">ダーク</string>
+    <string name="settings_reader">リーダー設定</string>
+    <string name="settings_reader_direction">読み方向</string>
+    <string name="settings_reader_direction_left_to_right">左から右</string>
+    <string name="settings_reader_direction_right_to_left">右から左</string>
+    <string name="settings_reader_zoom">デフォルトズーム</string>
+    <string name="settings_reader_zoom_fit">画面に合わせる</string>
+    <string name="settings_reader_zoom_fill">画面を埋める</string>
+    <string name="settings_reader_zoom_original">オリジナルサイズ</string>
+    <string name="settings_webdav">WebDAV 同期</string>
+    <string name="settings_webdav_url">サーバーURL</string>
+    <string name="settings_webdav_username">ユーザー名</string>
+    <string name="settings_webdav_password">パスワード</string>
+    <string name="settings_webdav_enabled">同期を有効にする</string>
+    <string name="settings_webdav_test">接続をテスト</string>
+    <string name="settings_webdav_testing">接続をテスト中...</string>
+    <string name="settings_webdav_success">接続成功</string>
+    <string name="settings_webdav_failed">接続失敗</string>
+    
+    <!-- Favorites -->
+    <string name="favorites_title">お気に入り</string>
+    <string name="favorites_empty">お気に入りはまだありません</string>
+    
+    <!-- Common -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">キャンセル</string>
+    <string name="common_delete">削除</string>
+    <string name="common_share">共有</string>
+    <string name="common_favorite">お気に入り</string>
+    <string name="common_unfavorite">お気に入り解除</string>
+    <string name="common_error">エラー</string>
+    <string name="common_loading">読み込み中...</string>
+    <string name="common_retry">再試行</string>
+    <string name="common_empty">空</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">ストレージ権限</string>
+    <string name="permission_storage_message">このアプリはコミックファイルを読み取るためにストレージ権限が必要です</string>
+    <string name="permission_grant">権限を許可</string>
+    
+    <!-- File Operations -->
+    <string name="file_select_comic">コミックファイルを選択</string>
+    <string name="file_importing">コミックをインポート中...</string>
+    <string name="file_import_success">コミックのインポートが完了しました</string>
+    <string name="file_import_failed">コミックのインポートに失敗しました</string>
+    <string name="file_unsupported_format">サポートされていないファイル形式</string>
+    <string name="file_processing_error">ファイル処理エラー</string>
+    
+    <!-- WebDAV Sync -->
+    <string name="sync_uploading">クラウドにアップロード中...</string>
+    <string name="sync_downloading">クラウドからダウンロード中...</string>
+    <string name="sync_success">同期が完了しました</string>
+    <string name="sync_failed">同期に失敗しました</string>
+    <string name="sync_in_progress">同期中</string>
+</resources>

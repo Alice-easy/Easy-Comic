@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">이지 코믹</string>
+    
+    <!-- Navigation -->
+    <string name="nav_bookshelf">서재</string>
+    <string name="nav_favorites">즐겨찾기</string>
+    <string name="nav_settings">설정</string>
+    
+    <!-- Bookshelf -->
+    <string name="bookshelf_title">내 만화</string>
+    <string name="bookshelf_search_hint">만화 검색...</string>
+    <string name="bookshelf_empty">만화를 찾을 수 없습니다</string>
+    <string name="bookshelf_loading">만화를 불러오는 중...</string>
+    
+    <!-- Reader -->
+    <string name="reader_title">뷰어</string>
+    <string name="reader_page_number">%1$d / %2$d 페이지</string>
+    <string name="reader_loading">페이지를 불러오는 중...</string>
+    <string name="reader_error_loading">페이지 로딩 실패</string>
+    <string name="reader_retry">다시 시도</string>
+    
+    <!-- Settings -->
+    <string name="settings_title">설정</string>
+    <string name="settings_theme">테마</string>
+    <string name="settings_theme_system">시스템 기본값</string>
+    <string name="settings_theme_light">밝음</string>
+    <string name="settings_theme_dark">어둠</string>
+    <string name="settings_reader">뷰어 설정</string>
+    <string name="settings_reader_direction">읽기 방향</string>
+    <string name="settings_reader_direction_left_to_right">왼쪽에서 오른쪽</string>
+    <string name="settings_reader_direction_right_to_left">오른쪽에서 왼쪽</string>
+    <string name="settings_reader_zoom">기본 확대/축소</string>
+    <string name="settings_reader_zoom_fit">화면에 맞춤</string>
+    <string name="settings_reader_zoom_fill">화면 채움</string>
+    <string name="settings_reader_zoom_original">원본 크기</string>
+    <string name="settings_webdav">WebDAV 동기화</string>
+    <string name="settings_webdav_url">서버 URL</string>
+    <string name="settings_webdav_username">사용자명</string>
+    <string name="settings_webdav_password">비밀번호</string>
+    <string name="settings_webdav_enabled">동기화 활성화</string>
+    <string name="settings_webdav_test">연결 테스트</string>
+    <string name="settings_webdav_testing">연결을 테스트하는 중...</string>
+    <string name="settings_webdav_success">연결 성공</string>
+    <string name="settings_webdav_failed">연결 실패</string>
+    
+    <!-- Favorites -->
+    <string name="favorites_title">즐겨찾기</string>
+    <string name="favorites_empty">즐겨찾기가 아직 없습니다</string>
+    
+    <!-- Common -->
+    <string name="common_ok">확인</string>
+    <string name="common_cancel">취소</string>
+    <string name="common_delete">삭제</string>
+    <string name="common_share">공유</string>
+    <string name="common_favorite">즐겨찾기</string>
+    <string name="common_unfavorite">즐겨찾기 해제</string>
+    <string name="common_error">오류</string>
+    <string name="common_loading">로딩 중...</string>
+    <string name="common_retry">다시 시도</string>
+    <string name="common_empty">비어있음</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage_title">저장소 권한</string>
+    <string name="permission_storage_message">이 앱은 만화 파일을 읽기 위해 저장소 권한이 필요합니다</string>
+    <string name="permission_grant">권한 허용</string>
+    
+    <!-- File Operations -->
+    <string name="file_select_comic">만화 파일 선택</string>
+    <string name="file_importing">만화를 가져오는 중...</string>
+    <string name="file_import_success">만화 가져오기 성공</string>
+    <string name="file_import_failed">만화 가져오기 실패</string>
+    <string name="file_unsupported_format">지원되지 않는 파일 형식</string>
+    <string name="file_processing_error">파일 처리 오류</string>
+    
+    <!-- WebDAV Sync -->
+    <string name="sync_uploading">클라우드에 업로드 중...</string>
+    <string name="sync_downloading">클라우드에서 다운로드 중...</string>
+    <string name="sync_success">동기화 완료</string>
+    <string name="sync_failed">동기화 실패</string>
+    <string name="sync_in_progress">동기화 진행 중</string>
+</resources>

@@ -1,0 +1,49 @@
+# ktlint 配置文件
+# https://github.com/pinterest/ktlint
+
+# 禁用的规则
+disabled_rules=import-ordering,no-wildcard-imports,experimental:annotation,experimental:argument-list-wrapping
+
+# 代码风格设置
+indent_style=space
+indent_size=4
+continuation_indent_size=4
+max_line_length=120
+
+# 导入排序设置
+ij_kotlin_imports_layout=*,java.**,javax.**,kotlin.**,^
+
+# Android特定设置
+android=true
+
+# 实验性规则设置
+experimental:annotation=disabled
+experimental:argument-list-wrapping=disabled
+experimental:multiline-if-else=disabled
+experimental:no-empty-first-line-in-method-block=disabled
+
+# 其他设置
+trim_trailing_whitespace=true
+insert_final_newline=true
+
+# 允许的最大空行数
+ij_kotlin_keep_blank_lines_in_declarations=2
+ij_kotlin_keep_blank_lines_in_code=2
+ij_kotlin_keep_blank_lines_before_right_brace=0
+
+# 函数签名格式
+ij_kotlin_method_parameters_wrap=normal
+ij_kotlin_method_parameters_lparen_on_next_line=false
+ij_kotlin_method_parameters_rparen_on_next_line=false
+
+# 链式调用格式
+ij_kotlin_method_call_chain_wrap=normal
+ij_kotlin_assignment_wrap=normal
+
+# Compose特定设置
+# 允许Compose函数名以大写字母开头
+standard:function-naming=disabled
+
+# 注解格式
+ij_kotlin_variable_annotation_wrap=split_into_lines
+ij_kotlin_parameter_annotation_wrap=off

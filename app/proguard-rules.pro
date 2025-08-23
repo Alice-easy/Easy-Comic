@@ -1,102 +1,74 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Easy Comic ProGuard Rules
+# 代码混淆和优化配置
 
-# Keep line number information for debugging stack traces
+# ======================
+# 基础配置
+# ======================
+
+# 保持源文件名和行号信息（用于调试崩溃报告）
 -keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Keep source file name for debugging
--keepattributes SourceFile
-
-# Keep annotations for reflection and dependency injection
--keepattributes *Annotation*, InnerClasses
+# 保持泛型签名
 -keepattributes Signature
--keepattributes EnclosingMethod
 
-# Keep Hilt dependency injection
--keep class dagger.hilt.** { *; }
--keep @dagger.hilt.android.lifecycle.HiltViewModel class * extends androidx.lifecycle.ViewModel {
-    <init>(...);
-}
--keep class * extends dagger.hilt.android.internal.managers.ApplicationComponentManager {
-    <init>(...);
-}
+# 保持注解
+-keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations
 
-# Keep Room database classes and annotations
--keep @androidx.room.Entity class *
--keep @androidx.room.Dao class *
--keep @androidx.room.Database class *
--keep @androidx.room.TypeConverter class *
--keepclassmembers class * extends androidx.room.RoomDatabase {
-    <init>();
-}
+# ======================
+# Android基础组件
+# ======================
 
-# Keep data classes and models
--keepclassmembers class com.easycomic.core.database.** { *; }
--keepclassmembers class com.easycomic.data.** { *; }
--keepclassmembers class com.easycomic.domain.model.** { *; }
+# 保持Application类
+-keep public class com.easycomic.EasyComicApplication
 
-# Keep Gson serialization
--keepattributes *Annotation*, InnerClasses
--dontnote com.google.gson.**
--keep class com.google.gson.** { *; }
--keepclassmembers class com.easycomic.** {
-    @com.google.gson.annotations.SerializedName <fields>;
-    @com.google.gson.annotations.Expose <fields>;
-}
+# 保持Activity和Fragment
+-keep public class * extends android.app.Activity
+-keep public class * extends androidx.fragment.app.Fragment
+-keep public class * extends android.app.Fragment
 
-# Keep Coil image loading library
--keep class coil.** { *; }
--keep interface coil.** { *; }
--keepclassmembers class coil.** { *; }
+# 保持Service
+-keep public class * extends android.app.Service
 
-# Keep WebDAV client (Sardine)
--keep class com.github.sardine.** { *; }
--keep class com.github.sardine.impl.** { *; }
+# 保持BroadcastReceiver
+-keep public class * extends android.content.BroadcastReceiver
 
-# Keep RAR extraction library (Junrar)
--keep class com.github.junrar.** { *; }
--keep class com.github.junrar.rarfile.** { *; }
+# 保持ContentProvider
+-keep public class * extends android.content.ContentProvider
 
-# Keep WorkManager
--keep class androidx.work.** { *; }
--keepclassmembers class androidx.work.** { *; }
--keep @androidx.work.Worker class * {
-    <init>(...);
-}
+# ======================
+# Jetpack Compose
+# ======================
 
-# Keep Compose UI
+# Compose 编译器生成的类
 -keep class androidx.compose.** { *; }
--keepclassmembers class androidx.compose.** { *; }
--keep class androidx.compose.ui.** { *; }
--keepclassmembers class androidx.compose.ui.** { *; }
+-keep class kotlin.coroutines.jvm.internal.** { *; }
 
-# Keep ViewModels
--keep @dagger.hilt.android.lifecycle.HiltViewModel class * extends androidx.lifecycle.ViewModel {
-    <init>(...);
-}
--keepclassmembers class * extends androidx.lifecycle.ViewModel {
-    <init>(...);
+# Compose UI
+-keepclassmembers class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
+    *;
 }
 
-# Keep lifecycle components
--keep class androidx.lifecycle.** { *; }
--keepclassmembers class androidx.lifecycle.** { *; }
+# Navigation Compose
+-keep class androidx.navigation.compose.** { *; }
 
-# Keep navigation
--keep class androidx.navigation.** { *; }
--keepclassmembers class androidx.navigation.** { *; }
+# ======================
+# Kotlin和协程
+# ======================
 
-# Keep Coroutines
--keep class kotlinx.coroutines.** { *; }
--keepclassmembers class kotlinx.coroutines.** { *; }
--keepinterface class kotlinx.coroutines.flow.** { *; }
+# Kotlin反射
+-keep class kotlin.reflect.** { *; }
+-keep class kotlin.Metadata { *; }
 
-# Keep serialization (if using kotlinx.serialization)
--dontnote kotlinx.serialization.AnnotationsKt
+# Kotlin协程
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidExceptionPreHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcher {}
+
+# Kotlin序列化（如果使用）
+-keepattributes InnerClasses
+-dontwarn kotlinx.serialization.**
 -keep,includedescriptorclasses class com.easycomic.**$$serializer { *; }
 -keepclassmembers class com.easycomic.** {
     *** Companion;
@@ -105,34 +77,135 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# Keep enum values
+# ======================
+# Koin依赖注入
+# ======================
+
+# 保持Koin相关类
+-keep class org.koin.** { *; }
+-keep class org.koin.core.** { *; }
+-keep class org.koin.dsl.** { *; }
+
+# 保持Module类
+-keep class com.easycomic.di.** { *; }
+-keep class com.easycomic.*.di.** { *; }
+
+# ======================
+# Room数据库
+# ======================
+
+# Room
+-keep class androidx.room.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-keep @androidx.room.Dao class *
+
+# 保持Entity类
+-keep class com.easycomic.data.entity.** { *; }
+
+# 保持DAO接口
+-keep interface com.easycomic.data.dao.** { *; }
+
+# 保持Database类
+-keep class com.easycomic.data.database.** { *; }
+
+# ======================
+# 域模型和数据类
+# ======================
+
+# 保持Domain模型
+-keep class com.easycomic.domain.model.** { *; }
+
+# 保持数据类的构造函数和字段
+-keepclassmembers class com.easycomic.domain.model.** {
+    <init>(...);
+    <fields>;
+}
+
+# ======================
+# 文件解析器
+# ======================
+
+# 保持ComicParser接口和实现类
+-keep interface com.easycomic.domain.parser.** { *; }
+-keep class com.easycomic.data.parser.** { *; }
+
+# JunRar库（RAR解析）
+-keep class com.github.junrar.** { *; }
+-dontwarn com.github.junrar.**
+
+# Apache Commons Compress
+-keep class org.apache.commons.compress.** { *; }
+-dontwarn org.apache.commons.compress.**
+
+# ======================
+# 图片加载（Coil）
+# ======================
+
+# Coil
+-keep class coil.** { *; }
+-keep interface coil.** { *; }
+
+# OkHttp (Coil依赖)
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+
+# ======================
+# 测试相关（在Release中排除）
+# ======================
+
+# 移除测试代码
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
+
+# Timber日志库
+-keep class timber.log.** { *; }
+-assumenosideeffects class timber.log.Timber {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+}
+
+# ======================
+# 性能监控
+# ======================
+
+# 保持PerformanceTracker
+-keep class com.easycomic.performance.** { *; }
+-keep class com.easycomic.util.PerformanceMonitor { *; }
+
+# ======================
+# 反射相关
+# ======================
+
+# 保持使用反射的类
+-keepclassmembers class * {
+    @androidx.annotation.Keep *;
+}
+
+# 保持枚举
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
 
-# Keep custom views
--keep public class * extends android.view.View {
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-    public void set*(...);
+# 保持Parcelable
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator CREATOR;
 }
 
-# Keep custom adapters
--keep public class * extends android.widget.BaseAdapter {
-    public <init>();
-    public void set*(...);
-    public *** getView(...);
-}
-
-# Keep parcelable implementations
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
-}
-
-# Keep serializable implementations
--keep class * implements java.io.Serializable {
+# 保持Serializable
+-keepnames class * implements java.io.Serializable
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
     private static final java.io.ObjectStreamField[] serialPersistentFields;
     private void writeObject(java.io.ObjectOutputStream);
     private void readObject(java.io.ObjectInputStream);
@@ -140,80 +213,67 @@
     java.lang.Object readResolve();
 }
 
-# Keep native methods
--keepclasseswithmembernames class * {
-    native <methods>;
-}
+# ======================
+# 第三方库特殊配置
+# ======================
 
-# Keep custom exceptions
--keep public class * extends java.lang.Exception
+# Gson（如果使用）
+-keepattributes Signature
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
 
-# Optimize and obfuscate
--optimizationpasses 5
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--dontpreverify
--verbose
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+# ======================
+# 自定义Keep规则
+# ======================
+
+# 保持所有UseCase类
+-keep class com.easycomic.domain.usecase.** { *; }
+
+# 保持所有Repository接口和实现
+-keep interface com.easycomic.domain.repository.** { *; }
+-keep class com.easycomic.data.repository.** { *; }
+
+# 保持ViewModel类
+-keep class com.easycomic.ui_bookshelf.BookshelfViewModel { *; }
+-keep class com.easycomic.ui_reader.ReaderViewModel { *; }
+
+# ======================
+# 优化配置
+# ======================
+
+# 允许优化
 -allowaccessmodification
+-dontpreverify
 
-# Remove logging in production
+# 移除未使用的代码
+-dontshrink
+
+# 代码优化级别
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!code/allocation/variable
+
+# ======================
+# 调试配置（Release时移除）
+# ======================
+
+# 在Release构建中移除调试信息
 -assumenosideeffects class android.util.Log {
-    public static *** v(...);
-    public static *** d(...);
-    public static *** i(...);
-    public static *** w(...);
-    public static *** e(...);
+    public static *** println(...);
 }
 
-# Remove debug code
--assumenosideeffects class * {
-    public *** debug*(...);
-    public *** log*(...);
-    public *** trace*(...);
+# 移除系统输出
+-assumenosideeffects class java.io.PrintStream {
+    public void println(%);
+    public void println(**);
 }
 
-# Keep application class
--keep public class com.easycomic.EasyComicApplication {
-    <init>();
-    void onCreate();
-}
+# ======================
+# 警告抑制
+# ======================
 
-# Keep application components
--keep public class * extends android.app.Application
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Fragment
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
-
-# Keep custom exceptions
--keep public class * extends java.lang.Exception
-
-# Keep bitmap and image processing classes
--keep class android.graphics.Bitmap { *; }
--keep class android.graphics.BitmapFactory { *; }
--keep class android.graphics.BitmapRegionDecoder { *; }
--keep class androidx.exifinterface.media.ExifInterface { *; }
-
-# Keep WebDAV security classes
--keep class androidx.security.crypto.** { *; }
--keep class androidx.security.crypto.EncryptedSharedPreferences { *; }
--keep class androidx.security.crypto.MasterKey { *; }
-
-# Keep file and directory operations
--keep class java.io.File { *; }
--keep class java.io.RandomAccessFile { *; }
--keep class java.io.FileInputStream { *; }
--keep class java.io.FileOutputStream { *; }
--keep class java.nio.file.** { *; }
-
-# Keep zip and rar operations
--keep class java.util.zip.** { *; }
--keep class java.util.jar.** { *; }
--keep class java.util.stream.** { *; }
-
-# Keep database operations
--keep class androidx.sqlite.** { *; }
--keep class androidx.sqlite.db.** { *; }
--keep class net.sqlcipher.** { *; }
+# 忽略警告
+-dontwarn javax.annotation.**
+-dontwarn javax.inject.**
+-dontwarn sun.misc.Unsafe
+-dontwarn java.lang.invoke.**
